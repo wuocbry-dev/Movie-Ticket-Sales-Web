@@ -1,0 +1,772 @@
+.account-management {
+  padding: 24px;
+  background: transparent;
+  min-height: 100%;
+}
+
+.am-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.am-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.am-page-icon {
+  font-size: 2.5rem;
+  color: #3498db;
+}
+
+.am-page-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #2c3e50;
+}
+
+.am-page-description {
+  margin: 0.5rem 0 0 0;
+  color: #7f8c8d;
+  font-size: 0.95rem;
+}
+
+.am-header-stats {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.am-stat-card {
+  text-align: center;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+  color: white;
+  min-width: 120px;
+}
+
+.am-stat-card:nth-child(2) {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.am-stat-card:nth-child(3) {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.am-stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.am-stat-label {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.am-filters-section {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 350px;
+  max-width: 450px;
+  position: relative;
+  margin-right: 2rem;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.9rem 1rem 0.9rem 2.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #ffffff;
+  color: #1f2937;
+}
+
+.search-box input::placeholder {
+  color: #9ca3af;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  border: 2px solid #e0e0e0;
+}
+
+.filter-icon {
+  color: #95a5a6;
+}
+
+.filter-select {
+  border: none;
+  padding: 0.375rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  background: transparent;
+}
+
+.filter-select:focus {
+  outline: none;
+}
+
+.users-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table thead {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.users-table th {
+  padding: 1.25rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.users-table tbody tr {
+  border-bottom: 1px solid #ecf0f1;
+  transition: all 0.3s ease;
+}
+
+.users-table tbody tr:hover {
+  background: #f8f9fa;
+  transform: scale(1.001);
+}
+
+.users-table td {
+  padding: 1.25rem 1rem;
+  font-size: 0.95rem;
+}
+
+.user-id {
+  font-weight: 600;
+  color: #7f8c8d;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, #89CFF0 0%, #51aed3 100%);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.user-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.user-email {
+  color: #7f8c8d;
+}
+
+.roles-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.badge {
+  padding: 0.4rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.badge-admin {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.badge-manager {
+  background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+  color: white;
+}
+
+.badge-customer {
+  background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+  color: #2c3e50;
+}
+
+.badge-default {
+  background: #ecf0f1;
+  color: #7f8c8d;
+}
+
+.membership-tier {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.tier-badge {
+  padding: 0.4rem 0.875rem;
+  border-radius: 20px;
+  font-weight: 600;
+  display: inline-block;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.tier-badge.tier-bronze {
+  background: linear-gradient(135deg, #cd7f32 0%, #8b5a2b 100%);
+  color: white;
+}
+
+.tier-badge.tier-silver {
+  background: linear-gradient(135deg, #c0c0c0 0%, #808080 100%);
+  color: white;
+}
+
+.tier-badge.tier-gold {
+  background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+  color: #7a5a00;
+}
+
+.tier-badge.tier-platinum {
+  background: linear-gradient(135deg, #e5e4e2 0%, #b8b8b8 100%);
+  color: #2c3e50;
+}
+
+.tier-badge.tier-diamond {
+  background: linear-gradient(135deg, #b9f2ff 0%, #5cd3ff 100%);
+  color: #004d66;
+}
+
+.text-muted {
+  color: #95a5a6;
+  font-style: italic;
+}
+
+.points {
+  text-align: center;
+}
+
+.points-badge {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: #d35400;
+  padding: 0.4rem 0.875rem;
+  border-radius: 20px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-action {
+  padding: 0.625rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.btn-edit {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-edit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-delete {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  margin-left: 0.5rem;
+}
+
+.btn-delete:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.btn-activate {
+  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+  color: white;
+  margin-left: 0.5rem;
+}
+
+.btn-activate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-active {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-inactive {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.no-data {
+  text-align: center;
+  padding: 3rem;
+  color: #95a5a6;
+  font-style: italic;
+}
+
+/* Role Edit Modal - Small size for simple form */
+.account-management .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.account-management .modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 550px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: accountModalSlideIn 0.3s ease;
+}
+
+@keyframes accountModalSlideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.account-management .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid #ecf0f1;
+}
+
+.account-management .modal-header h2 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+.account-management .close-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #95a5a6;
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.account-management .close-btn:hover {
+  background: #ecf0f1;
+  color: #e74c3c;
+}
+
+.account-management .modal-body {
+  padding: 2rem;
+}
+
+.account-management .user-info-modal {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  color: white;
+}
+
+.account-management .user-avatar-large {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+  border: 3px solid rgba(255, 255, 255, 0.5);
+}
+
+.account-management .user-info-modal h3 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.account-management .user-info-modal .text-muted {
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 0.25rem;
+}
+
+.account-management .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.account-management .form-group label {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.account-management .current-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.account-management .role-select {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.account-management .role-select:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.account-management .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-top: 2px solid #ecf0f1;
+}
+
+.account-management .btn-cancel,
+.account-management .btn-save {
+  padding: 0.875rem 1.75rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.account-management .btn-cancel {
+  background: #ecf0f1;
+  color: #7f8c8d;
+}
+
+.account-management .btn-cancel:hover {
+  background: #d5dbdb;
+}
+
+.account-management .btn-save {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.account-management .btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.account-management .loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: #7f8c8d;
+}
+
+.account-management .spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid #ecf0f1;
+  border-top-color: #3498db;
+  border-radius: 50%;
+  animation: accountSpin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes accountSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1200px) {
+  .am-page-header {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .am-header-stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 768px) {
+  .account-management {
+    padding: 1rem;
+  }
+
+  .users-table-container {
+    overflow-x: auto;
+  }
+
+  .users-table {
+    min-width: 800px;
+  }
+
+  .account-management .modal-content {
+    width: 95%;
+  }
+}
+
+/* Tier Badge Styles */
+.tier-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tier-bronze {
+  background: linear-gradient(135deg, #cd7f32 0%, #8b5a2b 100%);
+  color: white;
+}
+
+.tier-silver {
+  background: linear-gradient(135deg, #c0c0c0 0%, #808080 100%);
+  color: white;
+}
+
+.tier-gold {
+  background: linear-gradient(135deg, #ffd700 0%, #daa520 100%);
+  color: #333;
+}
+
+.tier-platinum {
+  background: linear-gradient(135deg, #e5e4e2 0%, #a9a9a9 100%);
+  color: #333;
+  border: 1px solid #888;
+}
+
+.tier-diamond {
+  background: linear-gradient(135deg, #b9f2ff 0%, #87ceeb 100%);
+  color: #1a1a2e;
+  border: 1px solid #00bfff;
+}
+
+/* Button Tier */
+.btn-tier {
+  background: linear-gradient(135deg, #ffd700 0%, #daa520 100%);
+  color: #333;
+}
+
+.btn-tier:hover {
+  background: linear-gradient(135deg, #ffed4a 0%, #f6ad55 100%);
+  transform: scale(1.15);
+}
+
+/* Modal Icon */
+.modal-icon {
+  color: #ffd700;
+  margin-right: 0.5rem;
+}
+
+/* Tier Select */
+.tier-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #374151;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tier-select:focus {
+  outline: none;
+  border-color: #ffd700;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+}
+
+/* Current Tier Display */
+.current-tier {
+  margin-top: 0.5rem;
+}
+
+/* Tier Preview Card */
+.tier-preview {
+  margin-top: 1rem;
+}
+
+.tier-info-card {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.tier-info-card h4 {
+  margin: 0 0 1rem 0;
+  color: #92400e;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tier-info-card h4 svg {
+  color: #fbbf24;
+}
+
+.tier-info-card ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style-type: none;
+}
+
+.tier-info-card li {
+  margin-bottom: 0.5rem;
+  color: #78350f;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+.tier-info-card li::before {
+  content: "✓";
+  position: absolute;
+  left: -1.25rem;
+  color: #059669;
+  font-weight: bold;
+}
+
+.tier-info-card li strong {
+  color: #92400e;
+}
+
+/* Tier Save Button */
+.btn-tier-save {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%) !important;
+  color: #1f2937 !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-tier-save:hover {
+  background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4) !important;
+}

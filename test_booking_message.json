@@ -1,0 +1,17 @@
+{
+    "emailType":  "BOOKING_CONFIRMATION",
+    "toEmail":  "khanhkhoi08@gmail.com",
+    "templateData":  {
+                         "hallName":  "Hall 1",
+                         "movieTitle":  "Spider-Man: No Way Home",
+                         "showDate":  "2025-12-15",
+                         "cinemaName":  "CGV Vincom Center",
+                         "totalAmount":  240000,
+                         "customerName":  "Nguyen Van A",
+                         "qrCodeUrl":  "https://d1qj5gj84zqips.cloudfront.net/qr-codes/TEST123.png",
+                         "totalSeats":  2,
+                         "bookingCode":  "TEST123",
+                         "startTime":  "19:30"
+                     },
+    "subject":  " Xác nh?n d?t vé - TEST123"
+}

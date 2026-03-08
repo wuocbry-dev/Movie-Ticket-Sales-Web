@@ -1,0 +1,501 @@
+=================================================================
+BACKLOG 3 TUẦN - MOVIE TICKET SALES WEB PROJECT
+=================================================================
+Dự án: Movie Ticket Sales Web Project
+Thời gian: 3 tuần (21 ngày)
+Team size: 4 người
+Backend: Đoàn Khánh, Vinh
+Frontend: Hồ Khánh, Quốc
+Ngày bắt đầu: 13/10/2025
+=================================================================
+
+## 📊 TỔNG QUAN Dự ÁN
+
+**Mục tiêu:** Hoàn thành MVP (Minimum Viable Product) của hệ thống đặt vé xem phim online
+**Scope:** Core features cho khách hàng đặt vé và admin quản lý
+**Tech Stack:** 
+- Backend: Spring Boot, MySQL, JWT
+- Frontend: React.js, Bootstrap/Material-UI
+- Tools: Git, Postman, VS Code
+
+=================================================================
+## 🗓️ SPRINT PLANNING - 3 TUẦN
+
+### **TUẦN 1 (13/10 - 19/10): FOUNDATION & CORE SETUP**
+**Mục tiêu:** Thiết lập nền tảng và các chức năng cơ bản
+
+### **TUẦN 2 (20/10 - 26/10): CORE FEATURES DEVELOPMENT** 
+**Mục tiêu:** Phát triển các tính năng chính của hệ thống
+
+### **TUẦN 3 (27/10 - 02/11): INTEGRATION & FINALIZATION**
+**Mục tiêu:** Tích hợp, testing và hoàn thiện sản phẩm
+
+=================================================================
+## 📋 TUẦN 1: FOUNDATION & CORE SETUP (13/10 - 19/10)
+
+### 🔧 **BACKEND TEAM (Đoàn Khánh + Vinh)**
+
+#### **Ngày 1-2 (13-14/10): Project Setup & Database**
+**Assignee: Đoàn Khánh (Lead Backend)**
+- [ ] Setup Spring Boot project với dependencies
+- [ ] Cấu hình MySQL database connection  
+- [ ] Tạo database schema từ SQL script
+- [ ] Setup JPA configuration
+- [ ] Tạo base entity classes
+- [ ] **Deliverable:** Working Spring Boot app với database connection
+
+**Assignee: Vinh**  
+- [ ] Tạo các Entity classes cơ bản (User, Role, Cinema, Movie)
+- [ ] Setup repository interfaces
+- [ ] Tạo sample data insertion scripts
+- [ ] **Deliverable:** Complete entity layer
+
+#### **Ngày 3-4 (15-16/10): Authentication & Security**
+**Assignee: Đoàn Khánh**
+- [ ] Implement JWT authentication
+- [ ] Tạo UserDetailsService
+- [ ] Setup Spring Security configuration
+- [ ] Tạo login/register endpoints
+- [ ] **Deliverable:** Authentication system
+
+**Assignee: Vinh**
+- [ ] Tạo User management APIs (CRUD)
+- [ ] Implement password encryption
+- [ ] Tạo role-based access control
+- [ ] **Deliverable:** User management endpoints
+
+#### **Ngày 5-7 (17-19/10): Core Business Entities**
+**Assignee: Đoàn Khánh**
+- [ ] Implement Movie management APIs
+- [ ] Tạo Cinema & CinemaHall APIs
+- [ ] Setup movie genres và mapping
+- [ ] **Deliverable:** Movie & Cinema APIs
+
+**Assignee: Vinh**
+- [ ] Implement Showtime management
+- [ ] Tạo Seat management APIs  
+- [ ] Basic pricing calculation
+- [ ] **Deliverable:** Showtime & Seat APIs
+
+---
+
+### 🎨 **FRONTEND TEAM (Hồ Khánh + Quốc)**
+
+#### **Ngày 1-2 (13-14/10): Project Setup & Basic Layout**
+**Assignee: Hồ Khánh (Lead Frontend)**
+- [ ] Setup React.js project với routing
+- [ ] Cấu hình UI framework (Bootstrap/Material-UI)
+- [ ] Tạo basic layout components (Header, Footer, Sidebar)
+- [ ] Setup Axios cho API calls
+- [ ] **Deliverable:** React project structure
+
+**Assignee: Quốc**
+- [ ] Thiết kế responsive homepage
+- [ ] Tạo navigation menu
+- [ ] Setup global styles và themes
+- [ ] **Deliverable:** Basic UI components
+
+#### **Ngày 3-4 (15-16/10): Authentication UI**
+**Assignee: Hồ Khánh**
+- [ ] Tạo Login page
+- [ ] Tạo Register page  
+- [ ] Implement JWT token storage
+- [ ] Setup protected routes
+- [ ] **Deliverable:** Authentication flow
+
+**Assignee: Quốc**
+- [ ] Tạo User Profile page
+- [ ] Implement form validations
+- [ ] Error handling cho auth
+- [ ] **Deliverable:** User management UI
+
+#### **Ngày 5-7 (17-19/10): Movie Display**
+**Assignee: Hồ Khánh**
+- [ ] Tạo Movie listing page
+- [ ] Movie card components
+- [ ] Movie detail page
+- [ ] Age rating display compliance
+- [ ] **Deliverable:** Movie browsing UI
+
+**Assignee: Quốc**
+- [ ] Implement search & filter functionality
+- [ ] Cinema listing page
+- [ ] Showtime display components
+- [ ] **Deliverable:** Movie discovery features
+
+=================================================================
+## 📋 TUẦN 2: CORE FEATURES DEVELOPMENT (20/10 - 26/10)
+
+### 🔧 **BACKEND TEAM**
+
+#### **Ngày 8-9 (20-21/10): Booking System Core**
+**Assignee: Đoàn Khánh**
+- [ ] Implement seat selection logic
+- [ ] Seat hold/reservation mechanism
+- [ ] Booking creation APIs
+- [ ] **Deliverable:** Core booking system
+
+**Assignee: Vinh**
+- [ ] Implement pricing engine
+- [ ] Surcharge calculation (VIP, 3D, weekend)
+- [ ] Discount application logic
+- [ ] **Deliverable:** Dynamic pricing system
+
+#### **Ngày 10-11 (22-23/10): Booking Management**
+**Assignee: Đoàn Khánh** 
+- [ ] Ticket generation với QR codes
+- [ ] Booking confirmation emails
+- [ ] Booking history APIs
+- [ ] **Deliverable:** Complete booking flow
+
+**Assignee: Vinh**
+- [ ] Payment integration setup (mock)
+- [ ] Booking cancellation logic
+- [ ] Refund processing
+- [ ] **Deliverable:** Payment & cancellation system
+
+#### **Ngày 12-14 (24-26/10): Advanced Features**
+**Assignee: Đoàn Khánh**
+- [ ] Membership & loyalty points
+- [ ] Promotion/voucher system
+- [ ] Basic reporting APIs
+- [ ] **Deliverable:** Loyalty & promotion features
+
+**Assignee: Vinh**
+- [ ] Admin dashboard APIs
+- [ ] Concession (bắp nước) management
+- [ ] System configuration APIs
+- [ ] **Deliverable:** Admin functionality
+
+---
+
+### 🎨 **FRONTEND TEAM**
+
+#### **Ngày 8-9 (20-21/10): Seat Selection**
+**Assignee: Hồ Khánh**
+- [ ] Interactive seat map component
+- [ ] Seat selection logic
+- [ ] Real-time seat availability
+- [ ] **Deliverable:** Seat selection interface
+
+**Assignee: Quốc**
+- [ ] Booking summary component
+- [ ] Price calculation display
+- [ ] Checkout page layout
+- [ ] **Deliverable:** Booking flow UI
+
+#### **Ngày 10-11 (22-23/10): Payment Integration**
+**Assignee: Hồ Khánh**
+- [ ] Payment method selection
+- [ ] Payment form validation
+- [ ] Payment confirmation page
+- [ ] **Deliverable:** Payment interface
+
+**Assignee: Quốc**
+- [ ] Booking confirmation page
+- [ ] QR code display
+- [ ] Email confirmation integration
+- [ ] **Deliverable:** Booking confirmation
+
+#### **Ngày 12-14 (24-26/10): User Dashboard**
+**Assignee: Hồ Khánh**
+- [ ] User booking history
+- [ ] Ticket management page
+- [ ] Membership dashboard
+- [ ] **Deliverable:** User account features
+
+**Assignee: Quốc**
+- [ ] Admin dashboard layout
+- [ ] Movie management interface
+- [ ] Showtime management UI
+- [ ] **Deliverable:** Admin interface
+
+=================================================================
+## 📋 TUẦN 3: INTEGRATION & FINALIZATION (27/10 - 02/11)
+
+### 🔧 **BACKEND TEAM**
+
+#### **Ngày 15-16 (27-28/10): API Integration & Testing**
+**Assignee: Đoàn Khánh**
+- [ ] API documentation với Swagger
+- [ ] Cross-origin configuration
+- [ ] API endpoint testing
+- [ ] **Deliverable:** Complete API documentation
+
+**Assignee: Vinh**
+- [ ] Unit testing cho core services
+- [ ] Integration testing
+- [ ] Performance optimization
+- [ ] **Deliverable:** Tested backend system
+
+#### **Ngày 17-18 (29-30/10): Data & Deployment**
+**Assignee: Đoàn Khánh**
+- [ ] Sample data population
+- [ ] Database indexing optimization
+- [ ] Production configuration
+- [ ] **Deliverable:** Production-ready backend
+
+**Assignee: Vinh**
+- [ ] Error handling improvement
+- [ ] Logging implementation
+- [ ] Security hardening
+- [ ] **Deliverable:** Robust error handling
+
+#### **Ngày 19-21 (31/10 - 02/11): Final Integration**
+**Both Backend Members:**
+- [ ] Frontend-Backend integration support
+- [ ] Bug fixing
+- [ ] Performance tuning
+- [ ] Final testing
+- [ ] **Deliverable:** Fully integrated system
+
+---
+
+### 🎨 **FRONTEND TEAM**
+
+#### **Ngày 15-16 (27-28/10): Integration & Testing**
+**Assignee: Hồ Khánh**
+- [ ] Connect all components to APIs
+- [ ] End-to-end testing
+- [ ] Cross-browser compatibility
+- [ ] **Deliverable:** Fully connected frontend
+
+**Assignee: Quốc**
+- [ ] UI/UX improvements
+- [ ] Responsive design testing
+- [ ] Loading states & error handling
+- [ ] **Deliverable:** Polished UI/UX
+
+#### **Ngày 17-18 (29-30/10): Optimization & Polish**
+**Assignee: Hồ Khánh**
+- [ ] Performance optimization
+- [ ] Code splitting & lazy loading
+- [ ] SEO optimization
+- [ ] **Deliverable:** Optimized frontend
+
+**Assignee: Quốc**
+- [ ] Final design adjustments
+- [ ] Accessibility improvements
+- [ ] Mobile responsiveness
+- [ ] **Deliverable:** Professional UI
+
+#### **Ngày 19-21 (31/10 - 02/11): Final Testing**
+**Both Frontend Members:**
+- [ ] User acceptance testing
+- [ ] Bug fixing
+- [ ] Production build
+- [ ] Deployment preparation
+- [ ] **Deliverable:** Production-ready frontend
+
+=================================================================
+## 🎯 DAILY STANDUPS & COORDINATION
+
+### **Daily Standup Format (9:00 AM mỗi ngày):**
+1. **What did I do yesterday?**
+2. **What will I do today?**  
+3. **Any blockers or dependencies?**
+4. **Need help from other team members?**
+
+### **Weekly Reviews:**
+- **Thứ 6 hàng tuần:** Demo session & retrospective
+- **Review deliverables và adjust plan nếu cần**
+
+=================================================================
+## 📊 MILESTONE & DELIVERABLES
+
+### **End of Week 1 (19/10):**
+- ✅ Working authentication system
+- ✅ Basic movie browsing
+- ✅ Database with sample data
+- ✅ Core API endpoints
+
+### **End of Week 2 (26/10):**
+- ✅ Complete booking flow
+- ✅ Payment integration (mock)
+- ✅ Admin dashboard
+- ✅ Responsive UI
+
+### **End of Week 3 (02/11):**
+- ✅ Fully integrated system
+- ✅ Production deployment
+- ✅ Documentation
+- ✅ Testing complete
+
+=================================================================
+## 🔧 TECHNICAL REQUIREMENTS BY ROLE
+
+### **Backend Requirements:**
+- **Đoàn Khánh (Senior):** JWT, Security, Complex Business Logic
+- **Vinh:** Entity Management, APIs, Data Processing
+
+**Skills needed:**
+- Spring Boot, Spring Security
+- JPA/Hibernate
+- MySQL
+- JWT Authentication
+- REST API Design
+
+### **Frontend Requirements:**
+- **Hồ Khánh (Senior):** React Architecture, State Management, Integration
+- **Quốc:** UI Components, Responsive Design, UX
+
+**Skills needed:**
+- React.js, JavaScript ES6+
+- HTML5/CSS3
+- Bootstrap/Material-UI
+- Axios for API calls
+- Responsive Design
+
+=================================================================
+## 🚨 RISK MANAGEMENT
+
+### **Potential Risks & Mitigation:**
+
+#### **Risk 1: Backend Integration Delays**
+- **Mitigation:** Frontend team dùng mock data trong tuần 1-2
+- **Contingency:** Parallel development với API contracts
+
+#### **Risk 2: Complex Seat Selection Logic**
+- **Mitigation:** Start với simple grid, enhance later
+- **Contingency:** Use existing libraries nếu cần
+
+#### **Risk 3: Payment Integration Complexity**
+- **Mitigation:** Implement mock payment first
+- **Contingency:** Focus on booking flow, payment as future feature
+
+#### **Risk 4: Time Constraints**
+- **Mitigation:** Daily progress tracking
+- **Contingency:** Reduce scope to core MVP features
+
+=================================================================
+## 📝 DEFINITION OF DONE
+
+### **For Backend Tasks:**
+- [ ] Code implemented & tested
+- [ ] API endpoints documented
+- [ ] Unit tests written (min 70% coverage)
+- [ ] Code review completed
+- [ ] Integrated with main branch
+
+### **For Frontend Tasks:**
+- [ ] UI component completed
+- [ ] Responsive design implemented  
+- [ ] Connected to backend APIs
+- [ ] Cross-browser tested
+- [ ] Code review completed
+
+### **For Integration Tasks:**
+- [ ] Frontend-backend communication working
+- [ ] End-to-end scenarios tested
+- [ ] Error handling implemented
+- [ ] Performance acceptable
+- [ ] User acceptance criteria met
+
+=================================================================
+## 🛠️ TOOLS & RESOURCES
+
+### **Development Tools:**
+- **IDE:** VS Code, IntelliJ IDEA
+- **API Testing:** Postman, Swagger UI
+- **Database:** MySQL Workbench, phpMyAdmin
+- **Version Control:** Git, GitHub
+
+### **Communication:**
+- **Daily Standup:** Google Meet/Zoom
+- **Chat:** Discord/Slack
+- **Task Tracking:** Trello/Jira
+- **Documentation:** Google Docs/Notion
+
+### **Resources:**
+- Database schema: `docs/database.sql`
+- API specification: `docs/api_endpoints_specification.txt`
+- Implementation guide: `docs/user_story_implementation_guide.txt`
+- Setup guide: `docs/database_setup_configuration.txt`
+
+=================================================================
+## 📈 SUCCESS METRICS
+
+### **Week 1 Success Criteria:**
+- [ ] 100% authentication flow working
+- [ ] Basic movie listing functional
+- [ ] Database properly configured
+- [ ] Team velocity established
+
+### **Week 2 Success Criteria:**
+- [ ] Complete booking flow (seat selection → payment)
+- [ ] Admin can manage movies/showtimes
+- [ ] All major APIs implemented
+- [ ] UI/UX 80% complete
+
+### **Week 3 Success Criteria:**
+- [ ] Full system integration
+- [ ] All user stories functional
+- [ ] Production-ready deployment
+- [ ] Documentation complete
+
+=================================================================
+## 🎯 FINAL DELIVERABLES (02/11/2025)
+
+### **Technical Deliverables:**
+1. **Working Web Application**
+   - Customer booking flow
+   - Admin management interface
+   - Responsive design
+
+2. **Source Code Repository**
+   - Clean, documented code
+   - Git history with meaningful commits
+   - README with setup instructions
+
+3. **Documentation Package**
+   - API documentation
+   - User manual
+   - Technical architecture
+   - Deployment guide
+
+4. **Testing Evidence**
+   - Test cases & results
+   - Performance metrics
+   - Security checklist
+
+### **Demo Preparation:**
+- [ ] Live demo environment ready
+- [ ] Sample data populated
+- [ ] Demo script prepared
+- [ ] Backup plans for technical issues
+
+=================================================================
+## 📞 CONTACT & ESCALATION
+
+### **Team Leads:**
+- **Backend Lead:** Đoàn Khánh
+- **Frontend Lead:** Hồ Khánh
+
+### **Escalation Path:**
+1. **Technical Issues:** Discuss trong daily standup
+2. **Blocking Issues:** Escalate to team leads
+3. **Scope Changes:** Team discussion & approval
+4. **Timeline Issues:** Adjust scope, không extend deadline
+
+=================================================================
+## 🏆 TEAM MOTIVATION
+
+### **Weekly Rewards:**
+- **Week 1:** Team lunch nếu đạt milestones
+- **Week 2:** Small celebration cho major features complete
+- **Week 3:** Project completion celebration
+
+### **Recognition:**
+- Daily appreciation cho good work
+- Weekly highlight của outstanding contributions
+- Final demo presentation để show achievements
+
+=================================================================
+
+**Good luck team! 🚀 Let's build an amazing movie ticket booking system!**
+
+**Remember:** Communication là key to success. Đừng ngại hỏi help khi cần!
+
+=================================================================
+END OF BACKLOG
+=================================================================

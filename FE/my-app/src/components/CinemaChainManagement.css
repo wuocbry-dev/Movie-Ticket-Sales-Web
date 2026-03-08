@@ -1,0 +1,572 @@
+/* Cinema Chain Management Styles */
+.cinema-chain-management {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: transparent;
+  min-height: 100%;
+}
+
+/* Header */
+.cinema-chain-management .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  padding: 24px 28px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.cinema-chain-management .page-title-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cinema-chain-management .page-icon {
+  font-size: 32px;
+  color: #667eea;
+}
+
+.cinema-chain-management .page-title-section h1 {
+  font-size: 26px;
+  color: #1e293b;
+  margin: 0;
+  font-weight: 700;
+}
+
+/* Search Section */
+.cinema-chain-management .search-section {
+  margin-bottom: 24px;
+}
+
+.cinema-chain-management .search-container {
+  position: relative;
+  max-width: 400px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.cinema-chain-management .search-container:focus-within {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.cinema-chain-management .search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 16px;
+}
+
+.cinema-chain-management .search-input {
+  width: 100%;
+  padding: 12px 16px 12px 42px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  background: transparent;
+  color: #1f2937;
+}
+
+.cinema-chain-management .search-input::placeholder {
+  color: #9ca3af;
+}
+
+.cinema-chain-management .search-input:focus {
+  outline: none;
+}
+
+/* Loading & Empty States */
+.cinema-chain-management .loading-container,
+.cinema-chain-management .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.cinema-chain-management .spinner {
+  font-size: 36px;
+  color: #667eea;
+  animation: chainSpin 1s linear infinite;
+}
+
+@keyframes chainSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.cinema-chain-management .empty-icon {
+  font-size: 48px;
+  color: #d1d5db;
+  margin-bottom: 12px;
+}
+
+.cinema-chain-management .empty-state p {
+  font-size: 15px;
+  color: #64748b;
+  margin-bottom: 16px;
+}
+
+/* Table */
+.cinema-chain-management .table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+}
+
+.cinema-chain-management .cinema-chains-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cinema-chain-management .cinema-chains-table thead {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.cinema-chain-management .cinema-chains-table th {
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cinema-chain-management .cinema-chains-table th:first-child,
+.cinema-chain-management .cinema-chains-table td:first-child {
+  padding-left: 24px;
+}
+
+.cinema-chain-management .cinema-chains-table th:last-child,
+.cinema-chain-management .cinema-chains-table td:last-child {
+  padding-right: 24px;
+}
+
+.cinema-chain-management .cinema-chains-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.cinema-chain-management .cinema-chains-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.cinema-chain-management .cinema-chains-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.cinema-chain-management .cinema-chains-table tbody tr.inactive {
+  opacity: 0.6;
+  background: #f8fafc;
+}
+
+.cinema-chain-management .id-cell {
+  font-weight: 600;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.cinema-chain-management .name-cell-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cinema-chain-management .name-cell-content.clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 6px;
+  margin: -6px;
+  border-radius: 8px;
+}
+
+.cinema-chain-management .name-cell-content.clickable:hover {
+  background: #eef2ff;
+}
+
+.cinema-chain-management .name-cell-content.clickable .chain-name {
+  color: #667eea;
+}
+
+.cinema-chain-management .name-cell-content.clickable:hover .chain-name {
+  text-decoration: underline;
+}
+
+.cinema-chain-management .chain-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.cinema-chain-management .logo-placeholder {
+  width: 40px;
+  height: 40px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 18px;
+}
+
+.cinema-chain-management .chain-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.cinema-chain-management .website-cell a {
+  color: #667eea;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.cinema-chain-management .website-cell a:hover {
+  text-decoration: underline;
+}
+
+.cinema-chain-management .text-muted {
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 13px;
+}
+
+.cinema-chain-management .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cinema-chain-management .badge-success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.cinema-chain-management .badge-danger {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.cinema-chain-management .action-buttons-wrapper {
+  display: flex;
+  gap: 6px;
+}
+
+/* Pagination */
+.cinema-chain-management .pagination-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-top: 20px;
+  border: 1px solid #e5e7eb;
+}
+
+.cinema-chain-management .pagination-info {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.cinema-chain-management .pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cinema-chain-management .page-indicator {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Modal */
+.cinema-chain-management .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 1000;
+  padding-top: 60px;
+  overflow: hidden;
+}
+
+.cinema-chain-management .modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  animation: chainModalSlide 0.3s ease;
+}
+
+@keyframes chainModalSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cinema-chain-management .modal-header {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+.cinema-chain-management .modal-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.cinema-chain-management .btn-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.cinema-chain-management .btn-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.cinema-chain-management .modal-form {
+  padding: 24px;
+}
+
+.cinema-chain-management .form-group {
+  margin-bottom: 20px;
+}
+
+.cinema-chain-management .form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.cinema-chain-management .form-group input,
+.cinema-chain-management .form-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.cinema-chain-management .form-group input:focus,
+.cinema-chain-management .form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.cinema-chain-management .form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+.cinema-chain-management .logo-preview {
+  margin-top: 10px;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+}
+
+.cinema-chain-management .logo-preview img {
+  max-width: 160px;
+  max-height: 80px;
+  object-fit: contain;
+}
+
+.cinema-chain-management .form-group-checkbox {
+  margin-top: 12px;
+}
+
+.cinema-chain-management .form-group-checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.cinema-chain-management .form-group-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+.cinema-chain-management .modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Buttons */
+.cinema-chain-management .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cinema-chain-management .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cinema-chain-management .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.cinema-chain-management .btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.cinema-chain-management .btn-secondary {
+  background: #64748b;
+  color: white;
+}
+
+.cinema-chain-management .btn-secondary:hover:not(:disabled) {
+  background: #475569;
+  transform: translateY(-2px);
+}
+
+.cinema-chain-management .btn-sm {
+  padding: 8px 14px;
+  font-size: 13px;
+  gap: 6px;
+}
+
+.cinema-chain-management .btn-info {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.cinema-chain-management .btn-info:hover {
+  background: #bfdbfe;
+}
+
+.cinema-chain-management .btn-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.cinema-chain-management .btn-danger:hover {
+  background: #fecaca;
+}
+
+.cinema-chain-management .spinner-small {
+  animation: chainSpin 1s linear infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cinema-chain-management {
+    padding: 16px;
+  }
+
+  .cinema-chain-management .page-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .cinema-chain-management .page-title-section h1 {
+    font-size: 22px;
+  }
+
+  .cinema-chain-management .table-container {
+    overflow-x: auto;
+  }
+
+  .cinema-chain-management .pagination-section {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .cinema-chain-management .modal-content {
+    margin: 16px;
+    max-width: calc(100vw - 32px);
+  }
+}

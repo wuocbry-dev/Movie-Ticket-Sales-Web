@@ -1,0 +1,1415 @@
+=================================================================
+SPRING BOOT ENTITY IMPLEMENTATION GUIDE
+=================================================================
+Dự án: Movie Ticket Sales Web Project
+Phiên bản: 1.0
+Ngày tạo: 2025-10-13
+=================================================================
+
+Hướng dẫn này cung cấp code implementation chi tiết cho tất cả các Entity classes
+trong hệ thống đặt vé xem phim, tuân thủ các best practices của Spring Boot và JPA.
+
+=================================================================
+1. BASE ENTITY CLASS
+=================================================================
+
+```java
+package aws.movie_ticket_sales_web_project.entity.base;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+
+@Data
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public abstract class BaseEntity {
+    
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    @CreatedBy
+    @Column(name = "created_by")
+    private Long createdBy;
+    
+    @LastModifiedBy
+    @Column(name = "updated_by")
+    private Long updatedBy;
+    
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        updatedAt = LocalDateTime.now();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+}
+```
+
+=================================================================
+2. USER MANAGEMENT ENTITIES
+=================================================================
+
+2.1. Role Entity
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import aws.movie_ticket_sales_web_project.entity.base.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "roles")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+public class Role extends BaseEntity {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "role_id")
+    @EqualsAndHashCode.Include
+    private Long roleId;
+    
+    @Column(name = "role_name", nullable = false, unique = true, length = 50)
+    private String roleName;
+    
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+    
+    // Relationships
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<UserRole> userRoles = new HashSet<>();
+    
+    // Constants for role names
+    public static final String CUSTOMER = "CUSTOMER";
+    public static final String CINEMA_STAFF = "CINEMA_STAFF";
+    public static final String CINEMA_MANAGER = "CINEMA_MANAGER";
+    public static final String SYSTEM_ADMIN = "SYSTEM_ADMIN";
+}
+```
+
+2.2. User Entity
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import aws.movie_ticket_sales_web_project.entity.base.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Entity
+@Table(name = "users", indexes = {
+    @Index(name = "idx_email", columnList = "email"),
+    @Index(name = "idx_phone", columnList = "phone_number"),
+    @Index(name = "idx_created_at", columnList = "created_at")
+})
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+public class User extends BaseEntity implements UserDetails {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    @EqualsAndHashCode.Include
+    private Long userId;
+    
+    @Column(name = "username", unique = true, length = 100)
+    private String username;
+    
+    @Column(name = "email", unique = true, length = 255)
+    private String email;
+    
+    @Column(name = "phone_number", unique = true, length = 20)
+    private String phoneNumber;
+    
+    @Column(name = "password_hash", nullable = false, length = 255)
+    private String passwordHash;
+    
+    @Column(name = "full_name", nullable = false, length = 255)
+    private String fullName;
+    
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender", length = 10)
+    private Gender gender;
+    
+    @Column(name = "avatar_url", length = 500)
+    private String avatarUrl;
+    
+    // Account status fields
+    @Column(name = "is_active")
+    @Builder.Default
+    private Boolean isActive = true;
+    
+    @Column(name = "is_email_verified")
+    @Builder.Default
+    private Boolean isEmailVerified = false;
+    
+    @Column(name = "is_phone_verified")
+    @Builder.Default
+    private Boolean isPhoneVerified = false;
+    
+    @Column(name = "email_verified_at")
+    private LocalDateTime emailVerifiedAt;
+    
+    @Column(name = "phone_verified_at")
+    private LocalDateTime phoneVerifiedAt;
+    
+    // Privacy compliance fields (GDPR/PDPA)
+    @Column(name = "privacy_policy_accepted")
+    @Builder.Default
+    private Boolean privacyPolicyAccepted = false;
+    
+    @Column(name = "privacy_policy_version", length = 20)
+    private String privacyPolicyVersion;
+    
+    @Column(name = "privacy_policy_accepted_at")
+    private LocalDateTime privacyPolicyAcceptedAt;
+    
+    @Column(name = "terms_of_service_accepted")
+    @Builder.Default
+    private Boolean termsOfServiceAccepted = false;
+    
+    @Column(name = "terms_of_service_version", length = 20)
+    private String termsOfServiceVersion;
+    
+    @Column(name = "terms_of_service_accepted_at")
+    private LocalDateTime termsOfServiceAcceptedAt;
+    
+    // Marketing preferences
+    @Column(name = "marketing_email_consent")
+    @Builder.Default
+    private Boolean marketingEmailConsent = false;
+    
+    @Column(name = "marketing_sms_consent")
+    @Builder.Default
+    private Boolean marketingSmsConsent = false;
+    
+    // Security fields
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+    
+    @Column(name = "failed_login_attempts")
+    @Builder.Default
+    private Integer failedLoginAttempts = 0;
+    
+    @Column(name = "locked_until")
+    private LocalDateTime lockedUntil;
+    
+    @Column(name = "password_reset_token", length = 255)
+    private String passwordResetToken;
+    
+    @Column(name = "password_reset_expires")
+    private LocalDateTime passwordResetExpires;
+    
+    // Relationships
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<UserRole> userRoles = new HashSet<>();
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<UserSession> sessions = new HashSet<>();
+    
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Membership membership;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Booking> bookings = new HashSet<>();
+    
+    // Enum definitions
+    public enum Gender {
+        MALE, FEMALE, OTHER
+    }
+    
+    // UserDetails implementation
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return userRoles.stream()
+                .map(userRole -> new SimpleGrantedAuthority("ROLE_" + userRole.getRole().getRoleName()))
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public String getPassword() {
+        return passwordHash;
+    }
+    
+    @Override
+    public String getUsername() {
+        return email != null ? email : username;
+    }
+    
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+    
+    @Override
+    public boolean isAccountNonLocked() {
+        return lockedUntil == null || lockedUntil.isBefore(LocalDateTime.now());
+    }
+    
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+    
+    @Override
+    public boolean isEnabled() {
+        return isActive != null && isActive;
+    }
+    
+    // Business methods
+    public boolean isUnder22() {
+        if (dateOfBirth == null) return false;
+        return dateOfBirth.isAfter(LocalDate.now().minusYears(22));
+    }
+    
+    public boolean isSenior() {
+        if (dateOfBirth == null) return false;
+        return dateOfBirth.isBefore(LocalDate.now().minusYears(60));
+    }
+    
+    public void incrementFailedLoginAttempts() {
+        this.failedLoginAttempts = (this.failedLoginAttempts == null ? 0 : this.failedLoginAttempts) + 1;
+    }
+    
+    public void resetFailedLoginAttempts() {
+        this.failedLoginAttempts = 0;
+        this.lockedUntil = null;
+    }
+    
+    public void lockAccount(int durationMinutes) {
+        this.lockedUntil = LocalDateTime.now().plusMinutes(durationMinutes);
+    }
+}
+```
+
+2.3. UserRole Entity
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import aws.movie_ticket_sales_web_project.entity.base.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "user_roles", uniqueConstraints = {
+    @UniqueConstraint(name = "unique_user_role", columnNames = {"user_id", "role_id"})
+})
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+public class UserRole extends BaseEntity {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_role_id")
+    @EqualsAndHashCode.Include
+    private Long userRoleId;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+    
+    @Column(name = "assigned_at", nullable = false)
+    @Builder.Default
+    private LocalDateTime assignedAt = LocalDateTime.now();
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_by")
+    private User assignedBy;
+}
+```
+
+2.4. UserSession Entity
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "user_sessions", indexes = {
+    @Index(name = "idx_user_id", columnList = "user_id"),
+    @Index(name = "idx_expires_at", columnList = "expires_at")
+})
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class UserSession {
+    
+    @Id
+    @Column(name = "session_id", length = 255)
+    @EqualsAndHashCode.Include
+    private String sessionId;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    
+    @Column(name = "ip_address", length = 45)
+    private String ipAddress;
+    
+    @Column(name = "user_agent", columnDefinition = "TEXT")
+    private String userAgent;
+    
+    @Column(name = "is_active")
+    @Builder.Default
+    private Boolean isActive = true;
+    
+    @Column(name = "expires_at", nullable = false)
+    private LocalDateTime expiresAt;
+    
+    @Column(name = "created_at", nullable = false)
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+    
+    // Business methods
+    public boolean isExpired() {
+        return expiresAt.isBefore(LocalDateTime.now());
+    }
+    
+    public void invalidate() {
+        this.isActive = false;
+    }
+}
+```
+
+=================================================================
+3. CINEMA & LOCATION ENTITIES
+=================================================================
+
+3.1. CinemaChain Entity
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import aws.movie_ticket_sales_web_project.entity.base.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "cinema_chains")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+public class CinemaChain extends BaseEntity {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "chain_id")
+    @EqualsAndHashCode.Include
+    private Long chainId;
+    
+    @Column(name = "chain_name", nullable = false, length = 255)
+    private String chainName;
+    
+    @Column(name = "logo_url", length = 500)
+    private String logoUrl;
+    
+    @Column(name = "website", length = 255)
+    private String website;
+    
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+    
+    @Column(name = "is_active")
+    @Builder.Default
+    private Boolean isActive = true;
+    
+    // Relationships
+    @OneToMany(mappedBy = "chain", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Cinema> cinemas = new HashSet<>();
+}
+```
+
+3.2. Cinema Entity
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import aws.movie_ticket_sales_web_project.entity.base.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+@Entity
+@Table(name = "cinemas", indexes = {
+    @Index(name = "idx_city", columnList = "city"),
+    @Index(name = "idx_chain_id", columnList = "chain_id")
+})
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+public class Cinema extends BaseEntity {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cinema_id")
+    @EqualsAndHashCode.Include
+    private Long cinemaId;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chain_id")
+    private CinemaChain chain;
+    
+    @Column(name = "cinema_name", nullable = false, length = 255)
+    private String cinemaName;
+    
+    @Column(name = "address", nullable = false, columnDefinition = "TEXT")
+    private String address;
+    
+    @Column(name = "city", nullable = false, length = 100)
+    private String city;
+    
+    @Column(name = "district", length = 100)
+    private String district;
+    
+    @Column(name = "phone_number", length = 20)
+    private String phoneNumber;
+    
+    @Column(name = "email", length = 255)
+    private String email;
+    
+    // Business compliance fields
+    @Column(name = "tax_code", length = 50)
+    private String taxCode;
+    
+    @Column(name = "legal_name", length = 255)
+    private String legalName;
+    
+    // Geographic coordinates
+    @Column(name = "latitude", precision = 10, scale = 8)
+    private BigDecimal latitude;
+    
+    @Column(name = "longitude", precision = 11, scale = 8)
+    private BigDecimal longitude;
+    
+    // Operating information
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "opening_hours", columnDefinition = "JSON")
+    @Builder.Default
+    private Map<String, String> openingHours = new HashMap<>();
+    
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "facilities", columnDefinition = "JSON")
+    @Builder.Default
+    private List<String> facilities = List.of();
+    
+    @Column(name = "is_active")
+    @Builder.Default
+    private Boolean isActive = true;
+    
+    // Relationships
+    @OneToMany(mappedBy = "cinema", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<CinemaHall> halls = new HashSet<>();
+    
+    @OneToMany(mappedBy = "cinema", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<ConcessionOrder> concessionOrders = new HashSet<>();
+    
+    // Business methods
+    public boolean isOpenAt(String dayOfWeek, String time) {
+        String hours = openingHours.get(dayOfWeek.toLowerCase());
+        if (hours == null || hours.isEmpty()) {
+            return false;
+        }
+        
+        // Parse opening hours format: "08:00-23:30"
+        String[] timeParts = hours.split("-");
+        if (timeParts.length != 2) {
+            return false;
+        }
+        
+        return time.compareTo(timeParts[0]) >= 0 && time.compareTo(timeParts[1]) <= 0;
+    }
+    
+    public boolean hasFacility(String facility) {
+        return facilities.contains(facility);
+    }
+    
+    public double getDistanceFrom(BigDecimal lat, BigDecimal lng) {
+        if (latitude == null || longitude == null || lat == null || lng == null) {
+            return Double.MAX_VALUE;
+        }
+        
+        // Haversine formula for distance calculation
+        double lat1Rad = Math.toRadians(latitude.doubleValue());
+        double lon1Rad = Math.toRadians(longitude.doubleValue());
+        double lat2Rad = Math.toRadians(lat.doubleValue());
+        double lon2Rad = Math.toRadians(lng.doubleValue());
+        
+        double deltaLat = lat2Rad - lat1Rad;
+        double deltaLon = lon2Rad - lon1Rad;
+        
+        double a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+                Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+                Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+        
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        
+        return 6371 * c; // Earth's radius in kilometers
+    }
+}
+```
+
+3.3. CinemaHall Entity
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import aws.movie_ticket_sales_web_project.entity.base.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+@Entity
+@Table(name = "cinema_halls", indexes = {
+    @Index(name = "idx_cinema_id", columnList = "cinema_id")
+})
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+public class CinemaHall extends BaseEntity {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "hall_id")
+    @EqualsAndHashCode.Include
+    private Long hallId;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cinema_id", nullable = false)
+    private Cinema cinema;
+    
+    @Column(name = "hall_name", nullable = false, length = 100)
+    private String hallName;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "hall_type")
+    @Builder.Default
+    private HallType hallType = HallType._2D;
+    
+    @Column(name = "total_seats", nullable = false)
+    private Integer totalSeats;
+    
+    // Seat configuration
+    @Column(name = "rows_count", nullable = false)
+    private Integer rowsCount;
+    
+    @Column(name = "seats_per_row", nullable = false)
+    private Integer seatsPerRow;
+    
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "seat_layout", columnDefinition = "JSON")
+    private Map<String, Object> seatLayout;
+    
+    // Technical specifications
+    @Column(name = "screen_type", length = 100)
+    private String screenType;
+    
+    @Column(name = "sound_system", length = 100)
+    private String soundSystem;
+    
+    @Column(name = "is_active")
+    @Builder.Default
+    private Boolean isActive = true;
+    
+    // Relationships
+    @OneToMany(mappedBy = "hall", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Seat> seats = new HashSet<>();
+    
+    @OneToMany(mappedBy = "hall", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Showtime> showtimes = new HashSet<>();
+    
+    // Enums
+    public enum HallType {
+        _2D("2D"),
+        _3D("3D"),
+        IMAX("IMAX"),
+        _4DX("4DX"),
+        SCREENX("SCREENX");
+        
+        private final String displayName;
+        
+        HallType(String displayName) {
+            this.displayName = displayName;
+        }
+        
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+    
+    // Business methods
+    public boolean supports3D() {
+        return hallType == HallType._3D || hallType == HallType.IMAX || hallType == HallType._4DX;
+    }
+    
+    public boolean supportsFormat(String format) {
+        if (format == null) return false;
+        
+        switch (format.toUpperCase()) {
+            case "2D":
+                return true;
+            case "3D":
+                return supports3D();
+            case "IMAX":
+                return hallType == HallType.IMAX;
+            case "4DX":
+                return hallType == HallType._4DX;
+            case "SCREENX":
+                return hallType == HallType.SCREENX;
+            default:
+                return false;
+        }
+    }
+}
+```
+
+3.4. Seat Entity
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "seats", 
+    uniqueConstraints = {
+        @UniqueConstraint(name = "unique_seat_position", columnNames = {"hall_id", "seat_row", "seat_number"})
+    },
+    indexes = {
+        @Index(name = "idx_hall_id", columnList = "hall_id")
+    })
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class Seat {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "seat_id")
+    @EqualsAndHashCode.Include
+    private Long seatId;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hall_id", nullable = false)
+    private CinemaHall hall;
+    
+    @Column(name = "seat_row", nullable = false, length = 5)
+    private String seatRow;
+    
+    @Column(name = "seat_number", nullable = false)
+    private Integer seatNumber;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "seat_type")
+    @Builder.Default
+    private SeatType seatType = SeatType.STANDARD;
+    
+    // Position in grid layout
+    @Column(name = "position_x")
+    private Integer positionX;
+    
+    @Column(name = "position_y")
+    private Integer positionY;
+    
+    @Column(name = "is_active")
+    @Builder.Default
+    private Boolean isActive = true;
+    
+    // Relationships
+    @OneToMany(mappedBy = "seat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Ticket> tickets = new HashSet<>();
+    
+    // Enums
+    public enum SeatType {
+        STANDARD("Ghế thường"),
+        VIP("Ghế VIP"),
+        COUPLE("Ghế đôi"),
+        WHEELCHAIR("Ghế xe lăn");
+        
+        private final String displayName;
+        
+        SeatType(String displayName) {
+            this.displayName = displayName;
+        }
+        
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+    
+    // Business methods
+    public String getSeatLabel() {
+        return seatRow + seatNumber;
+    }
+    
+    public boolean isVipSeat() {
+        return seatType == SeatType.VIP || seatType == SeatType.COUPLE;
+    }
+    
+    public boolean isAccessible() {
+        return seatType == SeatType.WHEELCHAIR;
+    }
+}
+```
+
+=================================================================
+4. MOVIE & CONTENT ENTITIES
+=================================================================
+
+4.1. MovieGenre Entity
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "movie_genres")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class MovieGenre {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "genre_id")
+    @EqualsAndHashCode.Include
+    private Long genreId;
+    
+    @Column(name = "genre_name", nullable = false, unique = true, length = 100)
+    private String genreName;
+    
+    @Column(name = "genre_name_en", length = 100)
+    private String genreNameEn;
+    
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+    
+    @Column(name = "is_active")
+    @Builder.Default
+    private Boolean isActive = true;
+    
+    // Relationships
+    @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<MovieGenreMapping> movieMappings = new HashSet<>();
+}
+```
+
+4.2. Movie Entity
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import aws.movie_ticket_sales_web_project.entity.base.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "movies", indexes = {
+    @Index(name = "idx_status", columnList = "status"),
+    @Index(name = "idx_release_date", columnList = "release_date"),
+    @Index(name = "idx_age_rating", columnList = "age_rating")
+})
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+public class Movie extends BaseEntity {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "movie_id")
+    @EqualsAndHashCode.Include
+    private Long movieId;
+    
+    @Column(name = "title", nullable = false, length = 255)
+    private String title;
+    
+    @Column(name = "title_en", length = 255)
+    private String titleEn;
+    
+    // Age rating compliance (Vietnam regulations)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "age_rating", nullable = false, length = 5)
+    private AgeRating ageRating;
+    
+    @Column(name = "content_warning", columnDefinition = "TEXT")
+    private String contentWarning;
+    
+    // Movie information
+    @Column(name = "synopsis", columnDefinition = "TEXT")
+    private String synopsis;
+    
+    @Column(name = "synopsis_en", columnDefinition = "TEXT")
+    private String synopsisEn;
+    
+    @Column(name = "duration_minutes", nullable = false)
+    private Integer durationMinutes;
+    
+    @Column(name = "release_date")
+    private LocalDate releaseDate;
+    
+    @Column(name = "end_date")
+    private LocalDate endDate;
+    
+    @Column(name = "country", length = 100)
+    private String country;
+    
+    @Column(name = "language", length = 100)
+    private String language;
+    
+    @Column(name = "subtitle_language", length = 100)
+    private String subtitleLanguage;
+    
+    // Cast and crew
+    @Column(name = "director", length = 255)
+    private String director;
+    
+    @Column(name = "cast", columnDefinition = "TEXT")
+    private String cast;
+    
+    @Column(name = "producer", length = 255)
+    private String producer;
+    
+    // Media content
+    @Column(name = "poster_url", length = 500)
+    private String posterUrl;
+    
+    @Column(name = "backdrop_url", length = 500)
+    private String backdropUrl;
+    
+    @Column(name = "trailer_url", length = 500)
+    private String trailerUrl;
+    
+    // Status and metadata
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    @Builder.Default
+    private MovieStatus status = MovieStatus.COMING_SOON;
+    
+    @Column(name = "is_featured")
+    @Builder.Default
+    private Boolean isFeatured = false;
+    
+    @Column(name = "imdb_rating", precision = 3, scale = 1)
+    private BigDecimal imdbRating;
+    
+    @Column(name = "imdb_id", length = 50)
+    private String imdbId;
+    
+    // Relationships
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<MovieGenreMapping> genreMappings = new HashSet<>();
+    
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Showtime> showtimes = new HashSet<>();
+    
+    // Enums
+    public enum AgeRating {
+        P("P", "Phim được phổ biến đến người xem ở mọi độ tuổi"),
+        K("K", "Phim được phổ biến đến khán giả dưới 13 tuổi và có người bảo hộ đi cùng"),
+        T13("T13", "Phim cấm khán giả dưới 13 tuổi"),
+        T16("T16", "Phim cấm khán giả dưới 16 tuổi"),
+        T18("T18", "Phim cấm khán giả dưới 18 tuổi");
+        
+        private final String code;
+        private final String description;
+        
+        AgeRating(String code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+        
+        public String getCode() {
+            return code;
+        }
+        
+        public String getDescription() {
+            return description;
+        }
+    }
+    
+    public enum MovieStatus {
+        COMING_SOON("Sắp chiếu"),
+        NOW_SHOWING("Đang chiếu"),
+        END_SHOWING("Kết thúc chiếu");
+        
+        private final String displayName;
+        
+        MovieStatus(String displayName) {
+            this.displayName = displayName;
+        }
+        
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+    
+    // Business methods
+    public boolean isNowShowing() {
+        return status == MovieStatus.NOW_SHOWING;
+    }
+    
+    public boolean isComingSoon() {
+        return status == MovieStatus.COMING_SOON;
+    }
+    
+    public boolean hasAgeRestriction() {
+        return ageRating != AgeRating.P;
+    }
+    
+    public boolean isRestrictedForAge(int age) {
+        switch (ageRating) {
+            case T13:
+                return age < 13;
+            case T16:
+                return age < 16;
+            case T18:
+                return age < 18;
+            case K:
+                return age >= 13; // K rating requires adult supervision for under 13
+            case P:
+            default:
+                return false;
+        }
+    }
+    
+    public int getDurationWithBreaks() {
+        // Add 15 minutes for ads and cleaning
+        return durationMinutes + 15;
+    }
+}
+```
+
+4.3. MovieGenreMapping Entity
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "movie_genre_mapping")
+@IdClass(MovieGenreMappingId.class)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class MovieGenreMapping {
+    
+    @Id
+    @Column(name = "movie_id")
+    @EqualsAndHashCode.Include
+    private Long movieId;
+    
+    @Id
+    @Column(name = "genre_id")
+    @EqualsAndHashCode.Include
+    private Long genreId;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "movie_id", insertable = false, updatable = false)
+    private Movie movie;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "genre_id", insertable = false, updatable = false)
+    private MovieGenre genre;
+}
+```
+
+4.4. MovieGenreMappingId Class
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import lombok.*;
+
+import java.io.Serializable;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+public class MovieGenreMappingId implements Serializable {
+    private Long movieId;
+    private Long genreId;
+}
+```
+
+=================================================================
+5. SHOWTIME & PRICING ENTITIES
+=================================================================
+
+5.1. Showtime Entity
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import aws.movie_ticket_sales_web_project.entity.base.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "showtimes", indexes = {
+    @Index(name = "idx_movie_hall_date", columnList = "movie_id,hall_id,show_date"),
+    @Index(name = "idx_show_date", columnList = "show_date"),
+    @Index(name = "idx_hall_id", columnList = "hall_id")
+})
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+public class Showtime extends BaseEntity {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "showtime_id")
+    @EqualsAndHashCode.Include
+    private Long showtimeId;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "movie_id", nullable = false)
+    private Movie movie;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hall_id", nullable = false)
+    private CinemaHall hall;
+    
+    @Column(name = "show_date", nullable = false)
+    private LocalDate showDate;
+    
+    @Column(name = "start_time", nullable = false)
+    private LocalTime startTime;
+    
+    @Column(name = "end_time", nullable = false)
+    private LocalTime endTime;
+    
+    // Format information
+    @Enumerated(EnumType.STRING)
+    @Column(name = "format_type")
+    @Builder.Default
+    private FormatType formatType = FormatType._2D;
+    
+    @Column(name = "subtitle_language", length = 50)
+    private String subtitleLanguage;
+    
+    // Status and availability
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    @Builder.Default
+    private ShowtimeStatus status = ShowtimeStatus.SCHEDULED;
+    
+    @Column(name = "available_seats")
+    private Integer availableSeats;
+    
+    // Pricing
+    @Column(name = "base_price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal basePrice;
+    
+    // Relationships
+    @OneToMany(mappedBy = "showtime", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Booking> bookings = new HashSet<>();
+    
+    // Enums
+    public enum FormatType {
+        _2D("2D"),
+        _3D("3D"),
+        IMAX("IMAX"),
+        _4DX("4DX"),
+        SCREENX("SCREENX");
+        
+        private final String displayName;
+        
+        FormatType(String displayName) {
+            this.displayName = displayName;
+        }
+        
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+    
+    public enum ShowtimeStatus {
+        SCHEDULED("Đã lên lịch"),
+        SELLING("Đang bán vé"),
+        SOLD_OUT("Hết vé"),
+        CANCELLED("Đã hủy");
+        
+        private final String displayName;
+        
+        ShowtimeStatus(String displayName) {
+            this.displayName = displayName;
+        }
+        
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+    
+    // Business methods
+    public boolean isSoldOut() {
+        return status == ShowtimeStatus.SOLD_OUT || (availableSeats != null && availableSeats <= 0);
+    }
+    
+    public boolean isAvailableForBooking() {
+        return status == ShowtimeStatus.SELLING && !isSoldOut();
+    }
+    
+    public boolean is3D() {
+        return formatType == FormatType._3D || formatType == FormatType.IMAX || formatType == FormatType._4DX;
+    }
+    
+    public boolean isPremiumFormat() {
+        return formatType == FormatType.IMAX || formatType == FormatType._4DX || formatType == FormatType.SCREENX;
+    }
+    
+    public void decreaseAvailableSeats(int count) {
+        if (availableSeats != null) {
+            availableSeats = Math.max(0, availableSeats - count);
+            if (availableSeats == 0) {
+                status = ShowtimeStatus.SOLD_OUT;
+            }
+        }
+    }
+    
+    public void increaseAvailableSeats(int count) {
+        if (availableSeats != null) {
+            availableSeats += count;
+            if (status == ShowtimeStatus.SOLD_OUT && availableSeats > 0) {
+                status = ShowtimeStatus.SELLING;
+            }
+        }
+    }
+}
+```
+
+5.2. PricingRule Entity
+```java
+package aws.movie_ticket_sales_web_project.entity;
+
+import aws.movie_ticket_sales_web_project.entity.base.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Map;
+
+@Entity
+@Table(name = "pricing_rules", indexes = {
+    @Index(name = "idx_valid_dates", columnList = "valid_from,valid_to"),
+    @Index(name = "idx_priority", columnList = "priority")
+})
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+public class PricingRule extends BaseEntity {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "rule_id")
+    @EqualsAndHashCode.Include
+    private Long ruleId;
+    
+    @Column(name = "rule_name", nullable = false, length = 255)
+    private String ruleName;
+    
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+    
+    // Rule conditions (JSON format for flexibility)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "conditions", columnDefinition = "JSON")
+    private Map<String, Object> conditions;
+    
+    // Rule type and value
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rule_type", nullable = false)
+    private RuleType ruleType;
+    
+    @Column(name = "amount", precision = 10, scale = 2)
+    private BigDecimal amount;
+    
+    @Column(name = "percentage", precision = 5, scale = 2)
+    private BigDecimal percentage;
+    
+    // Validity period
+    @Column(name = "valid_from", nullable = false)
+    private LocalDate validFrom;
+    
+    @Column(name = "valid_to")
+    private LocalDate validTo;
+    
+    // Targeting
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "applies_to", columnDefinition = "JSON")
+    private Map<String, Object> appliesTo;
+    
+    @Column(name = "priority")
+    @Builder.Default
+    private Integer priority = 0;
+    
+    @Column(name = "is_active")
+    @Builder.Default
+    private Boolean isActive = true;
+    
+    // Enums
+    public enum RuleType {
+        SURCHARGE("Phụ thu"),
+        DISCOUNT("Giảm giá"),
+        FIXED_PRICE("Giá cố định");
+        
+        private final String displayName;
+        
+        RuleType(String displayName) {
+            this.displayName = displayName;
+        }
+        
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+    
+    // Business methods
+    public boolean isValidForDate(LocalDate date) {
+        return !date.isBefore(validFrom) && (validTo == null || !date.isAfter(validTo));
+    }
+    
+    public boolean isCurrentlyActive() {
+        return isActive && isValidForDate(LocalDate.now());
+    }
+    
+    public BigDecimal calculateAdjustment(BigDecimal baseAmount) {
+        switch (ruleType) {
+            case SURCHARGE:
+                return amount != null ? amount : BigDecimal.ZERO;
+            case DISCOUNT:
+                if (percentage != null) {
+                    return baseAmount.multiply(percentage).divide(BigDecimal.valueOf(100));
+                } else if (amount != null) {
+                    return amount;
+                }
+                return BigDecimal.ZERO;
+            case FIXED_PRICE:
+                return amount != null ? amount.subtract(baseAmount) : BigDecimal.ZERO;
+            default:
+                return BigDecimal.ZERO;
+        }
+    }
+}
+```
+
+=================================================================
+Continue in next part due to length limitations...
+=================================================================

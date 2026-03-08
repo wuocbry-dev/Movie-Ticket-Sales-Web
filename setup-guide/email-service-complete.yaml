@@ -1,0 +1,261 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Complete Email Service Infrastructure - SNS -> Lambda -> SES
+
+Parameters:
+  Environment:
+    Type: String
+    Default: prod
+    AllowedValues: [dev, staging, prod]
+    Description: Environment name
+  
+  FromEmail:
+    Type: String
+    Default: q2kcinema@gmail.com
+    Description: Verified SES email address to send emails from
+
+Resources:
+  # ============================================
+  # SNS Topic for Email Requests
+  # ============================================
+  EmailSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${AWS::StackName}-email-topic-${Environment}"
+      DisplayName: Movie Ticket Email Notifications
+
+  # ============================================
+  # Lambda Execution Role
+  # ============================================
+  EmailLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-email-lambda-role-${Environment}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SESEmailPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ses:SendEmail
+                  - ses:SendRawEmail
+                Resource: "*"
+
+  # ============================================
+  # Lambda Function - Email Handler
+  # ============================================
+  EmailLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-email-handler-${Environment}"
+      Description: Processes SNS messages and sends emails via SES
+      Runtime: python3.11
+      Handler: email_handler.lambda_handler
+      Role: !GetAtt EmailLambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      Environment:
+        Variables:
+          FROM_EMAIL: !Ref FromEmail
+          ENVIRONMENT: !Ref Environment
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import logging
+          from botocore.exceptions import ClientError
+          import os
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          ses_client = boto3.client('ses')
+          FROM_EMAIL = os.environ.get('FROM_EMAIL', 'noreply@movieticket.com')
+          CHARSET = 'UTF-8'
+
+          def lambda_handler(event, context):
+              logger.info(f"Received event: {json.dumps(event)}")
+              results = []
+              
+              for record in event.get('Records', []):
+                  try:
+                      sns_message = record.get('Sns', {}).get('Message', '{}')
+                      email_request = json.loads(sns_message)
+                      
+                      logger.info(f"Processing email request: {email_request.get('emailType')}")
+                      
+                      email_type = email_request.get('emailType')
+                      to_email = email_request.get('toEmail')
+                      subject = email_request.get('subject')
+                      template_data = email_request.get('templateData', {})
+                      
+                      if email_request.get('htmlContent'):
+                          html_content = email_request['htmlContent']
+                      else:
+                          html_content = build_email_content(email_type, template_data)
+                      
+                      result = send_email_via_ses(to_email, subject, html_content)
+                      results.append({
+                          'to': to_email,
+                          'status': 'success',
+                          'messageId': result.get('MessageId')
+                      })
+                      
+                  except Exception as e:
+                      logger.error(f"Error processing record: {str(e)}")
+                      results.append({'status': 'error', 'error': str(e)})
+              
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({'message': 'Email processing completed', 'results': results})
+              }
+
+          def send_email_via_ses(to_email, subject, html_content):
+              try:
+                  response = ses_client.send_email(
+                      Source=FROM_EMAIL,
+                      Destination={'ToAddresses': [to_email]},
+                      Message={
+                          'Subject': {'Charset': CHARSET, 'Data': subject},
+                          'Body': {'Html': {'Charset': CHARSET, 'Data': html_content}}
+                      }
+                  )
+                  logger.info(f"Email sent successfully to {to_email}. MessageId: {response['MessageId']}")
+                  return response
+              except ClientError as e:
+                  logger.error(f"Failed to send email: {e.response['Error']['Message']}")
+                  raise
+
+          def build_email_content(email_type, data):
+              if email_type == 'BOOKING_CONFIRMATION':
+                  return build_booking_confirmation_email(data)
+              elif email_type == 'REFUND_CONFIRMATION':
+                  return build_refund_confirmation_email(data)
+              elif email_type == 'PASSWORD_RESET':
+                  return build_password_reset_email(data)
+              else:
+                  return f"<p>Email content for: {email_type}</p>"
+
+          def build_booking_confirmation_email(data):
+              qr_code_section = ""
+              if data.get('qrCodeUrl'):
+                  qr_code_section = f"<img src='{data['qrCodeUrl']}' alt='QR Code' style='max-width: 250px; height: auto; border: 4px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border-radius: 8px;' />"
+              else:
+                  qr_code_section = "<p>QR Code sẽ được tạo sau</p>"
+              
+              return f"""
+              <!DOCTYPE html>
+              <html>
+              <head><meta charset="UTF-8"></head>
+              <body style="font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px;">
+                  <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; text-align: center;">
+                          <h1 style="font-size: 28px; margin: 0;">🎬 VÉ ĐIỆN TỬ</h1>
+                          <p style="margin: 10px 0 0 0;">Đặt vé thành công!</p>
+                      </div>
+                      
+                      <div style="padding: 30px 20px;">
+                          <p>Xin chào <strong>{data.get('customerName', 'Quý khách')}</strong>,</p>
+                          <p>Vé xem phim của bạn đã được xác nhận thành công!</p>
+                          
+                          <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; border-left: 4px solid #667eea;">
+                              <h2 style="color: #667eea; margin: 0 0 15px 0;">🎥 {data.get('movieTitle', '')}</h2>
+                              <p><strong>📍 Rạp:</strong> {data.get('cinemaName', '')}</p>
+                              <p><strong>🏛️ Phòng:</strong> {data.get('hallName', '')}</p>
+                              <p><strong>📅 Ngày:</strong> {data.get('showDate', '')}</p>
+                              <p><strong>🕐 Giờ:</strong> {data.get('startTime', '')}</p>
+                              <p><strong>🎫 Số vé:</strong> {data.get('totalSeats', 0)} vé</p>
+                          </div>
+                          
+                          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+                              <p style="margin: 0;">Tổng thanh toán</p>
+                              <div style="font-size: 36px; font-weight: bold; margin: 10px 0;">{data.get('totalAmount', 0):,} ₫</div>
+                              <p style="margin: 0;">Đã thanh toán thành công</p>
+                          </div>
+                          
+                          <div style="text-align: center; padding: 30px 20px; background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
+                              <h3 style="color: #667eea; margin: 0 0 15px 0;">📱 MÃ QR CHECK-IN</h3>
+                              <p>Xuất trình mã QR này tại quầy để nhận vé</p>
+                              {qr_code_section}
+                              <div style="font-size: 24px; font-weight: bold; color: #667eea; margin: 15px 0; letter-spacing: 2px;">{data.get('bookingCode', '')}</div>
+                              <p style="color: #666; font-size: 14px;">Mã đặt vé của bạn</p>
+                          </div>
+                      </div>
+                  </div>
+              </body>
+              </html>
+              """
+
+          def build_password_reset_email(data):
+              return f"""
+              <!DOCTYPE html>
+              <html>
+              <head><meta charset="UTF-8"></head>
+              <body style="font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px;">
+                  <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden;">
+                      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; text-align: center;">
+                          <h1 style="margin: 0;">🔐 Đặt lại mật khẩu</h1>
+                      </div>
+                      <div style="padding: 30px 20px;">
+                          <p>Xin chào <strong>{data.get('fullName', 'Quý khách')}</strong>,</p>
+                          <p>Mã xác nhận đặt lại mật khẩu của bạn là:</p>
+                          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+                              <div style="font-size: 36px; font-weight: bold; letter-spacing: 8px;">{data.get('resetCode', '')}</div>
+                          </div>
+                          <p style="color: #856404; background: #fff3cd; padding: 15px; border-radius: 8px;">
+                              ⏰ <strong>Lưu ý:</strong> Mã này có hiệu lực trong 15 phút.
+                          </p>
+                      </div>
+                  </div>
+              </body>
+              </html>
+              """
+
+          def build_refund_confirmation_email(data):
+              return f"<html><body><h2>Xác nhận hoàn tiền</h2><p>Đặt vé {data.get('bookingCode')} đã được hoàn tiền {data.get('refundAmount', 0):,} VNĐ</p></body></html>"
+
+  # ============================================
+  # Lambda Permission for SNS
+  # ============================================
+  LambdaSNSPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref EmailLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref EmailSNSTopic
+
+  # ============================================
+  # SNS Subscription - Lambda
+  # ============================================
+  EmailSNSSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref EmailSNSTopic
+      Protocol: lambda
+      Endpoint: !GetAtt EmailLambdaFunction.Arn
+
+Outputs:
+  EmailSNSTopicArn:
+    Description: ARN of the SNS Topic for email requests
+    Value: !Ref EmailSNSTopic
+    
+  EmailLambdaFunctionName:
+    Description: Name of the Email Lambda Function
+    Value: !Ref EmailLambdaFunction
+    
+  BackendConfig:
+    Description: Configuration for backend application.properties
+    Value: !Sub |
+      aws.sns.email-topic-arn=${EmailSNSTopic}
+      aws.region=${AWS::Region}
+      email.service.enabled=true

@@ -1,0 +1,568 @@
+/* Modal Overlay - QuickBookingModal specific */
+.qbm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: qbmFadeIn 0.3s ease;
+}
+
+@keyframes qbmFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.qbm-modal-content {
+  background: linear-gradient(135deg, #1a1f2e 0%, #2d1b3d 100%);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: qbmSlideUp 0.3s ease;
+  position: relative;
+}
+
+@keyframes qbmSlideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.qbm-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 20px;
+  z-index: 10;
+}
+
+.qbm-modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+/* Modal Header */
+.qbm-modal-header {
+  padding: 30px 30px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.qbm-modal-header h2 {
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.qbm-step-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  position: relative;
+}
+
+.qbm-step-indicators::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 25%;
+  right: 25%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+.qbm-step-indicator {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-weight: 700;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  z-index: 1;
+  position: relative;
+}
+
+.qbm-step-indicator.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.qbm-step-indicator.current {
+  transform: scale(1.2);
+  animation: qbmPulse 2s infinite;
+}
+
+@keyframes qbmPulse {
+  0%, 100% {
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(102, 126, 234, 0.7);
+  }
+}
+
+/* Modal Body */
+.qbm-modal-body {
+  padding: 30px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.qbm-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.qbm-modal-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.qbm-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.5);
+  border-radius: 4px;
+}
+
+.qbm-modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.7);
+}
+
+.qbm-booking-step-content h3 {
+  color: #ffc107;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.qbm-selected-info {
+  background: rgba(255, 193, 7, 0.1);
+  border-left: 4px solid #ffc107;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.qbm-info-label {
+  color: #aaa;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.qbm-info-value {
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.qbm-loading-spinner {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-style: italic;
+}
+
+/* Cinema Grid */
+.qbm-cinema-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 15px;
+}
+
+.qbm-cinema-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.qbm-cinema-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #667eea;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.qbm-cinema-card.selected {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  border-color: #667eea;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.qbm-cinema-name {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.qbm-cinema-location {
+  color: #ffc107;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.qbm-cinema-address {
+  color: #999;
+  font-size: 13px;
+}
+
+/* Movie Grid */
+.qbm-movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.qbm-movie-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.qbm-movie-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #667eea;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.qbm-movie-card.selected {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  border-color: #667eea;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.qbm-movie-age-rating {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ffc107;
+  color: #000;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.qbm-movie-title {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  padding-right: 40px;
+}
+
+.qbm-movie-details {
+  color: #999;
+  font-size: 13px;
+}
+
+/* Date Grid */
+.qbm-date-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+.qbm-date-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.qbm-date-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #667eea;
+  transform: translateY(-3px);
+}
+
+.qbm-date-card.selected {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.qbm-date-day {
+  color: #ffc107;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.qbm-date-card.selected .qbm-date-day {
+  color: #fff;
+}
+
+.qbm-date-number {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* Time Grid */
+.qbm-time-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.qbm-time-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.qbm-time-card:hover:not(.disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #667eea;
+  transform: translateY(-3px);
+}
+
+.qbm-time-card.selected {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.qbm-time-card.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.qbm-time-value {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.qbm-time-room {
+  color: #ffc107;
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+
+.qbm-time-card.selected .qbm-time-room {
+  color: #fff;
+}
+
+.qbm-time-format {
+  color: #999;
+  font-size: 11px;
+}
+
+.qbm-time-card.selected .qbm-time-format {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Modal Footer */
+.qbm-modal-footer {
+  padding: 20px 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  gap: 15px;
+  justify-content: space-between;
+}
+
+.qbm-btn-prev,
+.qbm-btn-next,
+.qbm-btn-book {
+  flex: 1;
+  padding: 14px 30px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.qbm-btn-prev {
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.qbm-btn-prev:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+}
+
+.qbm-btn-prev:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.qbm-btn-next {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.qbm-btn-next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.qbm-btn-book {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border: none;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+}
+
+.qbm-btn-book:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 87, 108, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .qbm-modal-content {
+    max-width: 95%;
+    max-height: 95vh;
+  }
+
+  .qbm-modal-header {
+    padding: 20px 20px 15px;
+  }
+
+  .qbm-modal-header h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+  }
+
+  .qbm-step-indicators {
+    gap: 20px;
+  }
+
+  .qbm-step-indicator {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+
+  .qbm-modal-body {
+    padding: 20px;
+  }
+
+  .qbm-booking-step-content h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  .qbm-cinema-grid,
+  .qbm-movie-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .qbm-date-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+
+  .qbm-time-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+
+  .qbm-modal-footer {
+    padding: 15px 20px;
+    flex-direction: column;
+  }
+
+  .qbm-btn-prev,
+  .qbm-btn-next,
+  .qbm-btn-book {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .qbm-modal-header h2 {
+    font-size: 18px;
+  }
+
+  .qbm-step-indicators {
+    gap: 15px;
+  }
+
+  .qbm-step-indicator {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .qbm-date-grid,
+  .qbm-time-grid {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  }
+}

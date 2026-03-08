@@ -1,0 +1,264 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Email Service Infrastructure - SNS -> Lambda -> SES
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+    Description: Environment name
+  
+  FromEmail:
+    Type: String
+    Default: q2kcinema@gmail.com
+    Description: Verified SES email address to send emails from
+  
+  LambdaCodeS3Bucket:
+    Type: String
+    Description: S3 bucket containing Lambda deployment package
+    Default: ""
+  
+  LambdaCodeS3Key:
+    Type: String
+    Description: S3 key for Lambda deployment package
+    Default: ""
+
+Conditions:
+  UseS3Code: !Not [!Equals [!Ref LambdaCodeS3Bucket, ""]]
+
+Resources:
+  # ============================================
+  # SNS Topic for Email Requests
+  # ============================================
+  EmailSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${AWS::StackName}-email-topic-${Environment}"
+      DisplayName: Movie Ticket Email Notifications
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Service
+          Value: email
+
+  # ============================================
+  # Lambda Execution Role
+  # ============================================
+  EmailLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-email-lambda-role-${Environment}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SESEmailPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ses:SendEmail
+                  - ses:SendRawEmail
+                Resource: "*"
+        - PolicyName: SNSReadPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sns:GetTopicAttributes
+                  - sns:ListSubscriptionsByTopic
+                Resource: !Ref EmailSNSTopic
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  # ============================================
+  # Lambda Function - Email Handler
+  # ============================================
+  EmailLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-email-handler-${Environment}"
+      Description: Processes SNS messages and sends emails via SES
+      Runtime: python3.11
+      Handler: email_handler.lambda_handler
+      Role: !GetAtt EmailLambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      Environment:
+        Variables:
+          FROM_EMAIL: !Ref FromEmail
+          ENVIRONMENT: !Ref Environment
+      Code:
+        # If S3 bucket is provided, use S3, otherwise use inline code
+        # For production, always use S3 deployment package
+        ZipFile: |
+          import json
+          import boto3
+          import logging
+          from botocore.exceptions import ClientError
+          import os
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          ses_client = boto3.client('ses')
+          FROM_EMAIL = os.environ.get('FROM_EMAIL', 'noreply@movieticket.com')
+          CHARSET = 'UTF-8'
+
+          def lambda_handler(event, context):
+              logger.info(f"Received event: {json.dumps(event)}")
+              results = []
+              
+              for record in event.get('Records', []):
+                  try:
+                      sns_message = record.get('Sns', {}).get('Message', '{}')
+                      email_request = json.loads(sns_message)
+                      
+                      logger.info(f"Processing email request: {email_request.get('emailType')}")
+                      
+                      email_type = email_request.get('emailType')
+                      to_email = email_request.get('toEmail')
+                      subject = email_request.get('subject')
+                      template_data = email_request.get('templateData', {})
+                      
+                      if email_request.get('htmlContent'):
+                          html_content = email_request['htmlContent']
+                      else:
+                          html_content = build_email_content(email_type, template_data)
+                      
+                      result = send_email_via_ses(to_email, subject, html_content)
+                      results.append({
+                          'to': to_email,
+                          'status': 'success',
+                          'messageId': result.get('MessageId')
+                      })
+                      
+                  except Exception as e:
+                      logger.error(f"Error processing record: {str(e)}")
+                      results.append({'status': 'error', 'error': str(e)})
+              
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({'message': 'Email processing completed', 'results': results})
+              }
+
+          def send_email_via_ses(to_email, subject, html_content):
+              try:
+                  response = ses_client.send_email(
+                      Source=FROM_EMAIL,
+                      Destination={'ToAddresses': [to_email]},
+                      Message={
+                          'Subject': {'Charset': CHARSET, 'Data': subject},
+                          'Body': {'Html': {'Charset': CHARSET, 'Data': html_content}}
+                      }
+                  )
+                  logger.info(f"Email sent successfully to {to_email}. MessageId: {response['MessageId']}")
+                  return response
+              except ClientError as e:
+                  logger.error(f"Failed to send email: {e.response['Error']['Message']}")
+                  raise
+
+          def build_email_content(email_type, data):
+              if email_type == 'BOOKING_CONFIRMATION':
+                  return f"<h2>Booking Confirmation</h2><p>Dear {data.get('customerName')}, your booking {data.get('bookingCode')} is confirmed.</p>"
+              elif email_type == 'REFUND_CONFIRMATION':
+                  return f"<h2>Refund Confirmation</h2><p>Your refund for booking {data.get('bookingCode')} has been processed.</p>"
+              elif email_type == 'PASSWORD_RESET':
+                  return f"<h2>Password Reset</h2><p>Your reset code is: <strong>{data.get('resetCode')}</strong></p>"
+              else:
+                  return f"<p>Email content for: {email_type}</p>"
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Service
+          Value: email
+
+  # ============================================
+  # Lambda Permission for SNS
+  # ============================================
+  LambdaSNSPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref EmailLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref EmailSNSTopic
+
+  # ============================================
+  # SNS Subscription - Lambda
+  # ============================================
+  EmailSNSSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref EmailSNSTopic
+      Protocol: lambda
+      Endpoint: !GetAtt EmailLambdaFunction.Arn
+
+  # ============================================
+  # CloudWatch Log Group for Lambda
+  # ============================================
+  EmailLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${EmailLambdaFunction}"
+      RetentionInDays: 14
+
+  # ============================================
+  # CloudWatch Alarms
+  # ============================================
+  EmailLambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-email-lambda-errors-${Environment}"
+      AlarmDescription: Alarm when email Lambda function has errors
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref EmailLambdaFunction
+
+# ============================================
+# Outputs
+# ============================================
+Outputs:
+  EmailSNSTopicArn:
+    Description: ARN of the SNS Topic for email requests
+    Value: !Ref EmailSNSTopic
+    Export:
+      Name: !Sub "${AWS::StackName}-EmailTopicArn"
+
+  EmailSNSTopicName:
+    Description: Name of the SNS Topic
+    Value: !GetAtt EmailSNSTopic.TopicName
+
+  EmailLambdaFunctionArn:
+    Description: ARN of the Email Lambda Function
+    Value: !GetAtt EmailLambdaFunction.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-EmailLambdaArn"
+
+  EmailLambdaFunctionName:
+    Description: Name of the Email Lambda Function
+    Value: !Ref EmailLambdaFunction
+
+  BackendConfigExample:
+    Description: Configuration to add to backend application.properties
+    Value: !Sub |
+      # Add these to your application.properties or environment variables:
+      aws.sns.email-topic-arn=${EmailSNSTopic}
+      aws.region=${AWS::Region}
+      email.service.enabled=true

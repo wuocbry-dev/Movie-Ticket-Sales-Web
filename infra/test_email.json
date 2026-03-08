@@ -1,0 +1,9 @@
+{
+    "emailType": "PASSWORD_RESET",
+    "toEmail": "q2kcinema@gmail.com",
+    "subject": "Test Email",
+    "templateData": {
+        "fullName": "Test User",
+        "resetCode": "123456"
+    }
+}

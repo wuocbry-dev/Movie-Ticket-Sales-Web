@@ -1,0 +1,703 @@
+.staff-orders-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: transparent;
+  min-height: 100%;
+}
+
+.orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 20px;
+  background: white;
+  padding: 20px 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-left h2 {
+  margin: 0;
+  color: #1a1a2e;
+  font-size: 1.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.staff-orders-container .header-left h2::before {
+  content: '🍿';
+  font-size: 1.4rem;
+}
+
+.staff-orders-container .cinema-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 18px;
+  border-radius: 25px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.staff-orders-container .cinema-badge::before {
+  content: '📍';
+  font-size: 0.9rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Filter Tabs Style */
+.staff-orders-container .filter-group {
+  display: flex;
+  align-items: center;
+  background: #f0f2f5;
+  border-radius: 12px;
+  padding: 6px;
+  gap: 4px;
+}
+
+.staff-orders-container .filter-group .filter-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.85rem;
+}
+
+.status-filter {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #555;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  min-width: 180px;
+}
+
+.staff-orders-container .status-filter:hover {
+  background-color: rgba(102, 126, 234, 0.1);
+}
+
+.staff-orders-container .status-filter:focus {
+  outline: none;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.btn-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 91, 234, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.staff-orders-container .btn-refresh::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.staff-orders-container .btn-refresh:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.staff-orders-container .btn-refresh:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 91, 234, 0.45);
+}
+
+.staff-orders-container .btn-refresh:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.staff-orders-container .btn-refresh:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Orders Grid */
+.staff-orders-container .orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.staff-orders-container .order-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #ddd;
+  transition: all 0.3s ease;
+}
+
+.staff-orders-container .order-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.staff-orders-container .order-card.status-pending {
+  border-left-color: #f59e0b;
+}
+
+.staff-orders-container .order-card.status-confirmed {
+  border-left-color: #3b82f6;
+}
+
+.staff-orders-container .order-card.status-preparing {
+  border-left-color: #8b5cf6;
+}
+
+.staff-orders-container .order-card.status-ready {
+  border-left-color: #10b981;
+}
+
+.staff-orders-container .order-card.status-completed {
+  border-left-color: #6b7280;
+}
+
+.staff-orders-container .order-card.status-cancelled {
+  border-left-color: #ef4444;
+  opacity: 0.7;
+}
+
+.staff-orders-container .order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.staff-orders-container .order-number {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+/* Status Badge */
+.staff-orders-container .status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.staff-orders-container .status-badge svg {
+  font-size: 0.75rem;
+}
+
+.staff-orders-container .status-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.staff-orders-container .status-info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.staff-orders-container .status-primary {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.staff-orders-container .status-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.staff-orders-container .status-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.staff-orders-container .status-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Order Customer */
+.staff-orders-container .order-customer {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.staff-orders-container .order-customer strong {
+  display: block;
+  color: #333;
+  font-size: 1rem;
+}
+
+.staff-orders-container .customer-email {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Order Items */
+.staff-orders-container .order-items {
+  margin-bottom: 12px;
+}
+
+.staff-orders-container .order-items h4 {
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.staff-orders-container .order-items ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.staff-orders-container .order-items li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px dashed #eee;
+}
+
+.staff-orders-container .order-items li:last-child {
+  border-bottom: none;
+}
+
+.staff-orders-container .item-name {
+  flex: 1;
+  color: #333;
+}
+
+.staff-orders-container .item-qty {
+  margin: 0 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.staff-orders-container .item-price {
+  color: #e53935;
+  font-weight: 600;
+}
+
+/* Order Total */
+.staff-orders-container .order-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 2px solid #eee;
+  margin-top: 8px;
+}
+
+.staff-orders-container .order-total span {
+  color: #666;
+  font-weight: 500;
+}
+
+.staff-orders-container .order-total strong {
+  color: #e53935;
+  font-size: 1.15rem;
+}
+
+/* Order Time */
+.staff-orders-container .order-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #888;
+  font-size: 0.85rem;
+  margin: 12px 0;
+}
+
+/* Order Notes Section */
+.staff-orders-container .order-notes-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  border: 1px solid #e0e0e0;
+}
+
+.staff-orders-container .notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.staff-orders-container .notes-header strong {
+  color: #495057;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.staff-orders-container .notes-header strong::before {
+  content: '📝';
+  font-size: 1rem;
+}
+
+.staff-orders-container .notes-content {
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding: 10px 12px;
+  background: white;
+  border-radius: 6px;
+  border-left: 3px solid #667eea;
+  min-height: 36px;
+}
+
+.staff-orders-container .notes-content .no-note {
+  color: #aaa;
+  font-style: italic;
+}
+
+/* Edit Note Form */
+.staff-orders-container .edit-note-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.staff-orders-container .edit-note-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: white;
+  box-sizing: border-box;
+}
+
+.staff-orders-container .edit-note-form textarea:focus {
+  outline: none;
+  border-color: #764ba2;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.staff-orders-container .edit-note-form textarea::placeholder {
+  color: #aaa;
+}
+
+.staff-orders-container .edit-note-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.staff-orders-container .btn-edit-note {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+}
+
+.staff-orders-container .btn-edit-note:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.staff-orders-container .btn-save-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.staff-orders-container .btn-save-note:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.staff-orders-container .btn-cancel-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #6c757d 0%, #868e96 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}
+
+.staff-orders-container .btn-cancel-note:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+}
+
+/* Order Actions */
+.staff-orders-container .order-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.staff-orders-container .btn-action {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.staff-orders-container .btn-info {
+  background: #3b82f6;
+  color: white;
+}
+
+.staff-orders-container .btn-info:hover {
+  background: #2563eb;
+}
+
+.staff-orders-container .btn-primary {
+  background: #8b5cf6;
+  color: white;
+}
+
+.staff-orders-container .btn-primary:hover {
+  background: #7c3aed;
+}
+
+.staff-orders-container .btn-success {
+  background: #10b981;
+  color: white;
+}
+
+.staff-orders-container .btn-success:hover {
+  background: #059669;
+}
+
+.staff-orders-container .btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.staff-orders-container .btn-secondary:hover {
+  background: #4b5563;
+}
+
+/* No Cinema Warning */
+.staff-orders-container .no-cinema-warning {
+  text-align: center;
+  padding: 60px 20px;
+  background: #fff5f5;
+  border-radius: 12px;
+  margin-top: 40px;
+}
+
+.staff-orders-container .no-cinema-warning .warning-icon {
+  font-size: 4rem;
+  color: #e53935;
+  margin-bottom: 16px;
+}
+
+.staff-orders-container .no-cinema-warning h3 {
+  color: #c62828;
+  margin: 0 0 8px 0;
+}
+
+.staff-orders-container .no-cinema-warning p {
+  color: #666;
+}
+
+/* Loading Spinner */
+.staff-orders-container .loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  color: #666;
+}
+
+.staff-orders-container .loading-spinner svg {
+  font-size: 2.5rem;
+  color: #4a90e2;
+  margin-bottom: 16px;
+}
+
+/* No Orders */
+.staff-orders-container .no-orders {
+  text-align: center;
+  padding: 60px 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.staff-orders-container .no-orders .empty-icon {
+  font-size: 4rem;
+  color: #ccc;
+  margin-bottom: 16px;
+}
+
+.staff-orders-container .no-orders h3 {
+  color: #666;
+  margin: 0 0 8px 0;
+}
+
+.staff-orders-container .no-orders p {
+  color: #888;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .staff-orders-container .orders-header {
+    padding: 16px 20px;
+  }
+
+  .staff-orders-container .header-left h2 {
+    font-size: 1.3rem;
+  }
+
+  .staff-orders-container .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .staff-orders-container .filter-group {
+    flex: 1;
+  }
+
+  .staff-orders-container .status-filter {
+    min-width: 140px;
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .staff-orders-container {
+    padding: 16px;
+  }
+
+  .staff-orders-container .orders-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .staff-orders-container .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .staff-orders-container .header-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .staff-orders-container .filter-group {
+    width: 100%;
+  }
+
+  .staff-orders-container .status-filter {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .staff-orders-container .btn-refresh {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .staff-orders-container .orders-grid {
+    grid-template-columns: 1fr;
+  }
+}

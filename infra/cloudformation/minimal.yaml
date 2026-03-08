@@ -1,0 +1,191 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Simple, Cost-Optimized Application Stack (EC2 in Public, RDS)
+
+Parameters:
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+  PublicSubnetCidr:
+    Type: String
+    Default: 10.0.1.0/24
+  PrivateSubnetCidr:
+    Type: String
+    Default: 10.0.2.0/24
+  EC2InstanceType:
+    Type: String
+    Default: t4g.micro
+    AllowedValues: [t2.micro, t3.micro, t4g.micro]
+  DatabaseAllocatedStorage:
+    Type: Number
+    Default: 20
+  DatabaseInstanceType:
+    Type: String
+    Default: db.t4g.micro
+  DatabaseUsername:
+    Type: String
+    Default: admin
+  DatabasePassword:
+    Type: String
+    NoEcho: true
+    MinLength: 8
+
+Resources:
+  # 1. VPC và Network
+  AppVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-VPC"
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-IGW"
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref AppVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref AppVPC
+      CidrBlock: !Ref PublicSubnetCidr
+      MapPublicIpOnLaunch: true # Cho phép EC2 có IP công cộng
+      AvailabilityZone: !Select [ 0, !GetAZs "" ] # Chỉ dùng 1 AZ
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PublicSubnet-AZ1"
+
+  # Private Subnet cho RDS (cùng AZ với EC2)
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref AppVPC
+      CidrBlock: !Ref PrivateSubnetCidr
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select [ 0, !GetAZs "" ] # Cùng AZ với EC2
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet-AZ1"
+
+  # Private Subnet 2 (AWS RDS yêu cầu ít nhất 2 subnets trong DBSubnetGroup)
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref AppVPC
+      CidrBlock: 10.0.3.0/24
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select [ 1, !GetAZs "" ] # AZ khác (bắt buộc cho DBSubnetGroup)
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PrivateSubnet-AZ2"
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref AppVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-PublicRT"
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  # 2. Security Groups
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref AppVPC
+      GroupDescription: Enable HTTP and SSH access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0 # Cần thay thế bằng IP của bạn để bảo mật
+        - IpProtocol: tcp
+          FromPort: 80 # Cổng ứng dụng web
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: EC2-SG
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref AppVPC
+      GroupDescription: Allow traffic from EC2 Security Group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306 # Ví dụ: MySQL/MariaDB
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref EC2SecurityGroup # Chỉ cho phép EC2 kết nối
+      Tags:
+        - Key: Name
+          Value: RDS-SG
+
+  # 3. EC2 Instance
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref EC2InstanceType
+      ImageId: ami-090c88536f927d6b8 # Cần thay thế bằng AMI ID Linux Amazon 2023 mới nhất tại Region bạn đang dùng
+      SubnetId: !Ref PublicSubnet
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-AppServer"
+
+  # 4. RDS Database
+  MyRDSDBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for RDS
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2 # AWS yêu cầu ít nhất 2 subnets
+      Tags:
+        - Key: Name
+          Value: RDS-SubnetGroup
+
+  MyRDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Sub "${AWS::StackName}-db"
+      DBInstanceClass: !Ref DatabaseInstanceType
+      Engine: mysql # Ví dụ, thay thế bằng loại DB bạn dùng (postgres, mariadb,...)
+      MasterUsername: !Ref DatabaseUsername
+      MasterUserPassword: !Ref DatabasePassword
+      AllocatedStorage: !Ref DatabaseAllocatedStorage
+      DBSubnetGroupName: !Ref MyRDSDBSubnetGroup
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroup
+      PubliclyAccessible: false
+      MultiAZ: false # Chỉ dùng 1 AZ để tối ưu chi phí
+      AvailabilityZone: !Select [ 0, !GetAZs "" ] # Đặt RDS trong cùng AZ với EC2
+
+Outputs:
+  WebsiteURL:
+    Description: Public IP of the EC2 Instance (for direct access)
+    Value: !GetAtt MyEC2Instance.PublicIp

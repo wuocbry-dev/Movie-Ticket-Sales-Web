@@ -1,0 +1,99 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# ============================================
+# Source Code Files - Force LF (Linux/Mac)
+# ============================================
+
+# Java
+*.java text eol=lf
+*.properties text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# JavaScript/TypeScript
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+
+# Web
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.less text eol=lf
+
+# Documentation
+*.md text eol=lf
+*.txt text eol=lf
+
+# SQL
+*.sql text eol=lf
+
+# Shell scripts (must be LF for Linux)
+*.sh text eol=lf
+
+# Config files
+*.conf text eol=lf
+*.config text eol=lf
+*.env text eol=lf
+.env* text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+Dockerfile text eol=lf
+docker-compose.yml text eol=lf
+
+# Maven
+mvnw text eol=lf
+pom.xml text eol=lf
+
+# ============================================
+# Windows Specific - Force CRLF
+# ============================================
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+mvnw.cmd text eol=crlf
+
+# ============================================
+# Binary Files - No conversion
+# ============================================
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.webp binary
+
+# Fonts
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.otf binary
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+*.rar binary
+*.7z binary
+
+# Java
+*.jar binary
+*.war binary
+*.class binary
+
+# Other binaries
+*.pdf binary
+*.exe binary
+*.dll binary
+*.so binary
+
+# Lock files (keep as-is)
+package-lock.json text eol=lf -diff

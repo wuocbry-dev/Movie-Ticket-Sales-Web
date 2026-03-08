@@ -1,0 +1,1373 @@
+=================================================================
+HƯỚNG DẪN TRIỂN KHAI USER STORIES - HỆ THỐNG ĐẶT VÉ XEM PHIM
+=================================================================
+Dự án: Movie Ticket Sales Web Project
+Phiên bản: 1.0
+Ngày tạo: 2025-10-13
+=================================================================
+
+1. TỔNG QUAN HỆ THỐNG
+=================================================================
+
+Hệ thống được thiết kế dựa trên kiến trúc Spring Boot với database MySQL, 
+tuân thủ nghiêm ngặt các quy định pháp luật Việt Nam về:
+- Bảo vệ dữ liệu cá nhân (NĐ 13/2023/NĐ-CP)
+- Thương mại điện tử (NĐ 52/2013/NĐ-CP)
+- Phân loại phim (Thông tư 05/2023/TT-BVHTTDL)
+- Hóa đơn điện tử (NĐ 123/2020/NĐ-CP)
+
+Cấu trúc dự án:
+- Backend: Spring Boot (Java)
+- Frontend: React.js
+- Database: MySQL 8.0+
+- Cache: Redis (khuyến nghị)
+- Message Queue: RabbitMQ (cho xử lý thanh toán)
+
+=================================================================
+2. PHẦN 1: USER STORIES CHO NGƯỜI DÙNG CUỐI (KHÁN GIẢ)
+=================================================================
+
+2.1. EPIC 1.1: Quản lý Tài khoản và Thông tin Cá nhân
+-----------------------------------------------------------------
+
+US1.1.1: Đăng ký tài khoản mới
+=================================
+Database Tables: users, roles, user_roles
+
+Implementation Steps:
+
+BACKEND (Spring Boot):
+1. Tạo UserController với endpoint POST /api/users/register
+2. Tạo UserService với validation logic:
+   - Email/phone uniqueness check
+   - Password strength validation (8+ chars, mix of upper/lower/number/special)
+   - Privacy policy consent validation (must be explicitly true)
+
+3. UserRegistrationDTO:
+```java
+public class UserRegistrationDTO {
+    @NotBlank @Email
+    private String email;
+    
+    @NotBlank @Pattern(regexp="^[0-9]{10,11}$")
+    private String phoneNumber;
+    
+    @NotBlank @Size(min=8)
+    private String password;
+    
+    @NotBlank
+    private String fullName;
+    
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    private LocalDate dateOfBirth;
+    
+    @NotNull
+    private Boolean privacyPolicyAccepted; // MUST BE TRUE
+    
+    private String privacyPolicyVersion = "1.0";
+}
+```
+
+4. Validation Logic:
+```java
+@Service
+public class UserService {
+    public UserResponseDTO registerUser(UserRegistrationDTO dto) {
+        // 1. Validate privacy policy consent
+        if (!dto.getPrivacyPolicyAccepted()) {
+            throw new ValidationException("Privacy policy consent required");
+        }
+        
+        // 2. Check email/phone uniqueness
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new ValidationException("Email already exists");
+        }
+        
+        // 3. Hash password
+        String hashedPassword = passwordEncoder.encode(dto.getPassword());
+        
+        // 4. Create user entity
+        User user = new User();
+        user.setEmail(dto.getEmail());
+        user.setPasswordHash(hashedPassword);
+        user.setPrivacyPolicyAccepted(true);
+        user.setPrivacyPolicyVersion(dto.getPrivacyPolicyVersion());
+        user.setPrivacyPolicyAcceptedAt(LocalDateTime.now());
+        
+        // 5. Assign default CUSTOMER role
+        Role customerRole = roleRepository.findByRoleName("CUSTOMER");
+        user.getRoles().add(customerRole);
+        
+        // 6. Send verification email
+        emailService.sendVerificationEmail(user);
+        
+        return userRepository.save(user);
+    }
+}
+```
+
+FRONTEND (React):
+1. Registration Form Component:
+```jsx
+const RegistrationForm = () => {
+  const [formData, setFormData] = useState({
+    email: '',
+    phoneNumber: '',
+    password: '',
+    fullName: '',
+    dateOfBirth: '',
+    privacyPolicyAccepted: false // IMPORTANT: Default FALSE
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validate privacy policy consent
+    if (!formData.privacyPolicyAccepted) {
+      alert('Bạn phải đồng ý với Điều khoản và Chính sách bảo mật');
+      return;
+    }
+    
+    try {
+      const response = await api.post('/users/register', formData);
+      // Handle success
+    } catch (error) {
+      // Handle validation errors
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* Form fields */}
+      
+      {/* PRIVACY POLICY CONSENT - CRITICAL */}
+      <div className="privacy-consent">
+        <input
+          type="checkbox"
+          id="privacyPolicy"
+          checked={formData.privacyPolicyAccepted}
+          onChange={(e) => setFormData({...formData, privacyPolicyAccepted: e.target.checked})}
+        />
+        <label htmlFor="privacyPolicy">
+          Tôi đã đọc, hiểu và đồng ý với{' '}
+          <a href="/terms" target="_blank">Điều khoản Dịch vụ</a>
+          {' '}và{' '}
+          <a href="/privacy" target="_blank">Chính sách Bảo mật</a>
+        </label>
+      </div>
+      
+      <button type="submit">Đăng ký</button>
+    </form>
+  );
+};
+```
+
+Testing Checklist:
+□ Verify privacy policy checkbox is unchecked by default
+□ Test registration fails when privacy policy not accepted
+□ Verify email/phone uniqueness validation
+□ Test password strength requirements
+□ Confirm privacy policy acceptance is logged with timestamp
+□ Test email verification process
+
+-----------------------------------------------------------------
+
+US1.1.2: Đăng nhập vào hệ thống
+=================================
+Database Tables: users, user_sessions
+
+Implementation Steps:
+
+BACKEND:
+1. Authentication Controller:
+```java
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+    
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO request) {
+        // 1. Validate credentials
+        User user = authService.authenticate(request.getEmail(), request.getPassword());
+        
+        // 2. Check account status
+        if (!user.getIsActive()) {
+            throw new AccountLockedException("Account is locked");
+        }
+        
+        // 3. Generate JWT token
+        String token = jwtService.generateToken(user);
+        
+        // 4. Create user session
+        UserSession session = sessionService.createSession(user, request.getIpAddress(), request.getUserAgent());
+        
+        // 5. Reset failed login attempts
+        user.setFailedLoginAttempts(0);
+        user.setLastLoginAt(LocalDateTime.now());
+        userRepository.save(user);
+        
+        return ResponseEntity.ok(new AuthResponseDTO(token, user.toDTO()));
+    }
+}
+```
+
+2. Brute Force Protection:
+```java
+@Service
+public class AuthService {
+    private static final int MAX_FAILED_ATTEMPTS = 5;
+    private static final long LOCKOUT_DURATION_MINUTES = 15;
+    
+    public User authenticate(String email, String password) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+        
+        // Check if account is temporarily locked
+        if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(LocalDateTime.now())) {
+            throw new AccountLockedException("Account temporarily locked");
+        }
+        
+        // Verify password
+        if (!passwordEncoder.matches(password, user.getPasswordHash())) {
+            // Increment failed attempts
+            user.setFailedLoginAttempts(user.getFailedLoginAttempts() + 1);
+            
+            // Lock account if max attempts reached
+            if (user.getFailedLoginAttempts() >= MAX_FAILED_ATTEMPTS) {
+                user.setLockedUntil(LocalDateTime.now().plusMinutes(LOCKOUT_DURATION_MINUTES));
+            }
+            
+            userRepository.save(user);
+            throw new BadCredentialsException("Invalid credentials");
+        }
+        
+        return user;
+    }
+}
+```
+
+FRONTEND:
+```jsx
+const LoginForm = () => {
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await authApi.login(credentials);
+      localStorage.setItem('token', response.data.token);
+      // Redirect to dashboard
+    } catch (error) {
+      if (error.response?.status === 423) {
+        setError('Tài khoản tạm thời bị khóa do đăng nhập sai quá nhiều lần');
+      } else {
+        setError('Email hoặc mật khẩu không chính xác');
+      }
+    }
+  };
+
+  return (
+    <form onSubmit={handleLogin}>
+      <input
+        type="email"
+        value={credentials.email}
+        onChange={(e) => setCredentials({...credentials, email: e.target.value})}
+        placeholder="Email hoặc số điện thoại"
+        required
+      />
+      <input
+        type="password"
+        value={credentials.password}
+        onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+        placeholder="Mật khẩu"
+        required
+      />
+      {error && <div className="error">{error}</div>}
+      <button type="submit">Đăng nhập</button>
+      
+      <div className="social-login">
+        <GoogleLogin onSuccess={handleGoogleLogin} />
+        <FacebookLogin onSuccess={handleFacebookLogin} />
+      </div>
+      
+      <a href="/forgot-password">Quên mật khẩu?</a>
+    </form>
+  );
+};
+```
+
+-----------------------------------------------------------------
+
+US1.1.3: Quản lý thông tin hồ sơ cá nhân
+=================================
+Database Tables: users
+
+Implementation Steps:
+
+BACKEND:
+```java
+@RestController
+@RequestMapping("/api/users/profile")
+@PreAuthorize("hasRole('CUSTOMER')")
+public class ProfileController {
+    
+    @GetMapping
+    public ResponseEntity<UserProfileDTO> getProfile(Authentication auth) {
+        User user = userService.findByEmail(auth.getName());
+        return ResponseEntity.ok(user.toProfileDTO());
+    }
+    
+    @PutMapping
+    public ResponseEntity<UserProfileDTO> updateProfile(
+            @RequestBody @Valid UserProfileUpdateDTO dto,
+            Authentication auth) {
+        
+        User user = userService.updateProfile(auth.getName(), dto);
+        return ResponseEntity.ok(user.toProfileDTO());
+    }
+    
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(
+            @RequestBody @Valid ChangePasswordDTO dto,
+            Authentication auth) {
+        
+        userService.changePassword(auth.getName(), dto);
+        return ResponseEntity.ok().build();
+    }
+    
+    // GDPR Compliance - Right to be forgotten
+    @DeleteMapping
+    public ResponseEntity<Void> deleteAccount(Authentication auth) {
+        userService.deleteUserAccount(auth.getName());
+        return ResponseEntity.ok().build();
+    }
+}
+```
+
+FRONTEND:
+```jsx
+const ProfileManagement = () => {
+  const [profile, setProfile] = useState(null);
+  const [editing, setEditing] = useState(false);
+
+  const PrivacyCenter = () => (
+    <div className="privacy-center">
+      <h3>Trung tâm Quyền riêng tư</h3>
+      <div className="privacy-controls">
+        <label>
+          <input 
+            type="checkbox" 
+            checked={profile.marketingEmailConsent}
+            onChange={(e) => updateConsent('email', e.target.checked)}
+          />
+          Nhận email khuyến mãi
+        </label>
+        <label>
+          <input 
+            type="checkbox" 
+            checked={profile.marketingSmsConsent}
+            onChange={(e) => updateConsent('sms', e.target.checked)}
+          />
+          Nhận SMS khuyến mãi
+        </label>
+      </div>
+      
+      <div className="data-rights">
+        <button onClick={downloadMyData}>
+          Tải xuống dữ liệu của tôi
+        </button>
+        <button onClick={deleteAccount} className="danger">
+          Xóa tài khoản
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="profile-management">
+      <UserProfileForm profile={profile} onSave={updateProfile} />
+      <PrivacyCenter />
+    </div>
+  );
+};
+```
+
+=================================================================
+
+2.2. EPIC 1.2: Khám phá và Tìm kiếm Phim/Suất chiếu
+-----------------------------------------------------------------
+
+US1.2.1: Xem danh sách phim
+=================================
+Database Tables: movies, movie_genres, movie_genre_mapping
+
+Implementation Steps:
+
+BACKEND:
+```java
+@RestController
+@RequestMapping("/api/movies")
+public class MovieController {
+    
+    @GetMapping("/now-showing")
+    public ResponseEntity<Page<MovieSummaryDTO>> getNowShowingMovies(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size) {
+        
+        Page<Movie> movies = movieService.getNowShowingMovies(
+            PageRequest.of(page, size));
+        
+        return ResponseEntity.ok(movies.map(Movie::toSummaryDTO));
+    }
+    
+    @GetMapping("/coming-soon")
+    public ResponseEntity<Page<MovieSummaryDTO>> getComingSoonMovies(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size) {
+        
+        Page<Movie> movies = movieService.getComingSoonMovies(
+            PageRequest.of(page, size));
+        
+        return ResponseEntity.ok(movies.map(Movie::toSummaryDTO));
+    }
+}
+```
+
+```java
+@Service
+public class MovieService {
+    public Page<Movie> getNowShowingMovies(Pageable pageable) {
+        return movieRepository.findByStatusAndReleaseDateLessThanEqual(
+            MovieStatus.NOW_SHOWING, 
+            LocalDate.now(), 
+            pageable);
+    }
+}
+```
+
+FRONTEND:
+```jsx
+const MovieList = () => {
+  const [activeTab, setActiveTab] = useState('now-showing');
+  const [movies, setMovies] = useState([]);
+
+  const MovieCard = ({ movie }) => (
+    <div className="movie-card">
+      <img src={movie.posterUrl} alt={movie.title} />
+      <div className="movie-info">
+        <h3>{movie.title}</h3>
+        <div className="age-rating">
+          <AgeRatingBadge rating={movie.ageRating} />
+        </div>
+        <div className="genres">
+          {movie.genres.map(genre => (
+            <span key={genre.id} className="genre-tag">{genre.name}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  // Age Rating Badge Component - CRITICAL for compliance
+  const AgeRatingBadge = ({ rating }) => {
+    const getRatingStyle = (rating) => {
+      const styles = {
+        'P': { color: 'green', label: 'P - Phim được phổ biến đến người xem ở mọi độ tuổi' },
+        'K': { color: 'blue', label: 'K - Phim được phổ biến đến khán giả dưới 13 tuổi và có người bảo hộ đi cùng' },
+        'T13': { color: 'orange', label: 'T13 - Phim cấm khán giả dưới 13 tuổi' },
+        'T16': { color: 'red', label: 'T16 - Phim cấm khán giả dưới 16 tuổi' },
+        'T18': { color: 'darkred', label: 'T18 - Phim cấm khán giả dưới 18 tuổi' }
+      };
+      return styles[rating] || styles['P'];
+    };
+
+    const style = getRatingStyle(rating);
+    
+    return (
+      <span 
+        className={`age-rating-badge rating-${rating.toLowerCase()}`}
+        style={{ backgroundColor: style.color }}
+        title={style.label}
+      >
+        {rating}
+      </span>
+    );
+  };
+
+  return (
+    <div className="movie-list-container">
+      <div className="tabs">
+        <button 
+          className={activeTab === 'now-showing' ? 'active' : ''}
+          onClick={() => setActiveTab('now-showing')}
+        >
+          Phim đang chiếu
+        </button>
+        <button 
+          className={activeTab === 'coming-soon' ? 'active' : ''}
+          onClick={() => setActiveTab('coming-soon')}
+        >
+          Phim sắp chiếu
+        </button>
+      </div>
+      
+      <div className="movie-grid">
+        {movies.map(movie => (
+          <MovieCard key={movie.id} movie={movie} />
+        ))}
+      </div>
+    </div>
+  );
+};
+```
+
+-----------------------------------------------------------------
+
+US1.2.2: Xem thông tin chi tiết của một bộ phim
+=================================
+Database Tables: movies, movie_genres, movie_genre_mapping
+
+Implementation Steps:
+
+BACKEND:
+```java
+@GetMapping("/{movieId}")
+public ResponseEntity<MovieDetailDTO> getMovieDetail(@PathVariable Long movieId) {
+    Movie movie = movieService.findById(movieId);
+    return ResponseEntity.ok(movie.toDetailDTO());
+}
+```
+
+FRONTEND:
+```jsx
+const MovieDetail = ({ movieId }) => {
+  const [movie, setMovie] = useState(null);
+
+  const ContentWarning = ({ movie }) => {
+    if (!movie.contentWarning) return null;
+    
+    return (
+      <div className="content-warning">
+        <h4>⚠️ Cảnh báo nội dung:</h4>
+        <p>{movie.contentWarning}</p>
+      </div>
+    );
+  };
+
+  const AgeRatingSection = ({ rating, contentWarning }) => (
+    <div className="age-rating-section">
+      <div className="rating-badge-large">
+        <AgeRatingBadge rating={rating} />
+      </div>
+      <div className="rating-explanation">
+        <h4>Phân loại độ tuổi: {rating}</h4>
+        <p>{getRatingDescription(rating)}</p>
+        {contentWarning && <ContentWarning movie={movie} />}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="movie-detail">
+      <div className="movie-header">
+        <img src={movie.posterUrl} alt={movie.title} className="poster" />
+        <div className="movie-info">
+          <h1>{movie.title}</h1>
+          {movie.titleEn && <h2 className="title-en">{movie.titleEn}</h2>}
+          
+          {/* CRITICAL: Age rating must be prominent */}
+          <AgeRatingSection 
+            rating={movie.ageRating} 
+            contentWarning={movie.contentWarning} 
+          />
+          
+          <div className="movie-specs">
+            <span>🎬 {movie.director}</span>
+            <span>⏱️ {movie.durationMinutes} phút</span>
+            <span>🌍 {movie.country}</span>
+            <span>🗣️ {movie.language}</span>
+            {movie.subtitleLanguage && <span>📝 Phụ đề {movie.subtitleLanguage}</span>}
+          </div>
+          
+          <div className="formats">
+            {movie.availableFormats.map(format => (
+              <span key={format} className="format-tag">{format}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      <div className="movie-content">
+        <div className="synopsis">
+          <h3>Nội dung phim</h3>
+          <p>{movie.synopsis}</p>
+        </div>
+        
+        {movie.trailerUrl && (
+          <div className="trailer-section">
+            <h3>Trailer</h3>
+            <iframe 
+              src={movie.trailerUrl}
+              title="Movie Trailer"
+              allowFullScreen
+            />
+          </div>
+        )}
+        
+        <div className="cast-crew">
+          <h3>Diễn viên</h3>
+          <p>{movie.cast}</p>
+        </div>
+      </div>
+      
+      <div className="booking-section">
+        <button 
+          className="btn-book-now"
+          onClick={() => navigateToShowtimes(movie.id)}
+        >
+          Đặt vé ngay
+        </button>
+      </div>
+    </div>
+  );
+};
+```
+
+-----------------------------------------------------------------
+
+US1.2.3: Tìm kiếm và lọc suất chiếu
+=================================
+Database Tables: showtimes, movies, cinema_halls, cinemas, cinema_chains
+
+Implementation Steps:
+
+BACKEND:
+```java
+@GetMapping("/{movieId}/showtimes")
+public ResponseEntity<ShowtimeSearchResponseDTO> getMovieShowtimes(
+        @PathVariable Long movieId,
+        @RequestParam(required = false) Long cinemaId,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+        @RequestParam(required = false) String format) {
+    
+    ShowtimeSearchCriteria criteria = ShowtimeSearchCriteria.builder()
+        .movieId(movieId)
+        .cinemaId(cinemaId)
+        .date(date != null ? date : LocalDate.now())
+        .formatType(format)
+        .build();
+    
+    ShowtimeSearchResponseDTO response = showtimeService.searchShowtimes(criteria);
+    return ResponseEntity.ok(response);
+}
+```
+
+```java
+@Service
+public class ShowtimeService {
+    public ShowtimeSearchResponseDTO searchShowtimes(ShowtimeSearchCriteria criteria) {
+        // Build dynamic query based on criteria
+        List<Showtime> showtimes = showtimeRepository.findByCriteria(criteria);
+        
+        // Group by cinema and sort by time
+        Map<Cinema, List<Showtime>> groupedShowtimes = showtimes.stream()
+            .collect(Collectors.groupingBy(
+                showtime -> showtime.getHall().getCinema(),
+                Collectors.collectingAndThen(
+                    Collectors.toList(),
+                    list -> list.stream()
+                        .sorted(Comparator.comparing(Showtime::getStartTime))
+                        .collect(Collectors.toList())
+                )
+            ));
+        
+        return ShowtimeSearchResponseDTO.builder()
+            .movieId(criteria.getMovieId())
+            .searchDate(criteria.getDate())
+            .cinemaShowtimes(groupedShowtimes)
+            .build();
+    }
+}
+```
+
+FRONTEND:
+```jsx
+const ShowtimeSearch = ({ movieId }) => {
+  const [filters, setFilters] = useState({
+    cinemaId: null,
+    date: new Date(),
+    format: null
+  });
+  const [showtimes, setShowtimes] = useState([]);
+  const [cinemas, setCinemas] = useState([]);
+
+  const ShowtimeFilters = () => (
+    <div className="showtime-filters">
+      <div className="filter-group">
+        <label>Rạp chiếu:</label>
+        <select 
+          value={filters.cinemaId || ''}
+          onChange={(e) => setFilters({...filters, cinemaId: e.target.value || null})}
+        >
+          <option value="">Tất cả rạp</option>
+          {cinemas.map(cinema => (
+            <option key={cinema.id} value={cinema.id}>
+              {cinema.name} - {cinema.district}
+            </option>
+          ))}
+        </select>
+      </div>
+      
+      <div className="filter-group">
+        <label>Ngày xem:</label>
+        <input
+          type="date"
+          value={filters.date.toISOString().split('T')[0]}
+          min={new Date().toISOString().split('T')[0]}
+          max={getMaxDate()}
+          onChange={(e) => setFilters({...filters, date: new Date(e.target.value)})}
+        />
+      </div>
+      
+      <div className="filter-group">
+        <label>Định dạng:</label>
+        <select 
+          value={filters.format || ''}
+          onChange={(e) => setFilters({...filters, format: e.target.value || null})}
+        >
+          <option value="">Tất cả định dạng</option>
+          <option value="2D">2D</option>
+          <option value="3D">3D</option>
+          <option value="IMAX">IMAX</option>
+          <option value="4DX">4DX</option>
+        </select>
+      </div>
+    </div>
+  );
+
+  const ShowtimeGrid = () => (
+    <div className="showtime-grid">
+      {Object.entries(showtimes).map(([cinema, times]) => (
+        <div key={cinema.id} className="cinema-showtimes">
+          <div className="cinema-header">
+            <h3>{cinema.name}</h3>
+            <p>{cinema.address}</p>
+          </div>
+          
+          <div className="showtimes">
+            {times.map(showtime => (
+              <div 
+                key={showtime.id} 
+                className={`showtime-slot ${showtime.availableSeats === 0 ? 'sold-out' : ''}`}
+                onClick={() => handleShowtimeSelect(showtime)}
+              >
+                <div className="time">
+                  {formatTime(showtime.startTime)}
+                </div>
+                <div className="details">
+                  <span className="hall">{showtime.hall.name}</span>
+                  <span className="format">{showtime.formatType}</span>
+                  <span className="price">
+                    từ {formatCurrency(showtime.basePrice)}
+                  </span>
+                </div>
+                <div className="availability">
+                  {showtime.availableSeats > 0 
+                    ? `${showtime.availableSeats} ghế trống`
+                    : 'Hết vé'
+                  }
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="showtime-search">
+      <ShowtimeFilters />
+      <ShowtimeGrid />
+    </div>
+  );
+};
+```
+
+=================================================================
+
+2.3. EPIC 1.3: Quy trình Đặt vé và Thanh toán
+-----------------------------------------------------------------
+
+US1.3.1: Chọn ghế ngồi trên sơ đồ trực quan
+=================================
+Database Tables: seats, cinema_halls, showtimes, bookings (for seat holds)
+
+Implementation Steps:
+
+BACKEND:
+```java
+@RestController
+@RequestMapping("/api/showtimes/{showtimeId}/seats")
+public class SeatSelectionController {
+    
+    @GetMapping
+    public ResponseEntity<SeatMapDTO> getSeatMap(@PathVariable Long showtimeId) {
+        SeatMapDTO seatMap = seatService.getSeatMapForShowtime(showtimeId);
+        return ResponseEntity.ok(seatMap);
+    }
+    
+    @PostMapping("/hold")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<SeatHoldResponseDTO> holdSeats(
+            @PathVariable Long showtimeId,
+            @RequestBody SeatHoldRequestDTO request,
+            Authentication auth) {
+        
+        SeatHoldResponseDTO response = seatService.holdSeats(
+            showtimeId, 
+            request.getSeatIds(), 
+            auth.getName()
+        );
+        
+        return ResponseEntity.ok(response);
+    }
+}
+```
+
+```java
+@Service
+@Transactional
+public class SeatService {
+    private static final long SEAT_HOLD_DURATION_MINUTES = 10;
+    
+    public SeatMapDTO getSeatMapForShowtime(Long showtimeId) {
+        Showtime showtime = showtimeRepository.findById(showtimeId)
+            .orElseThrow(() -> new EntityNotFoundException("Showtime not found"));
+        
+        CinemaHall hall = showtime.getHall();
+        List<Seat> seats = seatRepository.findByHallId(hall.getHallId());
+        
+        // Get currently held/booked seats
+        List<Long> unavailableSeats = getUnavailableSeats(showtimeId);
+        
+        return SeatMapDTO.builder()
+            .hallId(hall.getHallId())
+            .hallName(hall.getHallName())
+            .totalSeats(hall.getTotalSeats())
+            .seatLayout(buildSeatLayout(seats, unavailableSeats))
+            .build();
+    }
+    
+    public SeatHoldResponseDTO holdSeats(Long showtimeId, List<Long> seatIds, String userEmail) {
+        // 1. Validate seats are available
+        List<Long> unavailableSeats = getUnavailableSeats(showtimeId);
+        List<Long> conflictSeats = seatIds.stream()
+            .filter(unavailableSeats::contains)
+            .collect(Collectors.toList());
+        
+        if (!conflictSeats.isEmpty()) {
+            throw new SeatUnavailableException("Selected seats are no longer available", conflictSeats);
+        }
+        
+        // 2. Create temporary booking for seat hold
+        User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        
+        Booking seatHold = new Booking();
+        seatHold.setShowtimeId(showtimeId);
+        seatHold.setUserId(user.getUserId());
+        seatHold.setBookingCode(generateSeatHoldCode());
+        seatHold.setStatus(BookingStatus.PENDING);
+        seatHold.setHoldExpiresAt(LocalDateTime.now().plusMinutes(SEAT_HOLD_DURATION_MINUTES));
+        seatHold.setTotalSeats(seatIds.size());
+        
+        seatHold = bookingRepository.save(seatHold);
+        
+        // 3. Create ticket records for held seats
+        List<Ticket> heldTickets = seatIds.stream()
+            .map(seatId -> {
+                Ticket ticket = new Ticket();
+                ticket.setBookingId(seatHold.getBookingId());
+                ticket.setSeatId(seatId);
+                ticket.setTicketCode(generateTicketCode());
+                ticket.setStatus(TicketStatus.BOOKED);
+                return ticket;
+            })
+            .collect(Collectors.toList());
+        
+        ticketRepository.saveAll(heldTickets);
+        
+        return SeatHoldResponseDTO.builder()
+            .holdId(seatHold.getBookingId())
+            .expiresAt(seatHold.getHoldExpiresAt())
+            .heldSeats(seatIds)
+            .build();
+    }
+}
+```
+
+FRONTEND:
+```jsx
+const SeatSelection = ({ showtimeId, onSeatsSelected }) => {
+  const [seatMap, setSeatMap] = useState(null);
+  const [selectedSeats, setSelectedSeats] = useState([]);
+  const [holdTimer, setHoldTimer] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(0);
+
+  const SeatMapComponent = ({ seatMap }) => {
+    const getSeatClassName = (seat) => {
+      const classes = ['seat', `seat-${seat.type.toLowerCase()}`];
+      
+      if (seat.status === 'UNAVAILABLE') classes.push('unavailable');
+      else if (seat.status === 'HELD') classes.push('held');
+      else if (selectedSeats.includes(seat.id)) classes.push('selected');
+      else classes.push('available');
+      
+      return classes.join(' ');
+    };
+
+    const handleSeatClick = (seat) => {
+      if (seat.status === 'UNAVAILABLE' || seat.status === 'HELD') return;
+      
+      if (selectedSeats.includes(seat.id)) {
+        setSelectedSeats(prev => prev.filter(id => id !== seat.id));
+      } else {
+        if (selectedSeats.length >= 8) {
+          alert('Tối đa 8 vé mỗi lần đặt');
+          return;
+        }
+        setSelectedSeats(prev => [...prev, seat.id]);
+      }
+    };
+
+    return (
+      <div className="seat-map">
+        <div className="screen">
+          <div className="screen-label">Màn hình</div>
+        </div>
+        
+        <div className="seats-container">
+          {seatMap.rows.map(row => (
+            <div key={row.rowLabel} className="seat-row">
+              <div className="row-label">{row.rowLabel}</div>
+              <div className="seats">
+                {row.seats.map(seat => (
+                  <div
+                    key={seat.id}
+                    className={getSeatClassName(seat)}
+                    onClick={() => handleSeatClick(seat)}
+                    title={`${row.rowLabel}${seat.number} - ${seat.type} - ${formatCurrency(seat.price)}`}
+                  >
+                    {seat.number}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <SeatLegend />
+      </div>
+    );
+  };
+
+  const SeatLegend = () => (
+    <div className="seat-legend">
+      <div className="legend-item">
+        <div className="seat available"></div>
+        <span>Còn trống</span>
+      </div>
+      <div className="legend-item">
+        <div className="seat selected"></div>
+        <span>Đang chọn</span>
+      </div>
+      <div className="legend-item">
+        <div className="seat unavailable"></div>
+        <span>Đã đặt</span>
+      </div>
+      <div className="legend-item">
+        <div className="seat seat-vip"></div>
+        <span>Ghế VIP</span>
+      </div>
+      <div className="legend-item">
+        <div className="seat seat-couple"></div>
+        <span>Ghế đôi</span>
+      </div>
+    </div>
+  );
+
+  const CountdownTimer = ({ timeLeft }) => {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    
+    return (
+      <div className="countdown-timer">
+        ⏰ Thời gian giữ ghế: {minutes}:{seconds.toString().padStart(2, '0')}
+      </div>
+    );
+  };
+
+  const handleConfirmSeats = async () => {
+    if (selectedSeats.length === 0) {
+      alert('Vui lòng chọn ít nhất một ghế');
+      return;
+    }
+
+    try {
+      const response = await api.post(`/showtimes/${showtimeId}/seats/hold`, {
+        seatIds: selectedSeats
+      });
+
+      // Start countdown timer
+      setHoldTimer(response.data.holdId);
+      setTimeLeft(600); // 10 minutes
+
+      onSeatsSelected(response.data);
+    } catch (error) {
+      if (error.response?.data?.conflictSeats) {
+        alert('Một số ghế đã được chọn bởi người khác. Vui lòng chọn ghế khác.');
+        // Refresh seat map
+        loadSeatMap();
+      }
+    }
+  };
+
+  return (
+    <div className="seat-selection">
+      <div className="selection-header">
+        <h2>Chọn ghế</h2>
+        {holdTimer && <CountdownTimer timeLeft={timeLeft} />}
+      </div>
+      
+      <SeatMapComponent seatMap={seatMap} />
+      
+      <div className="selection-summary">
+        <div className="selected-seats-info">
+          <h3>Ghế đã chọn ({selectedSeats.length})</h3>
+          <div className="selected-seats-list">
+            {selectedSeats.map(seatId => {
+              const seat = findSeatById(seatMap, seatId);
+              return (
+                <div key={seatId} className="selected-seat-item">
+                  <span>{seat.rowLabel}{seat.number}</span>
+                  <span className="seat-type">{seat.type}</span>
+                  <span className="seat-price">{formatCurrency(seat.price)}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        
+        <div className="total-info">
+          <div className="total-amount">
+            Tổng: {formatCurrency(calculateTotalAmount())}
+          </div>
+          <button 
+            className="btn-confirm-seats"
+            onClick={handleConfirmSeats}
+            disabled={selectedSeats.length === 0}
+          >
+            Xác nhận chọn ghế
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+[Content continues with remaining user stories...]
+
+Testing Checklist for Seat Selection:
+□ Verify seat map loads correctly with proper seat statuses
+□ Test seat hold mechanism with 10-minute timeout
+□ Confirm held seats are unavailable to other users
+□ Test seat selection limits (max 8 seats)
+□ Verify pricing calculation includes surcharges
+□ Test conflict resolution when seats become unavailable
+□ Confirm countdown timer works correctly
+□ Test seat hold expiration and cleanup
+
+=================================================================
+3. PRICING ENGINE CONFIGURATION
+=================================================================
+
+Rule-based Pricing Implementation:
+
+BACKEND:
+```java
+@Entity
+@Table(name = "pricing_rules")
+public class PricingRule {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long ruleId;
+    
+    @Column(name = "rule_name")
+    private String ruleName;
+    
+    @Enumerated(EnumType.STRING)
+    private RuleType ruleType; // SURCHARGE, DISCOUNT, FIXED_PRICE
+    
+    @Column(name = "conditions", columnDefinition = "JSON")
+    private String conditions; // JSON conditions
+    
+    private BigDecimal amount;
+    private BigDecimal percentage;
+    
+    @Column(name = "valid_from")
+    private LocalDate validFrom;
+    
+    @Column(name = "valid_to")
+    private LocalDate validTo;
+    
+    @Column(name = "applies_to", columnDefinition = "JSON")
+    private String appliesTo; // JSON targeting
+    
+    private Integer priority;
+    private Boolean isActive = true;
+}
+```
+
+```java
+@Service
+public class PricingEngine {
+    
+    public TicketPriceCalculation calculatePrice(PricingContext context) {
+        // 1. Start with base price
+        BigDecimal basePrice = context.getShowtime().getBasePrice();
+        
+        // 2. Get all applicable pricing rules
+        List<PricingRule> rules = pricingRuleRepository.findApplicableRules(
+            context.getShowtime().getShowDate(),
+            context.getSeat().getSeatType(),
+            context.getCustomerType()
+        );
+        
+        // 3. Apply rules in priority order
+        BigDecimal finalPrice = basePrice;
+        List<PriceAdjustment> adjustments = new ArrayList<>();
+        
+        for (PricingRule rule : rules.stream()
+                .sorted(Comparator.comparing(PricingRule::getPriority))
+                .collect(Collectors.toList())) {
+            
+            if (isRuleApplicable(rule, context)) {
+                PriceAdjustment adjustment = applyRule(rule, finalPrice, context);
+                adjustments.add(adjustment);
+                finalPrice = adjustment.getNewPrice();
+            }
+        }
+        
+        return TicketPriceCalculation.builder()
+            .basePrice(basePrice)
+            .finalPrice(finalPrice)
+            .adjustments(adjustments)
+            .build();
+    }
+    
+    private boolean isRuleApplicable(PricingRule rule, PricingContext context) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode conditions = mapper.readTree(rule.getConditions());
+            
+            // Check day of week condition
+            if (conditions.has("day_of_week")) {
+                JsonNode dayCondition = conditions.get("day_of_week");
+                String currentDay = context.getShowtime().getShowDate()
+                    .getDayOfWeek().toString();
+                
+                boolean dayMatches = false;
+                if (dayCondition.isArray()) {
+                    for (JsonNode day : dayCondition) {
+                        if (day.asText().equals(currentDay)) {
+                            dayMatches = true;
+                            break;
+                        }
+                    }
+                } else {
+                    dayMatches = dayCondition.asText().equals(currentDay);
+                }
+                
+                if (!dayMatches) return false;
+            }
+            
+            // Check time range condition
+            if (conditions.has("time_range")) {
+                JsonNode timeRange = conditions.get("time_range");
+                LocalTime startTime = LocalTime.parse(timeRange.get(0).asText());
+                LocalTime endTime = LocalTime.parse(timeRange.get(1).asText());
+                LocalTime showtimeStart = context.getShowtime().getStartTime();
+                
+                if (showtimeStart.isBefore(startTime) || showtimeStart.isAfter(endTime)) {
+                    return false;
+                }
+            }
+            
+            // Check cinema condition
+            if (conditions.has("cinema_ids")) {
+                JsonNode cinemaIds = conditions.get("cinema_ids");
+                Long currentCinemaId = context.getShowtime().getHall().getCinema().getCinemaId();
+                
+                boolean cinemaMatches = false;
+                for (JsonNode cinemaId : cinemaIds) {
+                    if (cinemaId.asLong() == currentCinemaId) {
+                        cinemaMatches = true;
+                        break;
+                    }
+                }
+                
+                if (!cinemaMatches) return false;
+            }
+            
+            return true;
+            
+        } catch (Exception e) {
+            log.error("Error evaluating pricing rule conditions", e);
+            return false;
+        }
+    }
+}
+```
+
+Example Pricing Rules Configuration:
+```json
+{
+  "rules": [
+    {
+      "ruleName": "Weekend Surcharge",
+      "ruleType": "SURCHARGE",
+      "conditions": {
+        "day_of_week": ["SATURDAY", "SUNDAY"]
+      },
+      "amount": 10000,
+      "priority": 1
+    },
+    {
+      "ruleName": "Late Night Discount",
+      "ruleType": "DISCOUNT",
+      "conditions": {
+        "time_range": ["22:00", "23:59"]
+      },
+      "percentage": 15,
+      "priority": 2
+    },
+    {
+      "ruleName": "VIP Seat Surcharge",
+      "ruleType": "SURCHARGE",
+      "appliesTo": {
+        "seat_types": ["VIP"]
+      },
+      "amount": 25000,
+      "priority": 3
+    },
+    {
+      "ruleName": "U22 Discount",
+      "ruleType": "DISCOUNT",
+      "appliesTo": {
+        "customer_types": ["U22"]
+      },
+      "percentage": 20,
+      "conditions": {
+        "day_of_week": ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY"]
+      },
+      "priority": 4
+    }
+  ]
+}
+```
+
+=================================================================
+4. COMPLIANCE IMPLEMENTATION CHECKLIST
+=================================================================
+
+Privacy & Data Protection (NĐ 13/2023/NĐ-CP):
+□ Privacy policy consent checkbox (not pre-checked)
+□ Data processing purpose clearly stated
+□ User consent logging with timestamp
+□ Right to access personal data
+□ Right to rectification
+□ Right to erasure (be forgotten)
+□ Data portability functionality
+□ Privacy settings dashboard
+
+Content Rating Compliance (Thông tư 05/2023/TT-BVHTTDL):
+□ Age rating badges on all movie listings
+□ Prominent display on movie detail pages
+□ Rating information in booking flow
+□ Content warnings for sensitive material
+□ Age verification for restricted content
+□ Staff training on rating enforcement
+
+E-commerce Compliance (NĐ 52/2013/NĐ-CP):
+□ Clear transaction terms display
+□ Order confirmation page
+□ Transaction data integrity
+□ Customer rights information
+□ Dispute resolution process
+
+Electronic Invoice Compliance (NĐ 123/2020/NĐ-CP):
+□ Tax code display on tickets
+□ Complete invoice information
+□ Digital signature for authenticity
+□ Invoice storage and retrieval
+□ Customer copy provision
+
+=================================================================
+5. SECURITY IMPLEMENTATION
+=================================================================
+
+Authentication & Authorization:
+- JWT token-based authentication
+- Role-based access control (RBAC)
+- Session management with expiration
+- Brute force protection
+- Password strength enforcement
+- Two-factor authentication (optional)
+
+Data Protection:
+- HTTPS encryption for all communications
+- Database encryption at rest
+- PCI DSS compliance for payment data
+- Input sanitization and validation
+- SQL injection prevention
+- XSS protection
+
+Payment Security:
+- Integration with certified payment gateways
+- No storage of sensitive payment data
+- Payment tokenization
+- Fraud detection integration
+- Secure webhook handling
+
+=================================================================
+6. PERFORMANCE & SCALABILITY
+=================================================================
+
+Database Optimization:
+- Proper indexing strategy
+- Query optimization
+- Connection pooling
+- Read replicas for reporting
+- Caching strategy (Redis)
+
+Application Performance:
+- CDN for static assets
+- Image optimization
+- Lazy loading
+- API response compression
+- Database query optimization
+- Caching at multiple levels
+
+Scalability Considerations:
+- Horizontal scaling capability
+- Load balancing
+- Microservices architecture (future)
+- Message queuing for async operations
+- Database sharding strategies
+
+=================================================================
+END OF IMPLEMENTATION GUIDE
+=================================================================

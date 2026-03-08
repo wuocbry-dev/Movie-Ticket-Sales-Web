@@ -1,0 +1,32 @@
+{
+  "widgets": [
+    {
+      "type": "metric",
+      "properties": {
+        "metrics": [
+          [ "EmailService", "EmailSent", "Environment", "prod", "EmailType", "BOOKING_CONFIRMATION" ],
+          [ "...", "PASSWORD_RESET" ],
+          [ "...", "REFUND_CONFIRMATION" ]
+        ],
+        "period": 300,
+        "stat": "Sum",
+        "region": "ap-southeast-1",
+        "title": "Emails Sent by Type"
+      }
+    },
+    {
+      "type": "metric", 
+      "properties": {
+        "metrics": [
+          [ "AWS/Lambda", "Duration", "FunctionName", "movie-ticket-email-service-email-handler-prod" ],
+          [ ".", "Errors", ".", "." ],
+          [ ".", "Invocations", ".", "." ]
+        ],
+        "period": 300,
+        "stat": "Average",
+        "region": "ap-southeast-1",
+        "title": "Lambda Performance"
+      }
+    }
+  ]
+}

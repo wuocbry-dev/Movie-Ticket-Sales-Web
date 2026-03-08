@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Storage - Movie Ticket Sales</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        button {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #f40612;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧹 Clear Browser Storage</h1>
+    <p>This utility will help you clean up corrupted data from your browser.</p>
+    
+    <div class="info message">
+        <p><strong>Current localStorage data:</strong></p>
+        <pre id="currentData">Loading...</pre>
+    </div>
+    
+    <button onclick="clearStorage()">Clear All Storage</button>
+    <button onclick="checkStorage()">Check Storage</button>
+    <button onclick="goToApp()">Go to App</button>
+    
+    <div id="result"></div>
+
+    <script>
+        function checkStorage() {
+            const user = localStorage.getItem('user');
+            const accessToken = document.cookie.includes('accessToken');
+            const refreshToken = document.cookie.includes('refreshToken');
+            
+            let html = '<strong>Storage Status:</strong><br>';
+            html += `User Data: ${user ? 'Present' : 'None'}<br>`;
+            html += `Access Token: ${accessToken ? 'Present' : 'None'}<br>`;
+            html += `Refresh Token: ${refreshToken ? 'Present' : 'None'}<br>`;
+            
+            if (user) {
+                html += `<br><strong>User Value:</strong><br>${user}<br>`;
+                if (user === 'undefined' || user === 'null') {
+                    html += '<br><span style="color: red;">⚠️ CORRUPTED DATA DETECTED!</span>';
+                }
+            }
+            
+            document.getElementById('currentData').innerHTML = html;
+        }
+        
+        function clearStorage() {
+            // Clear localStorage
+            localStorage.clear();
+            
+            // Clear cookies
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+            });
+            
+            // Clear sessionStorage
+            sessionStorage.clear();
+            
+            document.getElementById('result').innerHTML = '<div class="success message"><strong>✅ Success!</strong><br>All storage has been cleared. You can now return to the app.</div>';
+            
+            checkStorage();
+        }
+        
+        function goToApp() {
+            window.location.href = 'http://localhost:3000';
+        }
+        
+        // Check storage on load
+        checkStorage();
+    </script>
+</body>
+</html>
