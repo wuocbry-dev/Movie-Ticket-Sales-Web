@@ -1,0 +1,590 @@
+/* ===== QUICK BOOKING MINI - ISOLATED STYLES ===== */
+/* Prefix: qbm- to avoid conflicts */
+/* Nền đen mờ + blur (đồng bộ QuickBooking / modal) */
+
+/* Trigger Button */
+.qbm-trigger {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.qbm-trigger:hover {
+  background: linear-gradient(135deg, #ff7b45, #f9a12e);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+}
+
+/* Overlay */
+.qbm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.78);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 80px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Modal */
+.qbm-modal {
+  background: linear-gradient(
+    165deg,
+    rgba(0, 0, 0, 0.84) 0%,
+    rgba(12, 5, 22, 0.9) 50%,
+    rgba(4, 2, 10, 0.93) 100%
+  );
+  backdrop-filter: blur(28px) saturate(1.05);
+  -webkit-backdrop-filter: blur(28px) saturate(1.05);
+  border-radius: 12px;
+  width: 95%;
+  max-width: 900px;
+  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: qbmSlideIn 0.25s ease;
+}
+
+@keyframes qbmSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.qbm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.28);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.qbm-header h2 {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.qbm-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 28px;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.qbm-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Content */
+.qbm-content {
+  display: flex;
+  gap: 12px;
+  padding: 20px;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  background: rgba(0, 0, 0, 0.42);
+}
+
+/* Step */
+.qbm-step {
+  flex: 1;
+  min-width: 120px;
+  position: relative;
+}
+
+.qbm-step.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Selector */
+.qbm-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.qbm-selector:hover {
+  background: rgba(0, 0, 0, 0.62);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.qbm-selector.active {
+  background: rgba(0, 0, 0, 0.68);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.qbm-icon {
+  color: var(--ui-accent-mid);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.qbm-value {
+  flex: 1;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.qbm-chevron {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  transition: transform 0.2s ease;
+}
+
+.qbm-chevron.rotated {
+  transform: rotate(180deg);
+}
+
+/* Dropdown */
+.qbm-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.92) 0%, rgba(12, 6, 20, 0.96) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  animation: qbmDropIn 0.15s ease;
+}
+
+@keyframes qbmDropIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.qbm-dropdown-section {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.qbm-dropdown-section:last-child {
+  border-bottom: none;
+}
+
+.qbm-dropdown-label {
+  padding: 6px 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.qbm-dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.qbm-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.qbm-dropdown-item.selected {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.qbm-item-sub {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+}
+
+.qbm-dropdown-loading,
+.qbm-dropdown-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+}
+
+/* Showtime Item */
+.qbm-showtime-item {
+  gap: 10px;
+}
+
+.qbm-showtime-time {
+  font-weight: 700;
+  color: var(--ui-accent-mid);
+  font-size: 14px;
+}
+
+/* Scrollbar */
+.qbm-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.qbm-dropdown::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.qbm-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 3px;
+}
+
+.qbm-dropdown::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+  .qbm-trigger {
+    padding: 8px 12px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .qbm-overlay {
+    padding: 12px;
+    padding-top: max(12px, env(safe-area-inset-top));
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+    align-items: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+  }
+
+  .qbm-modal {
+    width: 100%;
+    max-width: none;
+    margin: 0 auto auto;
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  .qbm-header {
+    position: relative;
+    padding: 14px 52px 14px 16px;
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.55);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .qbm-header h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .qbm-close {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .qbm-content {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .qbm-step {
+    min-width: 0;
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  .qbm-selector {
+    padding: 14px 12px;
+    min-height: 48px;
+    box-sizing: border-box;
+  }
+
+  .qbm-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .qbm-value {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .qbm-chevron {
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .qbm-dropdown {
+    max-height: min(220px, 50vh);
+    left: 0;
+    right: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .qbm-dropdown-item {
+    padding: 12px 14px;
+    font-size: 13px;
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  .qbm-dropdown-label {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+
+  .qbm-book-btn {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 14px;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .qbm-overlay {
+    padding: 8px;
+  }
+
+  .qbm-modal {
+    max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+
+  .qbm-header h2 {
+    font-size: 1rem;
+  }
+
+  .qbm-content {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .qbm-selector {
+    padding: 12px 10px;
+    min-height: 46px;
+  }
+
+  .qbm-value {
+    font-size: 12px;
+  }
+}
+
+/* Book Now Button */
+.qbm-book-btn {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+  animation: qbmPulse 2s infinite;
+  height: fit-content;
+  align-self: center;
+}
+
+.qbm-book-btn:hover {
+  background: linear-gradient(135deg, #ff7b45, #f9a12e);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
+}
+
+.qbm-book-btn:active {
+  transform: translateY(0);
+}
+
+@keyframes qbmPulse {
+  0%, 100% {
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(255, 107, 53, 0.5);
+  }
+}
+
+/* ===== Aurora override (match current site background) ===== */
+.qbm-overlay {
+  background: rgba(4, 10, 24, 0.72);
+}
+
+.qbm-modal {
+  background: linear-gradient(165deg, rgba(10, 18, 40, 0.86) 0%, rgba(22, 34, 66, 0.92) 100%);
+  border: 1px solid rgba(132, 170, 255, 0.22);
+  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(132, 170, 255, 0.16);
+}
+
+.qbm-header {
+  background: rgba(14, 24, 50, 0.42);
+  border-bottom-color: rgba(132, 170, 255, 0.22);
+}
+
+.qbm-header h2 {
+  color: #f6f9ff;
+}
+
+.qbm-close {
+  background: rgba(18, 30, 58, 0.72);
+  color: rgba(236, 246, 255, 0.88);
+}
+
+.qbm-close:hover {
+  background: rgba(69, 197, 243, 0.2);
+  color: #fff;
+}
+
+.qbm-content {
+  background: rgba(8, 18, 40, 0.5);
+}
+
+.qbm-selector {
+  background: rgba(18, 30, 58, 0.62);
+  border-color: rgba(132, 170, 255, 0.26);
+}
+
+.qbm-selector:hover {
+  background: rgba(28, 44, 82, 0.76);
+  border-color: rgba(96, 165, 250, 0.5);
+}
+
+.qbm-selector.active {
+  background: rgba(34, 52, 92, 0.84);
+  border-color: rgba(96, 165, 250, 0.58);
+}
+
+.qbm-icon {
+  color: #7dd3fc;
+}
+
+.qbm-value {
+  color: #f6f9ff;
+}
+
+.qbm-chevron {
+  color: rgba(214, 230, 255, 0.55);
+}
+
+.qbm-dropdown {
+  background: linear-gradient(180deg, rgba(11, 22, 46, 0.94) 0%, rgba(16, 30, 58, 0.96) 100%);
+  border-color: rgba(132, 170, 255, 0.24);
+}
+
+.qbm-dropdown-section {
+  border-bottom-color: rgba(132, 170, 255, 0.16);
+}
+
+.qbm-dropdown-label {
+  color: rgba(205, 223, 255, 0.58);
+}
+
+.qbm-dropdown-item {
+  color: #f6f9ff;
+}
+
+.qbm-dropdown-item:hover {
+  background: rgba(69, 197, 243, 0.12);
+}
+
+.qbm-dropdown-item.selected {
+  background: rgba(139, 108, 255, 0.22);
+}
+
+.qbm-item-sub {
+  color: rgba(205, 223, 255, 0.62);
+}
+
+.qbm-book-btn {
+  background: linear-gradient(90deg, #8b6cff 0%, #45c5f3 100%);
+  box-shadow: 0 4px 15px rgba(76, 207, 255, 0.32);
+}
+
+.qbm-book-btn:hover {
+  background: linear-gradient(90deg, #9a7bff 0%, #58cff8 100%);
+  box-shadow: 0 6px 20px rgba(76, 207, 255, 0.48);
+}

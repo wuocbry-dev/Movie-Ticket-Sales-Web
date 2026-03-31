@@ -1,0 +1,171 @@
+@startuml UC_NguoiDung
+
+' ============================================================
+' USE CASE - KHÁCH & KHÁCH HÀNG (NGƯỜI DÙNG)
+' ============================================================
+
+left to right direction
+
+actor "Khách\n(Chưa đăng nhập)" as Guest
+actor "Khách hàng\n(Đã đăng nhập)" as User
+actor "Hệ thống Email\n(AWS SES)" as Email
+actor "Thanh toán\n(VNPay/MoMo)" as Payment
+actor "AI Gemini\n(Google)" as AI
+actor "AWS S3" as S3
+
+User -|> Guest
+
+rectangle "Xác thực" {
+    usecase "Đăng ký tài khoản" as UC01
+    usecase "Đăng nhập" as UC02
+    usecase "Quên mật khẩu" as UC03
+    usecase "Gửi mã xác nhận qua email" as UC04
+    usecase "Xác minh mã xác nhận" as UC05
+    usecase "Đặt lại mật khẩu" as UC06
+    usecase "Gửi lại mã xác nhận" as UC07
+}
+
+rectangle "Hồ sơ cá nhân" {
+    usecase "Xem hồ sơ cá nhân" as UC08
+    usecase "Cập nhật thông tin cá nhân" as UC09
+    usecase "Cập nhật ảnh đại diện" as UC10
+    usecase "Đổi mật khẩu" as UC11
+    usecase "Upload ảnh lên S3" as UC12
+}
+
+rectangle "Xem phim & lịch chiếu" {
+    usecase "Xem danh sách phim" as UC13
+    usecase "Xem chi tiết phim" as UC14
+    usecase "Xem danh sách thể loại" as UC15
+    usecase "Xem tất cả lịch chiếu" as UC16
+    usecase "Xem lịch chiếu theo phim" as UC17
+    usecase "Xem chi tiết lịch chiếu" as UC18
+}
+
+rectangle "Xem rạp" {
+    usecase "Xem danh sách chuỗi rạp" as UC19
+    usecase "Xem chi tiết chuỗi rạp" as UC20
+    usecase "Xem danh sách rạp" as UC21
+    usecase "Xem rạp theo chuỗi" as UC22
+    usecase "Xem chi tiết rạp" as UC23
+    usecase "Xem danh sách phòng chiếu" as UC24
+    usecase "Xem chi tiết phòng chiếu" as UC25
+}
+
+rectangle "Đặt vé xem phim" {
+    usecase "Xem sơ đồ ghế trống" as UC26
+    usecase "Giữ ghế tạm thời" as UC27
+    usecase "Hủy giữ ghế" as UC28
+    usecase "Gia hạn giữ ghế" as UC29
+    usecase "Tạo đơn đặt vé" as UC30
+    usecase "Xem đơn đặt vé của tôi" as UC31
+    usecase "Xem chi tiết đơn đặt vé" as UC32
+    usecase "Tra cứu đơn theo mã booking" as UC33
+    usecase "Hủy đơn đặt vé" as UC34
+}
+
+rectangle "Thanh toán" {
+    usecase "Thanh toán trực tuyến" as UC35
+    usecase "Kiểm tra trạng thái thanh toán" as UC36
+    usecase "Quy đổi điểm giảm giá" as UC37
+}
+
+rectangle "Bắp nước" {
+    usecase "Xem menu bắp nước tại rạp" as UC38
+    usecase "Xem bắp nước theo danh mục" as UC39
+    usecase "Tìm kiếm sản phẩm bắp nước" as UC40
+    usecase "Xem combo bắp nước" as UC41
+    usecase "Đặt bắp nước kèm vé" as UC42
+    usecase "Xem đơn bắp nước của tôi" as UC43
+    usecase "Xem chi tiết đơn bắp nước" as UC44
+    usecase "Hủy đơn bắp nước" as UC45
+}
+
+rectangle "Điểm thưởng & Khuyến mãi" {
+    usecase "Xem số dư điểm thưởng" as UC46
+    usecase "Xem lịch sử tích điểm" as UC47
+    usecase "Xem trước giảm giá khi dùng điểm" as UC48
+    usecase "Xem hạng thành viên" as UC49
+    usecase "Xem khuyến mãi hiện hành" as UC50
+    usecase "Xem chi tiết khuyến mãi" as UC51
+}
+
+rectangle "Trợ lý AI" {
+    usecase "Chat với AI tư vấn phim" as UC52
+    usecase "Nhận gợi ý phim theo sở thích" as UC53
+    usecase "Hỏi thông tin về phim" as UC54
+}
+
+' === KHÁCH (chưa đăng nhập) ===
+Guest -- UC01
+Guest -- UC02
+Guest -- UC03
+Guest -- UC13
+Guest -- UC14
+Guest -- UC15
+Guest -- UC16
+Guest -- UC17
+Guest -- UC18
+Guest -- UC19
+Guest -- UC20
+Guest -- UC21
+Guest -- UC22
+Guest -- UC23
+Guest -- UC24
+Guest -- UC25
+Guest -- UC38
+Guest -- UC39
+Guest -- UC40
+Guest -- UC41
+Guest -- UC50
+Guest -- UC51
+
+' === KHÁCH HÀNG (đã đăng nhập) ===
+User -- UC08
+User -- UC09
+User -- UC10
+User -- UC11
+User -- UC26
+User -- UC27
+User -- UC28
+User -- UC29
+User -- UC30
+User -- UC31
+User -- UC32
+User -- UC33
+User -- UC34
+User -- UC35
+User -- UC36
+User -- UC37
+User -- UC42
+User -- UC43
+User -- UC44
+User -- UC45
+User -- UC46
+User -- UC47
+User -- UC48
+User -- UC49
+User -- UC52
+User -- UC54
+
+' === QUAN HỆ INCLUDE / EXTEND ===
+UC03 ..> UC04 : <<include>>
+UC04 ..> UC05 : <<include>>
+UC05 ..> UC06 : <<include>>
+UC03 ..> UC07 : <<extend>>
+UC10 ..> UC12 : <<include>>
+UC30 ..> UC26 : <<include>>
+UC30 ..> UC27 : <<include>>
+UC35 ..> UC37 : <<extend>>
+UC37 ..> UC48 : <<include>>
+UC52 ..> UC53 : <<include>>
+
+' === HỆ THỐNG BÊN NGOÀI ===
+UC04 --> Email
+UC07 --> Email
+UC12 --> S3
+UC35 --> Payment
+UC36 --> Payment
+UC52 --> AI
+
+@enduml

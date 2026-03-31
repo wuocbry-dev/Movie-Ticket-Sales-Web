@@ -48,4 +48,8 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findByStatusAndHoldExpiresAtBefore(StatusBooking status, Instant expiresAt);
     
     List<Booking> findByStatusAndUpdatedAtBefore(StatusBooking status, Instant updatedAt);
+
+    /** Load booking với showtime, movie, hall, cinema (để gửi email trong async không bị LazyInitializationException) */
+    @Query("SELECT b FROM Booking b LEFT JOIN FETCH b.showtime s LEFT JOIN FETCH s.movie LEFT JOIN FETCH s.hall h LEFT JOIN FETCH h.cinema WHERE b.id = :id")
+    Optional<Booking> findByIdWithShowtimeAndCinema(@Param("id") Integer id);
 }

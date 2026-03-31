@@ -129,6 +129,7 @@ public class MovieService {
         dto.setReleaseDate(movie.getReleaseDate());
         dto.setStatus(movie.getStatus() != null ? movie.getStatus().toString() : null);
         dto.setPosterUrl(movie.getPosterUrl());
+        dto.setBackdropUrl(movie.getBackdropUrl());
         dto.setImdbRating(movie.getImdbRating());
         dto.setIsFeatured(movie.getIsFeatured());
         

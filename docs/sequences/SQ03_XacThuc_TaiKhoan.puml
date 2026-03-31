@@ -1,0 +1,48 @@
+@startuml SQ03_XacThuc_TaiKhoan
+
+title Quy trình Đăng ký và Đăng nhập (Tối giản)
+
+actor "Khách / Thành viên" as User
+participant "Giao diện (Frontend)" as FE
+participant "Hệ thống (Backend)" as BE
+database "Cơ sở dữ liệu" as DB
+
+' --- LUỒNG ĐĂNG KÝ ---
+group Đăng ký tài khoản
+    User -> FE: Nhập thông tin đăng ký
+    FE -> BE: Gửi yêu cầu Đăng ký (Email, Mật khẩu,...)
+    activate BE
+    
+    BE -> DB: Kiểm tra Email/SĐT đã tồn tại chưa
+    DB --> BE: Chưa tồn tại
+    
+    BE -> BE: Mã hóa mật khẩu bảo mật
+    
+    BE -> DB: Lưu thông tin User & Gán quyền "CUSTOMER"
+    BE -> DB: Khởi tạo thẻ thành viên (Bronze)
+    DB --> BE: Lưu thành công
+    
+    BE --> FE: Phản hồi Đăng ký thành công
+    deactivate BE
+    FE --> User: Thông báo thành công & Mời đăng nhập
+end
+
+' --- LUỒNG ĐĂNG NHẬP ---
+group Đăng nhập hệ thống
+    User -> FE: Nhập Email & Mật khẩu
+    FE -> BE: Gửi yêu cầu Đăng nhập
+    activate BE
+    
+    BE -> DB: Kiểm tra tài khoản & Lấy mật khẩu đã mã hóa
+    DB --> BE: Thông tin User
+    
+    BE -> BE: Xác thực mật khẩu & Tạo Token (JWT)
+    
+    BE -> DB: Cập nhật thời gian đăng nhập cuối
+    
+    BE --> FE: Trả về Token & Thông tin người dùng
+    deactivate BE
+    FE --> User: Đăng nhập thành công, vào trang chủ
+end
+
+@enduml

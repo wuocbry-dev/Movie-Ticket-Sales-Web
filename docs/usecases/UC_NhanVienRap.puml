@@ -1,0 +1,52 @@
+@startuml UC_NhanVienRap
+
+' ============================================================
+' USE CASE - NHÂN VIÊN RẠP (CINEMA_STAFF)
+' ============================================================
+
+left to right direction
+
+actor "Nhân viên rạp" as Staff
+
+rectangle "Check-in vé" {
+    usecase "Check-in vé bằng mã booking" as UC01
+    usecase "Xem chi tiết vé để check-in" as UC02
+    usecase "Kiểm tra vé thuộc rạp" as UC03
+    usecase "Thanh toán tiền mặt tại quầy" as UC04
+    usecase "Xem thông tin rạp của tôi" as UC05
+}
+
+rectangle "Xử lý đơn bắp nước" {
+    usecase "Xem đơn bắp nước tại rạp" as UC06
+    usecase "Xác nhận đơn bắp nước" as UC07
+    usecase "Bắt đầu chuẩn bị" as UC08
+    usecase "Đánh dấu sẵn sàng lấy" as UC09
+    usecase "Hoàn thành đơn bắp nước" as UC10
+    usecase "Cập nhật ghi chú đơn hàng" as UC11
+}
+
+rectangle "Thông tin nhân viên" {
+    usecase "Xem thông tin rạp được phân công" as UC12
+    usecase "Kiểm tra mình thuộc rạp nào" as UC13
+}
+
+Staff -- UC01
+Staff -- UC02
+Staff -- UC04
+Staff -- UC05
+Staff -- UC06
+Staff -- UC07
+Staff -- UC08
+Staff -- UC09
+Staff -- UC10
+Staff -- UC11
+Staff -- UC12
+Staff -- UC13
+
+UC01 ..> UC03 : <<include>>
+UC02 ..> UC03 : <<include>>
+UC07 ..> UC08 : <<extend>>
+UC08 ..> UC09 : <<extend>>
+UC09 ..> UC10 : <<extend>>
+
+@enduml

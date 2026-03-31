@@ -1,63 +1,90 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import HomePage from './components/HomePage';
-import LoginForm from './components/LoginForm';
-import MovieDetail from './components/MovieDetail';
-import ProfilePage from './components/ProfilePage';
-import BookingHistory from './components/BookingHistory';
-import Dashboard from './components/Dashboard';
-import MovieManagement from './components/MovieManagement';
-import AccountManagement from './components/AccountManagement';
-import CinemaChainManagement from './components/CinemaChainManagement';
-import CinemaManagement from './components/CinemaManagement';
-import MyCinemaManagement from './components/MyCinemaManagement';
-import UnifiedCinemaManagement from './components/UnifiedCinemaManagement';
-import CinemaHallManagement from './components/CinemaHallManagement';
-import ShowtimeManagement from './components/ShowtimeManagement';
-import ManagerShowtimeManagement from './components/ManagerShowtimeManagement';
-import BookingManagement from './components/BookingManagement';
-import AdminLayout from './components/AdminLayout';
-import SystemAdminLayout from './components/SystemAdminLayout';
-import SystemAdminDashboard from './components/SystemAdminDashboard';
-import StaffLayout from './components/StaffLayout';
-import StaffDashboard from './components/StaffDashboard';
-import TicketCheckIn from './components/TicketCheckIn';
-import StaffPayment from './components/StaffPayment';
-import StaffPaymentManager from './components/StaffPaymentManager';
-import StaffConcessionOrders from './components/StaffConcessionOrders';
-import AdminPaymentManager from './components/AdminPaymentManager';
-import ComingSoon from './components/ComingSoon';
-import NowShowingPage from './components/NowShowingPage';
-import ComingSoonPage from './components/ComingSoonPage';
-import CinemaListingPage from './components/CinemaListingPage';
-import BookingPage from './components/BookingPage';
-import SeatSelection from './components/SeatSelection';
-import BookingConfirmation from './components/BookingConfirmation';
-import ProtectedRoute from './components/ProtectedRoute';
-import ConcessionCategoryManagement from './components/ConcessionCategoryManagement';
-import ConcessionItemManagement from './components/ConcessionItemManagement';
-import CinemaConcessionManagement from './components/CinemaConcessionManagement';
-import ConcessionOrderManagement from './components/ConcessionOrderManagement';
-import CinemaStaffManagement from './components/CinemaStaffManagement';
-import ForgotPassword from './components/ForgotPassword';
+import Header from './components/UserInterface/Header';
+import BookingStatusBar from './components/UserInterface/BookingStatusBar';
+import Footer from './components/UserInterface/Footer';
+import HomePage from './components/UserInterface/HomePage';
+import LoginForm from './components/UserInterface/LoginForm';
+import MovieDetail from './components/UserInterface/MovieDetail';
+import ProfilePage from './components/UserInterface/ProfilePage';
+import BookingHistory from './components/UserInterface/BookingHistory';
+import Dashboard from './components/AdminDashboard/Dashboard';
+import MovieManagement from './components/AdminDashboard/MovieManagement';
+import AccountManagement from './components/AdminDashboard/AccountManagement';
+import CinemaChainManagement from './components/AdminDashboard/CinemaChainManagement';
+import CinemaManagement from './components/AdminDashboard/CinemaManagement';
+import MyCinemaManagement from './components/AdminDashboard/MyCinemaManagement';
+import UnifiedCinemaManagement from './components/AdminDashboard/UnifiedCinemaManagement';
+import CinemaHallManagement from './components/AdminDashboard/CinemaHallManagement';
+import ShowtimeManagement from './components/AdminDashboard/ShowtimeManagement';
+import ManagerShowtimeManagement from './components/AdminDashboard/ManagerShowtimeManagement';
+import BookingManagement from './components/AdminDashboard/BookingManagement';
+import AdminLayout from './components/AdminDashboard/AdminLayout';
+import StaffLayout from './components/Staff/StaffLayout';
+import StaffDashboard from './components/Staff/StaffDashboard';
+import TicketCheckIn from './components/Staff/TicketCheckIn';
+import StaffPayment from './components/Staff/StaffPayment';
+import StaffPaymentManager from './components/Staff/StaffPaymentManager';
+import StaffConcessionOrders from './components/Staff/StaffConcessionOrders';
+import AdminPaymentManager from './components/AdminDashboard/AdminPaymentManager';
+import ComingSoon from './components/UserInterface/ComingSoon';
+import NowShowingPage from './components/UserInterface/NowShowingPage';
+import ComingSoonPage from './components/UserInterface/ComingSoonPage';
+import CinemaListingPage from './components/UserInterface/CinemaListingPage';
+import ConcessionsPage from './components/UserInterface/ConcessionsPage';
+import PromotionsPage from './components/UserInterface/PromotionsPage';
+import PromotionManagement from './components/AdminDashboard/PromotionManagement';
+import BookingPage from './components/UserInterface/BookingPage';
+import SeatSelection from './components/UserInterface/SeatSelection';
+import BookingConfirmation from './components/UserInterface/BookingConfirmation';
+import Q2KThankYouPage from './components/UserInterface/Q2KThankYouPage';
+import ProtectedRoute from './components/UserInterface/ProtectedRoute';
+import ConcessionCategoryManagement from './components/AdminDashboard/ConcessionCategoryManagement';
+import ConcessionItemManagement from './components/AdminDashboard/ConcessionItemManagement';
+import CinemaConcessionManagement from './components/AdminDashboard/CinemaConcessionManagement';
+import ConcessionOrderManagement from './components/AdminDashboard/ConcessionOrderManagement';
+import CinemaStaffManagement from './components/AdminDashboard/CinemaStaffManagement';
+import ForgotPassword from './components/UserInterface/ForgotPassword';
+import BottomNav from './components/UserInterface/BottomNav';
+import { QuickBookingProvider } from './components/UserInterface/QuickBookingContext';
 import { ROLES } from './utils/roleUtils';
 // Import LoadingSpinner.css last to override other loading-spinner styles
-import './components/LoadingSpinner.css';
+import './components/UserInterface/LoadingSpinner.css';
 
 // Component to conditionally render Footer
 const ConditionalFooter = () => {
   const location = useLocation();
-  // Hide footer on admin, staff, login, and booking-related pages
   const hideFooterPaths = ['/admin', '/staff', '/system-admin', '/login', '/forgot-password', '/booking'];
   const shouldHideFooter = hideFooterPaths.some(path => location.pathname.startsWith(path));
-  
   if (shouldHideFooter) return null;
   return <Footer />;
+};
+
+// Bottom nav - chỉ hiện trên mobile, trang công khai
+const ConditionalBottomNav = () => {
+  const location = useLocation();
+  const hidePaths = ['/admin', '/staff', '/system-admin', '/login', '/forgot-password', '/booking'];
+  const shouldHide = hidePaths.some(path => location.pathname.startsWith(path));
+  if (shouldHide) return null;
+  return <BottomNav />;
+};
+
+// Không dùng Header / BookingStatusBar của site công khai trên khu admin & staff — layout riêng full màn hình
+const ADMIN_STAFF_PREFIXES = ['/admin', '/system-admin', '/staff'];
+const isAdminOrStaffShell = (pathname) =>
+  ADMIN_STAFF_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+
+const ConditionalHeader = () => {
+  const location = useLocation();
+  if (isAdminOrStaffShell(location.pathname)) return null;
+  return <Header />;
+};
+
+const ConditionalBookingStatusBar = () => {
+  const location = useLocation();
+  if (isAdminOrStaffShell(location.pathname)) return null;
+  return <BookingStatusBar />;
 };
 
 function App() {
@@ -88,8 +115,10 @@ function App() {
 
   return (
     <Router>
+      <QuickBookingProvider>
       <div className="App">
-        <Header />
+        <ConditionalHeader />
+        <ConditionalBookingStatusBar />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
@@ -99,9 +128,12 @@ function App() {
           <Route path="/booking" element={<BookingPage />} />
           <Route path="/booking/:showtimeId" element={<SeatSelection />} />
           <Route path="/booking-confirmation" element={<BookingConfirmation />} />
+          <Route path="/q2k-thank-you" element={<Q2KThankYouPage />} />
           <Route path="/now-showing" element={<NowShowingPage />} />
           <Route path="/coming-soon" element={<ComingSoonPage />} />
           <Route path="/cinemas" element={<CinemaListingPage />} />
+          <Route path="/concessions" element={<ConcessionsPage />} />
+          <Route path="/promotions" element={<PromotionsPage />} />
           
           {/* Protected Customer Routes */}
           <Route path="/profile" element={
@@ -121,6 +153,7 @@ function App() {
               <AdminLayout />
             </ProtectedRoute>
           }>
+            <Route index element={<Navigate to="dashboard" replace />} />
             {/* Core Management */}
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="movies" element={<MovieManagement />} />
@@ -138,7 +171,7 @@ function App() {
             {/* Sales */}
             <Route path="bookings" element={<BookingManagement />} />
             <Route path="payment-manager" element={<AdminPaymentManager />} />
-            <Route path="promotions" element={<ComingSoon feature="Quản Lý Khuyến Mãi" />} />
+            <Route path="promotions" element={<PromotionManagement />} />
             
             {/* Concession Management */}
             <Route path="concession-categories" element={<ConcessionCategoryManagement />} />
@@ -153,7 +186,6 @@ function App() {
             
             {/* System & Reports */}
             <Route path="reports" element={<ComingSoon feature="Báo Cáo & Thống Kê" />} />
-            <Route path="notifications" element={<ComingSoon feature="Thông Báo Hệ Thống" />} />
             <Route path="audit-logs" element={<ComingSoon feature="Nhật Ký Hệ Thống" />} />
             <Route path="settings" element={<ComingSoon feature="Cấu Hình Hệ Thống" />} />
           </Route>
@@ -164,6 +196,7 @@ function App() {
               <AdminLayout />
             </ProtectedRoute>
           }>
+            <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="*" element={<ComingSoon feature="Tính năng này" />} />
           </Route>
@@ -182,20 +215,9 @@ function App() {
           </Route>
         </Routes>
         <ConditionalFooter />
-        <ToastContainer
-          position="bottom-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-          style={{ fontSize: '14px', width: '320px' }}
-        />
+        <ConditionalBottomNav />
       </div>
+      </QuickBookingProvider>
     </Router>
   );
 }

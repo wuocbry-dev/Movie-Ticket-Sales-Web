@@ -19,6 +19,9 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
     return config;
   },
   (error) => {
@@ -37,6 +40,7 @@ api.interceptors.response.use(
         '/api/cinemas',
         '/api/showtimes',
         '/api/concessions',
+        '/api/promotions',
         '/api/auth/login',
         '/api/auth/register'
       ];

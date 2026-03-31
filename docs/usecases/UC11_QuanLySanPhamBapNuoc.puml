@@ -1,0 +1,56 @@
+@startuml UC11_QuanLySanPhamBapNuoc
+
+left to right direction
+
+actor "Khách" as Guest
+actor "Quản lý rạp" as Manager
+actor "Quản trị viên" as Admin
+actor "AWS S3" as S3
+
+Admin -|> Manager
+
+rectangle "UC11: Quản lý sản phẩm bắp nước" {
+    usecase "Xem menu bắp nước tại rạp" as UC_ViewMenu
+    usecase "Xem bắp nước theo danh mục" as UC_ViewByCategory
+    usecase "Tìm kiếm sản phẩm" as UC_Search
+    usecase "Xem combo bắp nước" as UC_ViewCombos
+    usecase "Thêm sản phẩm mới" as UC_CreateItem
+    usecase "Cập nhật sản phẩm" as UC_UpdateItem
+    usecase "Xóa sản phẩm (xóa mềm)" as UC_DeleteItem
+    usecase "Bật/tắt sản phẩm" as UC_ToggleItem
+    usecase "Upload hình ảnh sản phẩm" as UC_UploadImage
+    usecase "Xóa hình ảnh sản phẩm" as UC_DeleteImage
+    usecase "Xem sản phẩm tồn kho thấp" as UC_ViewLowStock
+    usecase "Xem thống kê sản phẩm" as UC_ViewStats
+    usecase "Thêm sản phẩm vào rạp" as UC_AddToCinema
+    usecase "Cập nhật giá tại rạp" as UC_UpdatePrice
+    usecase "Cập nhật tồn kho tại rạp" as UC_UpdateStock
+    usecase "Bật/tắt bán tại rạp" as UC_ToggleCinemaItem
+    usecase "Xóa sản phẩm khỏi rạp" as UC_RemoveFromCinema
+    usecase "Đồng bộ sản phẩm vào rạp mới" as UC_SyncItems
+}
+
+Guest -- UC_ViewMenu
+Guest -- UC_ViewByCategory
+Guest -- UC_Search
+Guest -- UC_ViewCombos
+
+Manager -- UC_AddToCinema
+Manager -- UC_UpdatePrice
+Manager -- UC_UpdateStock
+Manager -- UC_ToggleCinemaItem
+Manager -- UC_RemoveFromCinema
+Manager -- UC_ViewLowStock
+
+Admin -- UC_CreateItem
+Admin -- UC_UpdateItem
+Admin -- UC_DeleteItem
+Admin -- UC_ToggleItem
+Admin -- UC_UploadImage
+Admin -- UC_DeleteImage
+Admin -- UC_ViewStats
+Admin -- UC_SyncItems
+
+UC_UploadImage --> S3
+
+@enduml

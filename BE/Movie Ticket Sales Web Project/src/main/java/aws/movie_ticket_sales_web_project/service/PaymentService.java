@@ -106,9 +106,9 @@ public class PaymentService {
                 booking.setInvoiceIssuedAt(Instant.now());
                 bookingRepository.save(booking);
                 
-                // Send confirmation email (async) - don't fail payment if email fails
+                // Send confirmation email (async), truyền qrCodeUrl để mã QR luôn có trong mail
                 try {
-                    emailService.sendBookingConfirmation(booking);
+                    emailService.sendBookingConfirmation(booking.getId(), qrCodeUrl);
                 } catch (Exception e) {
                     log.warn("Failed to send confirmation email for booking: {}. Payment was successful.", booking.getBookingCode(), e);
                 }

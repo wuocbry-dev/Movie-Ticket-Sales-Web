@@ -1,6 +1,19 @@
 // API Configuration
 export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 
+/** Origin for absolute URLs to static files (uploads, QR paths). Uses current site origin when API is same-origin (`/api`). */
+export function getApiOrigin() {
+  const base = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+  if (base.startsWith('/')) {
+    return typeof window !== 'undefined' ? window.location.origin : '';
+  }
+  try {
+    return new URL(base).origin;
+  } catch {
+    return '';
+  }
+}
+
 export const API_ENDPOINTS = {
   // Auth endpoints
   LOGIN: '/auth/login',
@@ -37,4 +50,4 @@ export const API_ENDPOINTS = {
   CANCEL_BOOKING: (id) => `/bookings/${id}/cancel`,
 };
 
-export default { API_BASE_URL, API_ENDPOINTS };
+export default { API_BASE_URL, API_ENDPOINTS, getApiOrigin };

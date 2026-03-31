@@ -1,7 +1,18 @@
-/* Note: LoadingSpinner.css is imported in App.js to ensure it loads last for proper CSS override */
+/* Note: UserInterface/LoadingSpinner.css is imported in App.js to ensure it loads last for proper CSS override */
 
 .App {
   text-align: center;
+  overflow-x: hidden;
+  max-width: 100vw;
+  background: transparent;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+@media (max-width: 768px) {
+  .App {
+    padding-bottom: 0;
+  }
 }
 
 .App-logo {
@@ -39,7 +50,11 @@
   }
 }
 
-/* Custom Toast Notification Styles */
+/* Custom Toast Notification Styles - chỉ 1 thông báo, không chồng/lặp */
+.Toastify__toast-container {
+  width: 320px !important;
+}
+
 .Toastify__toast {
   font-size: 14px !important;
   padding: 12px !important;
@@ -59,4 +74,22 @@
 
 .Toastify__close-button {
   font-size: 14px !important;
+}
+
+/* Mobile: Toast responsive */
+@media (max-width: 768px) {
+  .Toastify__toast-container--bottom-right,
+  .Toastify__toast-container {
+    width: calc(100vw - 24px) !important;
+    max-width: none !important;
+    left: 12px !important;
+    right: 12px !important;
+    margin: 0 !important;
+    padding: 0 0 12px !important;
+  }
+
+  .Toastify__toast {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }

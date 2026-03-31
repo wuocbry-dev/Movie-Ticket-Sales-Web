@@ -1,0 +1,79 @@
+@startuml UC_QuanLyRap
+
+' ============================================================
+' USE CASE - QUẢN LÝ RẠP (CINEMA_MANAGER)
+' ============================================================
+
+left to right direction
+
+actor "Quản lý rạp" as Manager
+
+rectangle "Quản lý lịch chiếu" {
+    usecase "Xem lịch chiếu rạp của tôi" as UC01
+    usecase "Tạo lịch chiếu mới" as UC02
+    usecase "Cập nhật lịch chiếu" as UC03
+    usecase "Xóa lịch chiếu" as UC04
+}
+
+rectangle "Quản lý rạp & phòng chiếu" {
+    usecase "Xem rạp của tôi" as UC05
+    usecase "Xem phòng chiếu rạp của tôi" as UC06
+    usecase "Thêm phòng chiếu mới" as UC07
+    usecase "Cập nhật phòng chiếu" as UC08
+    usecase "Xóa phòng chiếu" as UC09
+    usecase "Tạo lại sơ đồ ghế" as UC10
+    usecase "Tạo lại ghế toàn bộ rạp" as UC11
+    usecase "Xóa tất cả ghế trong phòng" as UC12
+    usecase "Xóa tất cả ghế trong rạp" as UC13
+}
+
+rectangle "Quản lý bắp nước tại rạp" {
+    usecase "Thêm sản phẩm vào rạp" as UC14
+    usecase "Cập nhật giá tại rạp" as UC15
+    usecase "Cập nhật tồn kho tại rạp" as UC16
+    usecase "Bật/tắt bán tại rạp" as UC17
+    usecase "Xóa sản phẩm khỏi rạp" as UC18
+    usecase "Xem sản phẩm tồn kho thấp" as UC19
+}
+
+rectangle "Quản lý khuyến mãi" {
+    usecase "Xem tất cả khuyến mãi" as UC20
+    usecase "Thêm khuyến mãi mới" as UC21
+    usecase "Cập nhật khuyến mãi" as UC22
+    usecase "Xóa khuyến mãi" as UC23
+}
+
+rectangle "Quản lý nhân viên" {
+    usecase "Gán nhân viên vào rạp" as UC24
+    usecase "Xem danh sách nhân viên của rạp" as UC25
+    usecase "Cho nhân viên nghỉ việc" as UC26
+}
+
+Manager -- UC01
+Manager -- UC02
+Manager -- UC03
+Manager -- UC04
+Manager -- UC05
+Manager -- UC06
+Manager -- UC07
+Manager -- UC08
+Manager -- UC09
+Manager -- UC10
+Manager -- UC11
+Manager -- UC12
+Manager -- UC13
+Manager -- UC14
+Manager -- UC15
+Manager -- UC16
+Manager -- UC17
+Manager -- UC18
+Manager -- UC19
+Manager -- UC20
+Manager -- UC21
+Manager -- UC22
+Manager -- UC23
+Manager -- UC24
+Manager -- UC25
+Manager -- UC26
+
+@enduml

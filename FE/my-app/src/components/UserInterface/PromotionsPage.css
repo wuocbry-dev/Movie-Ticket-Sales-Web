@@ -1,0 +1,237 @@
+/* PromotionsPage — UI/UX chuẩn, co giãn desktop & mobile */
+.promo-page {
+  --promo-bg: transparent;
+  --promo-surface: #161b22;
+  --promo-surface-hover: #21262d;
+  --promo-accent: #f0b429;
+  --promo-text: #e6edf3;
+  --promo-text-muted: rgba(230, 237, 243, 0.65);
+  --promo-border: rgba(255, 255, 255, 0.08);
+  --promo-radius: 12px;
+  min-height: 100vh;
+  background: var(--promo-bg);
+  padding: 96px 0 88px;
+  box-sizing: border-box;
+}
+
+.promo-page__inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.promo-page__header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.promo-page__title {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--promo-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.promo-page__subtitle {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--promo-text-muted);
+}
+
+.promo-page__loading {
+  height: 200px;
+  background: var(--promo-surface);
+  border-radius: var(--promo-radius);
+  animation: promo-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes promo-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.promo-page__empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--promo-text-muted);
+}
+
+.promo-page__empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.promo-page__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.promo-page__card {
+  background: var(--promo-surface);
+  border: 1px solid var(--promo-border);
+  border-radius: var(--promo-radius);
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.promo-page__card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(240, 180, 41, 0.3);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+.promo-page__card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: var(--promo-surface-hover);
+  overflow: hidden;
+}
+
+.promo-page__card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.promo-page__placeholder {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--promo-text-muted);
+  font-size: 0.95rem;
+}
+
+.promo-page__placeholder--show {
+  display: flex;
+}
+
+.promo-page__placeholder svg {
+  font-size: 2.5rem;
+  opacity: 0.6;
+}
+
+.promo-page__card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.promo-page__card-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--promo-text);
+  line-height: 1.3;
+}
+
+.promo-page__card-code {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--promo-accent);
+}
+
+.promo-page__card-type {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--promo-text-muted);
+}
+
+.promo-page__card-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--promo-text-muted);
+  line-height: 1.5;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.promo-page__card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--promo-accent);
+}
+
+.promo-page__card-dates {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--promo-text-muted);
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .promo-page__inner {
+    padding: 0 24px;
+  }
+
+  .promo-page__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .promo-page__title {
+    font-size: 1.75rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .promo-page {
+    padding: 72px 0 88px;
+  }
+
+  .promo-page__inner {
+    padding: 0 14px;
+  }
+
+  .promo-page__header {
+    margin-bottom: 24px;
+  }
+
+  .promo-page__title {
+    font-size: 1.4rem;
+    gap: 8px;
+  }
+
+  .promo-page__subtitle {
+    font-size: 0.9rem;
+  }
+
+  .promo-page__grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .promo-page__card-body {
+    padding: 14px;
+  }
+
+  .promo-page__card-title {
+    font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .promo-page__title {
+    font-size: 1.25rem;
+  }
+}

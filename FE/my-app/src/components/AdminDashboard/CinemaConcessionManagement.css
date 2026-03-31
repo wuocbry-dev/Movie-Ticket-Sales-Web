@@ -1,0 +1,598 @@
+/* Admin — Bắp nước theo rạp */
+.adm-cnc {
+  color: var(--adm-page-text, #e8eaed);
+  min-height: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.adm-cnc__hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.08));
+  background: var(--adm-ui-card-tint);
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.32);
+}
+
+.adm-cnc__titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.adm-cnc__title {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.2vw, 1.55rem);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.adm-cnc__title svg {
+  color: var(--adm-page-accent, #e50914);
+}
+
+.adm-cnc__sub {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--adm-page-muted, #8b939e);
+}
+
+.adm-cnc__hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.adm-cnc__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.12));
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--adm-page-text, #e8eaed);
+  transition: border-color 0.2s, filter 0.2s, opacity 0.2s;
+}
+
+.adm-cnc__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.adm-cnc__btn--primary {
+  background: var(--adm-page-accent, #e50914);
+  color: #fff;
+  border-color: var(--adm-page-accent, #e50914);
+}
+
+.adm-cnc__btn--primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.adm-cnc__btn--sync {
+  border-color: rgba(59, 130, 246, 0.45);
+  color: #93c5fd;
+}
+
+.adm-cnc__btn--ghost {
+  background: transparent;
+  color: var(--adm-page-muted, #8b939e);
+}
+
+.adm-cnc__btn--submit {
+  background: var(--adm-page-accent, #e50914);
+  color: #fff;
+  border-color: var(--adm-page-accent, #e50914);
+}
+
+.adm-cnc__btn--amber {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.45);
+}
+
+.adm-cnc__select-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.08));
+  background: var(--adm-page-card, #141922);
+}
+
+.adm-cnc__select-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--adm-page-muted, #8b939e);
+}
+
+.adm-cnc__select {
+  flex: 1;
+  min-width: 200px;
+  max-width: 420px;
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.12));
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--adm-page-text, #e8eaed);
+  font-size: 0.88rem;
+}
+
+.adm-cnc__select,
+.adm-cnc__filter-select,
+.adm-cnc__field select {
+  color-scheme: dark;
+}
+
+.adm-cnc__select option {
+  background: rgba(0, 0, 0, 0.92) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.adm-cnc__stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.adm-cnc__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.65rem 1.1rem;
+  border-radius: 10px;
+  border: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.1));
+  background: rgba(0, 0, 0, 0.2);
+  min-width: 100px;
+}
+
+.adm-cnc__stat--ok .adm-cnc__stat-num {
+  color: #4ade80;
+}
+
+.adm-cnc__stat--warn .adm-cnc__stat-num {
+  color: #fb923c;
+}
+
+.adm-cnc__stat-num {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--adm-page-text, #e8eaed);
+}
+
+.adm-cnc__stat-lbl {
+  font-size: 0.72rem;
+  color: var(--adm-page-muted, #8b939e);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.adm-cnc__stat-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.1));
+  background: var(--adm-page-card, #141922);
+}
+
+.adm-cnc__filter-ico {
+  color: var(--adm-page-muted, #8b939e);
+  font-size: 0.85rem;
+}
+
+.adm-cnc__filter-select {
+  border: none;
+  background: transparent;
+  color: var(--adm-page-text, #e8eaed);
+  font-size: 0.86rem;
+  cursor: pointer;
+  min-width: 140px;
+}
+
+.adm-cnc__filter-select option {
+  background: rgba(0, 0, 0, 0.92) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.adm-cnc__banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  background: rgba(251, 191, 36, 0.08);
+  color: #fdba74;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.adm-cnc__banner svg {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.adm-cnc__state,
+.adm-cnc__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.08));
+  background: var(--adm-page-card, #141922);
+  gap: 0.75rem;
+}
+
+.adm-cnc__empty h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.adm-cnc__empty-ico {
+  font-size: 2.5rem;
+  color: var(--adm-page-muted, #8b939e);
+  opacity: 0.65;
+}
+
+.adm-cnc__muted {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--adm-page-muted, #8b939e);
+  text-align: center;
+}
+
+.adm-cnc__spin {
+  animation: adm-cnc-spin 0.85s linear infinite;
+  font-size: 1.75rem;
+  color: var(--adm-page-accent, #e50914);
+}
+
+@keyframes adm-cnc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.adm-cnc__table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.08));
+  background: var(--adm-page-card, #141922);
+}
+
+.adm-cnc__table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.adm-cnc__table th,
+.adm-cnc__table td {
+  padding: 0.75rem 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.08));
+  font-size: 0.86rem;
+}
+
+.adm-cnc__table th {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--adm-page-muted, #8b939e);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.adm-cnc__table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.adm-cnc__product {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.adm-cnc__thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.adm-cnc__thumb-ph {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(229, 9, 20, 0.1);
+  color: var(--adm-page-muted, #8b939e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.adm-cnc__pname {
+  font-weight: 600;
+}
+
+.adm-cnc__combo {
+  display: inline-block;
+  margin-top: 0.2rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  background: rgba(251, 146, 60, 0.25);
+  color: #fdba74;
+}
+
+.adm-cnc__price {
+  font-weight: 700;
+  color: var(--adm-page-accent, #e50914);
+}
+
+.adm-cnc__tag-price {
+  display: block;
+  font-size: 0.65rem;
+  color: #f87171;
+  margin-top: 0.15rem;
+}
+
+.adm-cnc__stock {
+  display: inline-flex;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+.adm-cnc__stock--low {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.adm-cnc__avail {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+}
+
+.adm-cnc__avail--on {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+.adm-cnc__avail--off {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.adm-cnc__actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.adm-cnc__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.12));
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--adm-page-text, #e8eaed);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.adm-cnc__icon-btn--edit {
+  border-color: rgba(229, 9, 20, 0.35);
+  color: var(--adm-page-accent, #e50914);
+}
+
+.adm-cnc__icon-btn--toggle {
+  border-color: rgba(251, 191, 36, 0.35);
+  color: #fbbf24;
+}
+
+.adm-cnc__icon-btn--del {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+/* Modal */
+.adm-cnc__modal {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(8px, 3vh, 28px) 0.75rem;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  box-sizing: border-box;
+}
+
+.adm-cnc__panel {
+  width: 100%;
+  max-width: 480px;
+  max-height: min(96vh, 900px);
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  border: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.1));
+  background: var(--adm-page-card, #141922);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+}
+
+.adm-cnc__panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.08));
+  flex-shrink: 0;
+}
+
+.adm-cnc__panel-head h2 {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.adm-cnc__panel-x {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.12));
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--adm-page-muted, #8b939e);
+  cursor: pointer;
+}
+
+.adm-cnc__panel-x:hover {
+  color: var(--adm-page-accent, #e50914);
+}
+
+.adm-cnc__panel-body {
+  padding: 1rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.adm-cnc__section {
+  margin-bottom: 0.5rem;
+}
+
+.adm-cnc__sec-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--adm-page-accent, #e50914);
+}
+
+.adm-cnc__divider {
+  height: 1px;
+  background: var(--adm-page-border, rgba(255, 255, 255, 0.08));
+  margin: 1rem 0;
+}
+
+.adm-cnc__field {
+  margin-bottom: 0.85rem;
+}
+
+.adm-cnc__field label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--adm-page-muted, #8b939e);
+}
+
+.adm-cnc__field input,
+.adm-cnc__field select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.12));
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--adm-page-text, #e8eaed);
+  font-size: 0.86rem;
+}
+
+.adm-cnc__field input:focus,
+.adm-cnc__field select:focus {
+  outline: none;
+  border-color: var(--adm-page-accent, #e50914);
+}
+
+.adm-cnc__field select option {
+  background: rgba(0, 0, 0, 0.92) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.adm-cnc__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.adm-cnc__row--end {
+  align-items: flex-end;
+}
+
+.adm-cnc__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border-top: 1px solid var(--adm-page-border, rgba(255, 255, 255, 0.08));
+  flex-shrink: 0;
+  background: var(--adm-page-card, #141922);
+}
+
+@media (max-width: 768px) {
+  .adm-cnc__hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .adm-cnc__hero-actions {
+    flex-direction: column;
+  }
+
+  .adm-cnc__hero-actions .adm-cnc__btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .adm-cnc__stat-filter {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .adm-cnc__row,
+  .adm-cnc__row--end {
+    grid-template-columns: 1fr;
+  }
+
+  .adm-cnc__row--end .adm-cnc__btn {
+    width: 100%;
+  }
+}

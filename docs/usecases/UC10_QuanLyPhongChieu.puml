@@ -1,0 +1,36 @@
+@startuml UC10_QuanLyPhongChieu
+
+left to right direction
+
+actor "Khách" as Guest
+actor "Quản lý rạp" as Manager
+actor "Quản trị viên" as Admin
+
+Admin -|> Manager
+
+rectangle "UC10: Quản lý phòng chiếu & ghế ngồi" {
+    usecase "Xem danh sách phòng chiếu" as UC_ViewHalls
+    usecase "Xem chi tiết phòng chiếu" as UC_ViewHallDetail
+    usecase "Xem phòng chiếu rạp của tôi" as UC_ViewMyHalls
+    usecase "Thêm phòng chiếu mới" as UC_CreateHall
+    usecase "Cập nhật phòng chiếu" as UC_UpdateHall
+    usecase "Xóa phòng chiếu" as UC_DeleteHall
+    usecase "Tạo lại sơ đồ ghế" as UC_RegenerateSeats
+    usecase "Tạo lại ghế toàn bộ rạp" as UC_RegenerateAllSeats
+    usecase "Xóa tất cả ghế trong phòng" as UC_DeleteSeatsInHall
+    usecase "Xóa tất cả ghế trong rạp" as UC_DeleteSeatsInCinema
+}
+
+Guest -- UC_ViewHalls
+Guest -- UC_ViewHallDetail
+
+Manager -- UC_ViewMyHalls
+Manager -- UC_CreateHall
+Manager -- UC_UpdateHall
+Manager -- UC_DeleteHall
+Manager -- UC_RegenerateSeats
+Manager -- UC_RegenerateAllSeats
+Manager -- UC_DeleteSeatsInHall
+Manager -- UC_DeleteSeatsInCinema
+
+@enduml

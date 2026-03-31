@@ -1,0 +1,30 @@
+@startuml UC01_XacThuc_TaiKhoan
+
+left to right direction
+
+actor "Khách" as Guest
+actor "Hệ thống Email\n(AWS SES)" as EmailSystem
+
+rectangle "UC01: Xác thực & Quản lý tài khoản" {
+    usecase "Đăng ký tài khoản" as UC_Register
+    usecase "Đăng nhập" as UC_Login
+    usecase "Quên mật khẩu" as UC_ForgotPassword
+    usecase "Gửi mã xác nhận qua email" as UC_SendResetCode
+    usecase "Xác minh mã xác nhận" as UC_VerifyCode
+    usecase "Đặt lại mật khẩu" as UC_ResetPassword
+    usecase "Gửi lại mã xác nhận" as UC_ResendCode
+}
+
+Guest -- UC_Register
+Guest -- UC_Login
+Guest -- UC_ForgotPassword
+
+UC_ForgotPassword ..> UC_SendResetCode : <<include>>
+UC_SendResetCode ..> UC_VerifyCode : <<include>>
+UC_VerifyCode ..> UC_ResetPassword : <<include>>
+UC_ForgotPassword ..> UC_ResendCode : <<extend>>
+
+UC_SendResetCode --> EmailSystem
+UC_ResendCode --> EmailSystem
+
+@enduml

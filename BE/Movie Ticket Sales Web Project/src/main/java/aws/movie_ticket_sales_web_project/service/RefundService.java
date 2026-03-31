@@ -83,7 +83,7 @@ public class RefundService {
                 showtimeRepository.save(showtime);
 
                 // Send refund confirmation email
-                emailService.sendRefundConfirmation(booking);
+                emailService.sendRefundConfirmation(booking.getId());
 
                 log.info("Refund processed for booking: {}", booking.getBookingCode());
 

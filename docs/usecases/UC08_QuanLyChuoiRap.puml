@@ -1,0 +1,27 @@
+@startuml UC08_QuanLyChuoiRap
+
+left to right direction
+
+actor "Khách" as Guest
+actor "Quản trị viên" as Admin
+
+rectangle "UC08: Quản lý chuỗi rạp" {
+    usecase "Xem danh sách chuỗi rạp" as UC_ViewCinemaChains
+    usecase "Xem chi tiết chuỗi rạp" as UC_ViewChainDetail
+    usecase "Xem tất cả chuỗi rạp (kể cả ẩn)" as UC_ViewAllChains
+    usecase "Thêm chuỗi rạp mới" as UC_CreateChain
+    usecase "Cập nhật thông tin chuỗi rạp" as UC_UpdateChain
+    usecase "Xóa chuỗi rạp (xóa mềm)" as UC_DeleteChain
+    usecase "Xóa vĩnh viễn chuỗi rạp" as UC_PermanentDeleteChain
+}
+
+Guest -- UC_ViewCinemaChains
+Guest -- UC_ViewChainDetail
+
+Admin -- UC_ViewAllChains
+Admin -- UC_CreateChain
+Admin -- UC_UpdateChain
+Admin -- UC_DeleteChain
+Admin -- UC_PermanentDeleteChain
+
+@enduml

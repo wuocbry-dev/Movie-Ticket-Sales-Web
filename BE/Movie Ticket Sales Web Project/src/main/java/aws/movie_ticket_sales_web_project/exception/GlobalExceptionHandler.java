@@ -47,11 +47,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
         log.error("Unexpected error: ", ex);
         
+        String message = "Đã có lỗi xảy ra. Vui lòng thử lại sau.";
+        Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+        String causeMsg = cause.getMessage();
+        if (causeMsg != null && (causeMsg.contains("Unknown column") || causeMsg.contains("image_url"))) {
+            message = "Bảng promotions chưa có cột image_url. Chạy file docs/add_promotion_image_url.sql trong MySQL rồi thử lại.";
+        } else if (causeMsg != null && causeMsg.length() < 200) {
+            message = causeMsg;
+        }
+        
         Map<String, Object> error = new HashMap<>();
         error.put("timestamp", Instant.now().toString());
         error.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         error.put("error", "Internal Server Error");
-        error.put("message", "Đã có lỗi xảy ra. Vui lòng thử lại sau.");
+        error.put("message", message);
         
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }

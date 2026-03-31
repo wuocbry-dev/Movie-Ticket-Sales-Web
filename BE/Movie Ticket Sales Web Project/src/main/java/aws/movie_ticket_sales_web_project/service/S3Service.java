@@ -25,9 +25,6 @@ public class S3Service {
     @Value("${aws.s3.region}")
     private String region;
 
-    @Value("${aws.cloudfront.domain:}")
-    private String cloudfrontDomain;
-
     /**
      * Upload file to S3 and return the public URL
      */
@@ -54,15 +51,8 @@ public class S3Service {
 
             s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
 
-            // Return CloudFront URL if configured, otherwise S3 direct URL
-            String fileUrl;
-            if (cloudfrontDomain != null && !cloudfrontDomain.isEmpty()) {
-                fileUrl = String.format("https://%s/%s", cloudfrontDomain, fileName);
-            } else {
-                fileUrl = String.format("https://%s.s3.%s.amazonaws.com/%s", 
+            String fileUrl = String.format("https://%s.s3.%s.amazonaws.com/%s",
                     bucketName, region, fileName);
-            }
-            
             log.info("File uploaded successfully: {}", fileUrl);
             return fileUrl;
 
@@ -116,23 +106,21 @@ public class S3Service {
     }
 
     /**
+     * Upload promotion image
+     */
+    public String uploadPromotionImage(MultipartFile file) throws IOException {
+        return uploadFile(file, "promotions");
+    }
+
+    /**
      * Delete file from S3 with full path extraction
      */
     public void deleteFileByUrl(String fileUrl) {
         try {
             // Extract file key from full URL
             // URL format: https://bucket.s3.region.amazonaws.com/folder/filename
-            // Or CloudFront: https://d1234.cloudfront.net/folder/filename
-            String fileKey;
             String s3BaseUrl = String.format("https://%s.s3.%s.amazonaws.com/", bucketName, region);
-            
-            if (cloudfrontDomain != null && !cloudfrontDomain.isEmpty() 
-                    && fileUrl.contains(cloudfrontDomain)) {
-                String cfBaseUrl = String.format("https://%s/", cloudfrontDomain);
-                fileKey = fileUrl.replace(cfBaseUrl, "");
-            } else {
-                fileKey = fileUrl.replace(s3BaseUrl, "");
-            }
+            String fileKey = fileUrl.replace(s3BaseUrl, "");
             
             if (fileKey.isEmpty() || fileKey.equals(fileUrl)) {
                 log.warn("Could not extract file key from URL: {}", fileUrl);

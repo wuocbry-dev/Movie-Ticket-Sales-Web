@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movie Ticket Sales – Overview Slide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent:   #E53935;
+      --accent2:  #FF7043;
+      --bg:       #FAFAFA;
+      --card:     #FFFFFF;
+      --text:     #1A1A2E;
+      --muted:    #6B7280;
+      --border:   #E5E7EB;
+      --tag-bg:   #FEF2F2;
+      --tag-text: #B91C1C;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+
+    /* ─── Slide wrapper ─────────────────────────────────────── */
+    .slide {
+      width: 1280px;
+      max-width: 100%;
+      background: var(--card);
+      border-radius: 28px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0,0,0,.08);
+      overflow: hidden;
+    }
+
+    /* ─── Header strip ──────────────────────────────────────── */
+    .slide-header {
+      background: linear-gradient(135deg, #E53935 0%, #FF7043 55%, #FFA726 100%);
+      padding: 48px 64px 52px;
+      position: relative;
+      overflow: hidden;
+    }
+    .slide-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,.22);
+      border: 1.5px solid rgba(255,255,255,.5);
+      color: #fff;
+      border-radius: 100px;
+      padding: 5px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .slide-header h1 {
+      font-size: clamp(30px, 4vw, 52px);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      position: relative;
+      max-width: 720px;
+    }
+    .slide-header h1 span {
+      color: rgba(255,255,255,.75);
+      font-weight: 400;
+      font-size: 0.7em;
+      display: block;
+      letter-spacing: 0;
+      margin-top: 4px;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-top: 28px;
+      position: relative;
+    }
+    .meta-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.18);
+      border-radius: 100px;
+      padding: 7px 18px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .meta-pill svg { width: 16px; height: 16px; opacity: .85; }
+
+    /* ─── Body ──────────────────────────────────────────────── */
+    .slide-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 0;
+    }
+
+    /* ─── Section base ──────────────────────────────────────── */
+    .section {
+      padding: 44px 52px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .section:nth-child(even) { border-right: none; }
+    .section-full {
+      grid-column: 1 / -1;
+      border-right: none;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .section-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .icon-red  { background: #FEE2E2; }
+    .icon-blue { background: #EFF6FF; }
+    .icon-green { background: #F0FDF4; }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ─── Objective ─────────────────────────────────────────── */
+    .objective-text {
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: #374151;
+    }
+    .objective-highlight {
+      display: inline;
+      background: linear-gradient(135deg, #FEE2E2, #FEF3C7);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .kpi-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .kpi {
+      flex: 1;
+      text-align: center;
+      background: #F9FAFB;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 12px;
+    }
+    .kpi-num {
+      font-size: 26px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #E53935, #FF7043);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+    .kpi-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-top: 5px;
+    }
+
+    /* ─── Problem ───────────────────────────────────────────── */
+    .problem-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .problem-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.6;
+    }
+    .problem-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #E53935, #FF7043);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ─── Features grid ─────────────────────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .feat-card {
+      background: #F9FAFB;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 16px;
+      transition: box-shadow .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .feat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 16px 16px 0 0;
+    }
+    .feat-card.red::before   { background: linear-gradient(90deg, #E53935, #FF7043); }
+    .feat-card.blue::before  { background: linear-gradient(90deg, #2563EB, #60A5FA); }
+    .feat-card.green::before { background: linear-gradient(90deg, #059669, #34D399); }
+    .feat-card.amber::before { background: linear-gradient(90deg, #D97706, #FCD34D); }
+
+    .feat-emoji {
+      font-size: 26px;
+      line-height: 1;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .feat-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .feat-desc {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ─── Role badges row ───────────────────────────────────── */
+    .roles-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .role-badge.customer { background: #EFF6FF; color: #1D4ED8; }
+    .role-badge.staff    { background: #F0FDF4; color: #166534; }
+    .role-badge.manager  { background: #FFF7ED; color: #C2410C; }
+    .role-badge.sysadmin { background: #F5F3FF; color: #6D28D9; }
+
+    /* ─── Footer strip ──────────────────────────────────────── */
+    .slide-footer {
+      background: #F3F4F6;
+      border-top: 1px solid var(--border);
+      padding: 18px 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-stack {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .stack-chip {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #374151;
+    }
+    .footer-note {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+  </style>
+</head>
+<body>
+
+<div class="slide">
+
+  <!-- ── HEADER ─────────────────────────────────────────────── -->
+  <div class="slide-header">
+    <div class="badge">🎬 &nbsp;Web Application Project</div>
+    <h1>
+      Movie Ticket Sales System
+      <span>Project Overview — Objectives · Problems · Key Features</span>
+    </h1>
+    <div class="header-meta">
+      <div class="meta-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2M8 7V5a2 2 0 0 0-4 0v2"/></svg>
+        Full-Stack Web App
+      </div>
+      <div class="meta-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        React · Spring Boot · MySQL
+      </div>
+      <div class="meta-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Multi-Role Access Control
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BODY GRID ───────────────────────────────────────────── -->
+  <div class="slide-body">
+
+    <!-- OBJECTIVE -->
+    <div class="section">
+      <div class="section-label">
+        <div class="section-icon icon-red">🎯</div>
+        <span class="section-title">Objective</span>
+      </div>
+      <p class="objective-text">
+        Build a <span class="objective-highlight">complete online cinema platform</span> that enables customers to discover
+        movies, browse showtimes, reserve seats, and pay — all in one seamless digital experience.<br/><br/>
+        The system replaces <strong>manual box-office operations</strong> with an automated, role-based
+        web application that serves customers, cinema staff, managers, and system administrators
+        from a single unified platform.
+      </p>
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-num">4</div>
+          <div class="kpi-label">User Roles</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-num">20+</div>
+          <div class="kpi-label">API Modules</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-num">100%</div>
+          <div class="kpi-label">Role-Based Auth</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROBLEM -->
+    <div class="section">
+      <div class="section-label">
+        <div class="section-icon icon-blue">⚡</div>
+        <span class="section-title">Problem Statement</span>
+      </div>
+      <ul class="problem-list">
+        <li>
+          <div class="problem-dot">1</div>
+          <div>Traditional box-office queues cause long wait times and poor customer experience for moviegoers.</div>
+        </li>
+        <li>
+          <div class="problem-dot">2</div>
+          <div>Manual seat management is error-prone, leading to double-bookings and scheduling conflicts.</div>
+        </li>
+        <li>
+          <div class="problem-dot">3</div>
+          <div>Cinema staff lack a centralized tool to track payments, check-in tickets, and manage concessions in real time.</div>
+        </li>
+        <li>
+          <div class="problem-dot">4</div>
+          <div>No integrated promotion or loyalty system makes it difficult to retain customers and increase revenue.</div>
+        </li>
+        <li>
+          <div class="problem-dot">5</div>
+          <div>Administrators struggle to oversee multiple cinema chains, user accounts, and operational data without a unified dashboard.</div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- FEATURES -->
+    <div class="section section-full">
+      <div class="section-label">
+        <div class="section-icon icon-green">✨</div>
+        <span class="section-title">List of Features</span>
+      </div>
+
+      <div class="features-grid">
+
+        <!-- Customer-facing -->
+        <div class="feat-card red">
+          <span class="feat-emoji">🎬</span>
+          <div class="feat-name">Movie Discovery</div>
+          <div class="feat-desc">Browse Now Showing & Coming Soon movies with detailed info, trailers, and ratings.</div>
+        </div>
+
+        <div class="feat-card red">
+          <span class="feat-emoji">🪑</span>
+          <div class="feat-name">Seat Selection & Booking</div>
+          <div class="feat-desc">Real-time interactive seat map; customers pick seats and reserve in a step-by-step guided flow.</div>
+        </div>
+
+        <div class="feat-card red">
+          <span class="feat-emoji">🍿</span>
+          <div class="feat-name">Concession Ordering</div>
+          <div class="feat-desc">Add food & drinks alongside ticket booking; browse per-cinema concession menus.</div>
+        </div>
+
+        <div class="feat-card red">
+          <span class="feat-emoji">🎁</span>
+          <div class="feat-name">Promotions & Loyalty</div>
+          <div class="feat-desc">Apply discount codes and accumulate loyalty points redeemable on future purchases.</div>
+        </div>
+
+        <!-- Staff-facing -->
+        <div class="feat-card blue">
+          <span class="feat-emoji">📲</span>
+          <div class="feat-name">Ticket Check-In</div>
+          <div class="feat-desc">Staff scan or enter booking codes to validate tickets at the cinema entrance in real time.</div>
+        </div>
+
+        <div class="feat-card blue">
+          <span class="feat-emoji">💳</span>
+          <div class="feat-name">Payment Management</div>
+          <div class="feat-desc">Staff process on-site payments and managers review transaction histories and refunds.</div>
+        </div>
+
+        <div class="feat-card green">
+          <span class="feat-emoji">🏢</span>
+          <div class="feat-name">Cinema & Hall Management</div>
+          <div class="feat-desc">Admins manage cinema chains, individual venues, and seating hall configurations.</div>
+        </div>
+
+        <div class="feat-card green">
+          <span class="feat-emoji">🗓️</span>
+          <div class="feat-name">Showtime Scheduling</div>
+          <div class="feat-desc">Create and manage movie showtimes per cinema; handle scheduling conflicts automatically.</div>
+        </div>
+
+        <div class="feat-card amber">
+          <span class="feat-emoji">👥</span>
+          <div class="feat-name">Account Management</div>
+          <div class="feat-desc">System admins manage all user accounts, roles, and cinema staff assignments.</div>
+        </div>
+
+        <div class="feat-card amber">
+          <span class="feat-emoji">🎞️</span>
+          <div class="feat-name">Movie Management</div>
+          <div class="feat-desc">Add, edit, and remove movies with full metadata: genres, cast, posters, and release dates.</div>
+        </div>
+
+        <div class="feat-card amber">
+          <span class="feat-emoji">📦</span>
+          <div class="feat-name">Concession Catalog</div>
+          <div class="feat-desc">Manage concession categories and items; assign different menus per cinema location.</div>
+        </div>
+
+        <div class="feat-card amber">
+          <span class="feat-emoji">📊</span>
+          <div class="feat-name">Admin Dashboard</div>
+          <div class="feat-desc">Central overview of bookings, revenue, users, and system activity for managers and admins.</div>
+        </div>
+
+      </div>
+
+      <!-- Role badges -->
+      <div class="roles-row" style="margin-top:24px">
+        <span style="font-size:12px; font-weight:600; color:var(--muted);">Roles covered:</span>
+        <span class="role-badge customer">👤 Customer</span>
+        <span class="role-badge staff">🧑‍💼 Cinema Staff</span>
+        <span class="role-badge manager">🏛️ Cinema Manager</span>
+        <span class="role-badge sysadmin">🔧 System Admin</span>
+      </div>
+    </div>
+
+  </div><!-- end slide-body -->
+
+  <!-- ── FOOTER ──────────────────────────────────────────────── -->
+  <div class="slide-footer">
+    <div class="footer-stack">
+      <span style="font-size:12px; font-weight:600; color:var(--muted); margin-right:4px;">Tech Stack:</span>
+      <span class="stack-chip">⚛️ React</span>
+      <span class="stack-chip">🍃 Spring Boot</span>
+      <span class="stack-chip">🐬 MySQL</span>
+      <span class="stack-chip">🐳 Docker</span>
+      <span class="stack-chip">🔐 JWT Auth</span>
+    </div>
+    <span class="footer-note">Movie Ticket Sales Web Project — 2024 / 2025</span>
+  </div>
+
+</div><!-- end slide -->
+
+</body>
+</html>

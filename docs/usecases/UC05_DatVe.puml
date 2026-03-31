@@ -1,0 +1,40 @@
+@startuml UC05_DatVe
+
+left to right direction
+
+actor "Khách hàng" as User
+actor "Quản trị viên" as Admin
+
+rectangle "UC05: Đặt vé xem phim" {
+    usecase "Xem sơ đồ ghế trống" as UC_ViewSeatAvailability
+    usecase "Giữ ghế tạm thời" as UC_HoldSeats
+    usecase "Hủy giữ ghế" as UC_ReleaseSeats
+    usecase "Gia hạn giữ ghế" as UC_ExtendHold
+    usecase "Tạo đơn đặt vé" as UC_CreateBooking
+    usecase "Xem đơn đặt vé của tôi" as UC_ViewMyBookings
+    usecase "Xem chi tiết đơn đặt vé" as UC_ViewBookingDetail
+    usecase "Tra cứu đơn theo mã booking" as UC_SearchBookingByCode
+    usecase "Hủy đơn đặt vé" as UC_CancelBooking
+    usecase "Xem tất cả đơn đặt vé" as UC_ViewAllBookings
+    usecase "Lọc đơn theo trạng thái" as UC_FilterBookings
+    usecase "Xóa đơn đặt vé" as UC_DeleteBooking
+}
+
+User -- UC_ViewSeatAvailability
+User -- UC_HoldSeats
+User -- UC_ReleaseSeats
+User -- UC_ExtendHold
+User -- UC_CreateBooking
+User -- UC_ViewMyBookings
+User -- UC_ViewBookingDetail
+User -- UC_SearchBookingByCode
+User -- UC_CancelBooking
+
+Admin -- UC_ViewAllBookings
+Admin -- UC_FilterBookings
+Admin -- UC_DeleteBooking
+
+UC_CreateBooking ..> UC_ViewSeatAvailability : <<include>>
+UC_CreateBooking ..> UC_HoldSeats : <<include>>
+
+@enduml

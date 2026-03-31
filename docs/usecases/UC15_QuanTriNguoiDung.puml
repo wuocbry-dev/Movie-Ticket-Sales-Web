@@ -1,0 +1,27 @@
+@startuml UC15_QuanTriNguoiDung
+
+left to right direction
+
+actor "Quản trị viên" as Admin
+
+rectangle "UC15: Quản trị người dùng & Vai trò" {
+    usecase "Xem danh sách tất cả người dùng" as UC_ViewAllUsers
+    usecase "Xem người dùng theo vai trò" as UC_ViewUsersByRole
+    usecase "Cập nhật vai trò người dùng" as UC_UpdateUserRole
+    usecase "Vô hiệu hóa tài khoản" as UC_DeleteUser
+    usecase "Kích hoạt lại tài khoản" as UC_ActivateUser
+    usecase "Xem danh sách vai trò" as UC_ViewRoles
+    usecase "Thêm vai trò mới" as UC_AddRole
+    usecase "Kiểm tra quyền Admin" as UC_CheckAdmin
+}
+
+Admin -- UC_ViewAllUsers
+Admin -- UC_ViewUsersByRole
+Admin -- UC_UpdateUserRole
+Admin -- UC_DeleteUser
+Admin -- UC_ActivateUser
+Admin -- UC_ViewRoles
+Admin -- UC_AddRole
+Admin -- UC_CheckAdmin
+
+@enduml

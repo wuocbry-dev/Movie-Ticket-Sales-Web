@@ -1,0 +1,30 @@
+@startuml UC04_QuanLyLichChieu
+
+left to right direction
+
+actor "Khách" as Guest
+actor "Quản lý rạp" as Manager
+actor "Quản trị viên" as Admin
+
+Admin -|> Manager
+
+rectangle "UC04: Quản lý lịch chiếu" {
+    usecase "Xem tất cả lịch chiếu" as UC_ViewAllShowtimes
+    usecase "Xem lịch chiếu theo phim" as UC_ViewShowtimesByMovie
+    usecase "Xem chi tiết lịch chiếu" as UC_ViewShowtimeDetail
+    usecase "Tạo lịch chiếu mới" as UC_CreateShowtime
+    usecase "Cập nhật lịch chiếu" as UC_UpdateShowtime
+    usecase "Xóa lịch chiếu" as UC_DeleteShowtime
+    usecase "Xem lịch chiếu rạp của tôi" as UC_ViewMyShowtimes
+}
+
+Guest -- UC_ViewAllShowtimes
+Guest -- UC_ViewShowtimesByMovie
+Guest -- UC_ViewShowtimeDetail
+
+Manager -- UC_ViewMyShowtimes
+Manager -- UC_CreateShowtime
+Manager -- UC_UpdateShowtime
+Manager -- UC_DeleteShowtime
+
+@enduml

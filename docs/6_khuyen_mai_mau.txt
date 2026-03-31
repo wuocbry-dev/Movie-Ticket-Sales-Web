@@ -1,0 +1,113 @@
+# 6 KHUYẾN MÃI MẪU – DÙNG ĐỂ CẬP NHẬT TRONG ADMIN
+
+Dùng thông tin bên dưới để thêm/sửa từng khuyến mãi trong **Admin → Khuyến mãi** (hoặc chạy file SQL tương ứng).
+
+---
+
+## 1. Xong mùa thi – Quẩy mùa hè (Học sinh/Sinh viên)
+
+- **Mã khuyến mãi:** SUMMER25
+- **Tên:** Xong mùa thi Quẩy mùa hè!
+- **Mô tả:** Áp dụng dành cho khách hàng thành viên thuộc đối tượng Học sinh - Sinh viên. Tặng 1 nước ngọt miễn phí khi giao dịch từ 2 vé xem phim trở lên.
+- **Loại:** Tặng sản phẩm (FREE_ITEM)
+- **Giảm (%):** 0
+- **Giảm (₫):** 0
+- **Đơn tối thiểu (₫):** 0
+- **Giảm tối đa (₫):** 0
+- **Ngày bắt đầu / kết thúc:** Tùy bạn (vd: hôm nay → +90 ngày)
+- **Số lần dùng (tổng):** 2000 (hoặc để trống = không giới hạn)
+- **Lần/người:** 1
+- **Trạng thái:** Bật
+
+---
+
+## 2. Vé 58K/62K – MoMo
+
+- **Mã khuyến mãi:** MOMO58
+- **Tên:** BETA VÉ RẺ MOMO MUA LIỀN!
+- **Mô tả:** 58.000₫/vé Thứ 2 - Thứ 6; 62.000₫/vé Thứ 7 - Chủ nhật. Áp dụng khi thanh toán qua Ví MoMo.
+- **Loại:** Giảm tiền cố định (FIXED_AMOUNT)
+- **Giảm (%):** 0
+- **Giảm (₫):** 42000 (giảm còn ~58K so với giá gốc, tùy giá vé của bạn)
+- **Đơn tối thiểu (₫):** 100000
+- **Giảm tối đa (₫):** 0
+- **Ngày bắt đầu / kết thúc:** Tùy bạn
+- **Số lần dùng (tổng):** 1000
+- **Lần/người:** 2
+- **Trạng thái:** Bật
+
+---
+
+## 3. Giảm 20% vé
+
+- **Mã khuyến mãi:** OFF20
+- **Tên:** 20% OFF
+- **Mô tả:** Giảm 20% giá vé xem phim. Áp dụng cho tất cả suất chiếu. Đơn tối thiểu 150.000₫.
+- **Loại:** Giảm theo % (PERCENTAGE)
+- **Giảm (%):** 20
+- **Giảm (₫):** 0
+- **Đơn tối thiểu (₫):** 150000
+- **Giảm tối đa (₫):** 50000
+- **Ngày bắt đầu / kết thúc:** Tùy bạn
+- **Số lần dùng (tổng):** 3000
+- **Lần/người:** 2
+- **Trạng thái:** Bật
+
+---
+
+## 4. Combo 2 vé tặng bắp
+
+- **Mã khuyến mãi:** COMBO2VE
+- **Tên:** Mua 2 vé tặng 1 Bắp
+- **Mô tả:** Khi mua từ 2 vé xem phim trở lên được tặng 1 bắp size M (hoặc tương đương).
+- **Loại:** Mua X tặng Y (BUY_X_GET_Y)
+- **Giảm (%):** 0
+- **Giảm (₫):** 0
+- **Đơn tối thiểu (₫):** 120000
+- **Giảm tối đa (₫):** 0
+- **Ngày bắt đầu / kết thúc:** Tùy bạn
+- **Số lần dùng (tổng):** 500
+- **Lần/người:** 1
+- **Trạng thái:** Bật
+
+---
+
+## 5. Giảm 50K cho thành viên
+
+- **Mã khuyến mãi:** MEMBER50K
+- **Tên:** Thành viên giảm 50.000₫
+- **Mô tả:** Áp dụng cho tài khoản có hạng thành viên (GOLD/PLATINUM). Giảm 50.000₫ trên đơn từ 200.000₫.
+- **Loại:** Giảm tiền cố định (FIXED_AMOUNT)
+- **Giảm (%):** 0
+- **Giảm (₫):** 50000
+- **Đơn tối thiểu (₫):** 200000
+- **Giảm tối đa (₫):** 50000
+- **Ngày bắt đầu / kết thúc:** Tùy bạn
+- **Số lần dùng (tổng):** 0 (không giới hạn)
+- **Lần/người:** 1
+- **Trạng thái:** Bật
+
+---
+
+## 6. Nhân đôi điểm thưởng
+
+- **Mã khuyến mãi:** DOUBLEPOINT
+- **Tên:** Nhân đôi điểm thưởng
+- **Mô tả:** Giao dịch trong thời gian khuyến mãi được nhân đôi điểm tích lũy.
+- **Loại:** Nhân điểm thưởng (POINTS_MULTIPLIER)
+- **Giảm (%):** 0
+- **Giảm (₫):** 0
+- **Đơn tối thiểu (₫):** 0
+- **Giảm tối đa (₫):** 0
+- **Ngày bắt đầu / kết thúc:** Tùy bạn
+- **Số lần dùng (tổng):** 0
+- **Lần/người:** 0 (không giới hạn)
+- **Trạng thái:** Bật
+
+---
+
+## Ghi chú
+
+- **Ảnh:** Dữ liệu mẫu không kèm ảnh. Bạn tự cập nhật sau: Admin → Khuyến mãi → Sửa từng khuyến mãi → "Ảnh khuyến mãi (S3)" → chọn file ảnh.
+- **Ngày:** Trong admin nhập Ngày bắt đầu / Ngày kết thúc theo đợt khuyến mãi thực tế.
+- Nếu dùng SQL: chạy file `insert_6_promotions_sample.sql` (cùng thư mục) sau khi đã có bảng `promotions`.

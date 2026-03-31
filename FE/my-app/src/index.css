@@ -1,13 +1,151 @@
+* {
+  box-sizing: border-box;
+}
+
+/* Nền toàn app — phong cách điện ảnh chuyên nghiệp (midnight + neon glow nhẹ) */
+:root {
+  --app-page-bg: radial-gradient(1100px 520px at 10% -8%, rgba(168, 85, 247, 0.28), transparent 62%),
+    radial-gradient(900px 460px at 92% 110%, rgba(56, 189, 248, 0.24), transparent 64%),
+    linear-gradient(135deg, #0b1224 0%, #17233f 48%, #243a61 100%);
+  --app-page-bg-fallback: #0b1224;
+
+  /* Nút, viền, highlight — cùng palette đăng nhập (thay thế #667eea / #764ba2 cũ) */
+  --ui-gradient-primary: linear-gradient(135deg, #6b3fd4 0%, #c23d9a 52%, #ff7b5c 100%);
+  --ui-gradient-primary-hover: linear-gradient(135deg, #7d52e0 0%, #d14faa 50%, #ff9070 100%);
+  --ui-gradient-soft: linear-gradient(135deg, rgba(107, 63, 212, 0.22) 0%, rgba(194, 61, 154, 0.18) 52%, rgba(255, 123, 92, 0.14) 100%);
+  --ui-gradient-fade: linear-gradient(135deg, rgba(107, 63, 212, 0.14) 0%, rgba(194, 61, 154, 0.12) 100%);
+  --ui-accent-mid: #b565d8;
+  --ui-accent-deep: #8b4dc4;
+  --ui-btn-grad: linear-gradient(90deg, #8b6cff 0%, #45c5f3 100%);
+  --ui-btn-grad-hover: linear-gradient(90deg, #9a7bff 0%, #58cff8 100%);
+
+  /* Admin: nền card / sidebar pha tím (trên nền app) */
+  --adm-ui-card-tint: linear-gradient(
+    145deg,
+    rgba(139, 108, 255, 0.16) 0%,
+    rgba(18, 28, 52, 0.96) 55%,
+    #121c34 100%
+  );
+  --adm-ui-sidebar-bg: linear-gradient(195deg, #111b34 0%, #172748 45%, #101a30 100%);
+}
+
+html {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  min-height: 100%;
+  background: var(--app-page-bg);
+  background-color: var(--app-page-bg-fallback);
+  background-attachment: fixed;
+  background-size: cover;
+}
+
 body {
   margin: 0;
+  overflow-x: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: transparent;
+}
+
+#root {
+  overflow-x: hidden;
+  max-width: 100vw;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: transparent;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Dropdown đồng bộ toàn app (AdminDashboard + UserInterface) */
+select {
+  color-scheme: dark;
+  background: rgba(10, 20, 44, 0.9);
+  color: rgba(246, 250, 255, 0.96);
+  border: 1px solid rgba(132, 170, 255, 0.28);
+}
+
+select:hover {
+  border-color: rgba(132, 170, 255, 0.45);
+}
+
+select:focus {
+  outline: none;
+  border-color: rgba(88, 207, 248, 0.72);
+  box-shadow: 0 0 0 2px rgba(88, 207, 248, 0.2);
+}
+
+select option {
+  background: rgba(7, 18, 40, 0.98) !important;
+  color: rgba(247, 251, 255, 0.96) !important;
+}
+
+/* Nút bấm đồng bộ toàn web theo tông tím-xanh */
+button,
+input[type='button'],
+input[type='submit'],
+input[type='reset'] {
+  background: var(--ui-btn-grad) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(69, 197, 243, 0.3);
+  transition: filter 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+button:hover:not(:disabled),
+input[type='button']:hover:not(:disabled),
+input[type='submit']:hover:not(:disabled),
+input[type='reset']:hover:not(:disabled) {
+  background: var(--ui-btn-grad-hover) !important;
+  filter: brightness(1.04);
+  box-shadow: 0 6px 20px rgba(69, 197, 243, 0.4);
+  transform: translateY(-1px);
+}
+
+button:disabled,
+input[type='button']:disabled,
+input[type='submit']:disabled,
+input[type='reset']:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Function-based button gradients for non-admin pages */
+.btn-cancel {
+  background: linear-gradient(135deg, #4f5d79 0%, #65769b 100%) !important;
+  border-color: rgba(160, 182, 219, 0.42) !important;
+  color: #eef4ff !important;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5a6a88 0%, #7387af 100%) !important;
+}
+
+.bcf__btn--success,
+.csx__btn--add,
+.pp-btn-save-all,
+.qbm-btn-book,
+.btn-book-showtime,
+.btn-book-small {
+  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%) !important;
+  border-color: rgba(137, 180, 255, 0.45) !important;
+  color: #f3f8ff !important;
+}
+
+.bcf__btn--success:hover:not(:disabled),
+.csx__btn--add:hover:not(:disabled),
+.pp-btn-save-all:hover:not(:disabled),
+.qbm-btn-book:hover:not(:disabled),
+.btn-book-showtime:hover:not(:disabled),
+.btn-book-small:hover:not(:disabled) {
+  background: linear-gradient(135deg, #8a70ff 0%, #5bd1fa 100%) !important;
 }

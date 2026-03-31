@@ -1,0 +1,26 @@
+@startuml UC07_CheckInVe
+
+left to right direction
+
+actor "Nhân viên rạp" as Staff
+actor "Quản lý rạp" as Manager
+
+Manager -|> Staff
+
+rectangle "UC07: Check-in vé tại rạp" {
+    usecase "Check-in vé bằng mã booking" as UC_CheckIn
+    usecase "Xem chi tiết vé để check-in" as UC_ViewTicketForCheckIn
+    usecase "Kiểm tra vé thuộc rạp" as UC_ValidateCinema
+    usecase "Thanh toán tiền mặt tại quầy" as UC_CashPayment
+    usecase "Xem thông tin rạp của tôi" as UC_ViewMyCinema
+}
+
+Staff -- UC_CheckIn
+Staff -- UC_ViewTicketForCheckIn
+Staff -- UC_CashPayment
+Staff -- UC_ViewMyCinema
+
+UC_CheckIn ..> UC_ValidateCinema : <<include>>
+UC_ViewTicketForCheckIn ..> UC_ValidateCinema : <<include>>
+
+@enduml

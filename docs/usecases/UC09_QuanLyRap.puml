@@ -1,0 +1,33 @@
+@startuml UC09_QuanLyRap
+
+left to right direction
+
+actor "Khách" as Guest
+actor "Quản lý rạp" as Manager
+actor "Quản trị viên" as Admin
+
+Admin -|> Manager
+
+rectangle "UC09: Quản lý rạp chiếu phim" {
+    usecase "Xem danh sách rạp" as UC_ViewCinemas
+    usecase "Xem rạp theo chuỗi rạp" as UC_ViewCinemasByChain
+    usecase "Xem chi tiết rạp" as UC_ViewCinemaDetail
+    usecase "Xem rạp của tôi" as UC_ViewMyCinemas
+    usecase "Thêm rạp mới" as UC_CreateCinema
+    usecase "Cập nhật thông tin rạp" as UC_UpdateCinema
+    usecase "Xóa rạp" as UC_DeleteCinema
+    usecase "Xem tất cả rạp (Admin)" as UC_ViewAllCinemasAdmin
+}
+
+Guest -- UC_ViewCinemas
+Guest -- UC_ViewCinemasByChain
+Guest -- UC_ViewCinemaDetail
+
+Manager -- UC_ViewMyCinemas
+
+Admin -- UC_CreateCinema
+Admin -- UC_UpdateCinema
+Admin -- UC_DeleteCinema
+Admin -- UC_ViewAllCinemasAdmin
+
+@enduml

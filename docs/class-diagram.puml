@@ -1,0 +1,223 @@
+@startuml Class_Diagram_Full_System
+
+title Sơ đồ Lớp Hệ thống Đầy đủ (Complete Class Diagram)
+
+' --- Cấu hình hiển thị ---
+skinparam monochrome true
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+left to right direction
+
+' --- MODULE: NGƯỜI DÙNG & BẢO MẬT ---
+package "Người dùng & Xác thực" {
+    class User {
+        + Integer id
+        + String email
+        + String passwordHash
+        + String fullName
+        + Boolean isActive
+    }
+    class Role {
+        + Integer id
+        + String roleName
+    }
+    class UserRole {
+        + Instant assignedAt
+    }
+    class UserSession {
+        + String sessionToken
+        + Instant expiresAt
+    }
+    class PasswordResetToken {
+        + String token
+        + Instant expiryDate
+    }
+}
+
+' --- MODULE: THÀNH VIÊN & ĐIỂM THƯỞNG ---
+package "Thẻ thành viên" {
+    class Membership {
+        + String membershipNumber
+        + Integer totalPoints
+    }
+    class MembershipTier {
+        + String tierName
+        + Integer tierLevel
+    }
+    class PointsTransaction {
+        + Integer pointsChange
+        + String description
+    }
+}
+
+' --- MODULE: HỆ THỐNG RẠP ---
+package "Cơ sở hạ tầng Rạp" {
+    class CinemaChain {
+        + Integer id
+        + String chainName
+    }
+    class Cinema {
+        + Integer id
+        + String cinemaName
+        + String address
+    }
+    class CinemaHall {
+        + Integer id
+        + String hallName
+    }
+    class Seat {
+        + Integer id
+        + String seatRow
+        + Integer seatNumber
+    }
+    class CinemaStaff {
+        + String position
+        + Boolean isActive
+    }
+}
+
+' --- MODULE: PHIM & LỊCH CHIẾU ---
+package "Phim & Suất chiếu" {
+    class Movie {
+        + Integer id
+        + String title
+        + Integer durationMinutes
+    }
+    class MovieGenre {
+        + String genreName
+    }
+    class MovieGenreMapping {
+    }
+    class Showtime {
+        + LocalDate showDate
+        + LocalTime startTime
+    }
+    class PricingRule {
+        + String ruleName
+        + BigDecimal surcharge
+    }
+}
+
+' --- MODULE: ĐẶT VÉ & THANH TOÁN ---
+package "Quản lý Giao dịch" {
+    class Booking {
+        + String bookingCode
+        + BigDecimal totalAmount
+    }
+    class Ticket {
+        + String ticketCode
+        + BigDecimal finalPrice
+    }
+    class Payment {
+        + String transactionId
+        + String status
+    }
+    class Refund {
+        + String refundReference
+        + BigDecimal amount
+    }
+}
+
+' --- MODULE: KHUYẾN MÃI ---
+package "Khuyến mãi" {
+    class Promotion {
+        + String promoName
+        + BigDecimal discountValue
+    }
+    class UserVoucher {
+        + String voucherCode
+        + Boolean isUsed
+    }
+}
+
+' --- MODULE: BẮP NƯỚC ---
+package "Dịch vụ Bắp nước" {
+    class ConcessionCategory {
+        + String categoryName
+    }
+    class ConcessionItem {
+        + String itemName
+        + BigDecimal basePrice
+    }
+    class CinemaConcessionItem {
+        + Integer stockQuantity
+    }
+    class ConcessionOrder {
+        + String orderNumber
+        + BigDecimal totalAmount
+    }
+    class ConcessionOrderItem {
+        + Integer quantity
+    }
+}
+
+' --- MODULE: KỸ THUẬT ---
+package "Hệ thống bổ trợ" {
+    class Notification {
+        + String message
+        + Boolean isRead
+    }
+    class SystemLog {
+        + String logLevel
+        + String message
+    }
+    class SystemConfiguration {
+        + String configKey
+        + String configValue
+    }
+}
+
+' --- QUAN HỆ CỦA CÁC THỰC THỂ ---
+
+' Người dùng
+User "1" -- "*" UserRole
+UserRole "*" -- "1" Role
+User "1" -- "*" UserSession
+User "1" -- "*" PasswordResetToken
+User "1" -- "1" Membership
+User "1" -- "*" Notification
+User "1" -- "*" SystemLog : (Bởi ai)
+
+' Thành viên
+Membership "*" -- "1" MembershipTier
+Membership "1" -- "*" PointsTransaction
+
+' Rạp
+CinemaChain "1" -- "*" Cinema
+Cinema "1" -- "*" CinemaHall
+Cinema "1" -- "0..1" User : (Quản lý)
+Cinema "1" -- "*" CinemaStaff
+CinemaStaff "*" -- "1" User
+CinemaHall "1" -- "*" Seat
+CinemaHall "1" -- "*" Showtime
+
+' Phim
+Movie "1" -- "*" Showtime
+Movie "*" -- "*" MovieGenreMapping
+MovieGenreMapping "*" -- "1" MovieGenre
+Showtime "*" -- "1" PricingRule
+
+' Giao dịch
+Booking "*" -- "1" User
+Booking "*" -- "1" Showtime
+Booking "1" -- "*" Ticket
+Ticket "1" -- "1" Seat
+Booking "1" -- "0..1" Payment
+Payment "1" -- "0..1" Refund
+Booking "1" -- "*" PointsTransaction : (Tiêu điểm)
+
+' Khuyến mãi
+Promotion "1" -- "*" UserVoucher
+UserVoucher "*" -- "1" User
+Booking "0..1" -- "0..1" UserVoucher
+
+' Bắp nước
+ConcessionCategory "1" -- "*" ConcessionItem
+Cinema "1" -- "*" CinemaConcessionItem
+CinemaConcessionItem "*" -- "1" ConcessionItem
+Booking "1" -- "0..1" ConcessionOrder
+ConcessionOrder "1" -- "*" ConcessionOrderItem
+ConcessionOrderItem "*" -- "1" ConcessionItem
+
+@enduml

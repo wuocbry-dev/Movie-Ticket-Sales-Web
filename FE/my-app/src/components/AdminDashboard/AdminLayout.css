@@ -1,0 +1,680 @@
+/* === Admin shell: tách biệt hoàn toàn layout site công khai === */
+.adm-shell {
+  --adm-bg: #0b1224;
+  --adm-surface: #121c34;
+  --adm-surface2: #1a2746;
+  --adm-border: rgba(132, 170, 255, 0.18);
+  --adm-text: #eef5ff;
+  --adm-muted: #9fb4d6;
+  --adm-accent: #8b6cff;
+  --adm-accent-dim: rgba(139, 108, 255, 0.18);
+  --adm-sidebar-w: 268px;
+  --adm-sidebar-collapsed: 72px;
+  --adm-topbar-h: 56px;
+  --adm-font: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background: transparent;
+  color: var(--adm-text);
+  font-family: var(--adm-font);
+  text-align: left;
+}
+
+/* Sidebar */
+.adm-sidebar {
+  position: fixed;
+  z-index: 200;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--adm-sidebar-w);
+  display: flex;
+  flex-direction: column;
+  background: var(--adm-ui-sidebar-bg);
+  border-right: 1px solid var(--adm-border);
+  transition: width 0.25s ease, transform 0.25s ease;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35);
+}
+
+.adm-shell[data-sidebar='collapsed'] .adm-sidebar {
+  width: var(--adm-sidebar-collapsed);
+}
+
+.adm-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1rem 0.75rem;
+  min-height: 52px;
+  border-bottom: 1px solid var(--adm-border);
+}
+
+.adm-sidebar__logo {
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+  color: var(--adm-text);
+}
+
+.adm-sidebar__logo--sm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  font-size: 1.25rem;
+}
+
+.adm-sidebar__badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--adm-accent);
+  background: var(--adm-accent-dim);
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+}
+
+.adm-sidebar__collapse {
+  margin: 0.5rem 0.75rem 0;
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--adm-muted);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.adm-sidebar__collapse:hover {
+  background: rgba(139, 108, 255, 0.24);
+  color: var(--adm-text);
+}
+
+.adm-sidebar__nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.5rem 0.65rem 1rem;
+}
+
+.adm-sidebar__nav::-webkit-scrollbar {
+  width: 6px;
+}
+.adm-sidebar__nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+.adm-nav__label {
+  padding: 1.25rem 0.75rem 0.4rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--adm-muted);
+}
+
+.adm-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0.75rem;
+  margin-bottom: 2px;
+  border-radius: 10px;
+  color: rgba(232, 234, 237, 0.88);
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  font-size: 0.9rem;
+  font-weight: 500;
+  width: 100%;
+  box-sizing: border-box;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.adm-nav__link:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--adm-text);
+}
+
+.adm-nav__link.is-active {
+  background: var(--adm-accent-dim);
+  border-color: rgba(139, 108, 255, 0.45);
+  color: #fff;
+}
+
+.adm-nav__link.is-active .adm-nav__ico {
+  color: var(--adm-accent);
+}
+
+.adm-nav__ico {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  min-width: 22px;
+  font-size: 1.05rem;
+  opacity: 0.95;
+}
+
+.adm-shell[data-sidebar='collapsed'] .adm-nav__text {
+  display: none;
+}
+
+.adm-shell[data-sidebar='collapsed'] .adm-nav__label {
+  display: none;
+}
+
+.adm-shell[data-sidebar='collapsed'] .adm-sidebar__badge {
+  display: none;
+}
+
+.adm-shell[data-sidebar='collapsed'] .adm-sidebar__logo:not(.adm-sidebar__logo--sm) {
+  display: none;
+}
+
+.adm-shell[data-sidebar='collapsed'] .adm-sidebar__brand {
+  justify-content: center;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.adm-shell[data-sidebar='collapsed'] .adm-sidebar__collapse {
+  align-self: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.adm-nav__link--muted {
+  color: var(--adm-muted);
+}
+
+.adm-nav__link--danger {
+  color: #f87171;
+}
+
+.adm-nav__link--danger:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.adm-sidebar__footer {
+  padding: 0.65rem 0.65rem 1rem;
+  border-top: 1px solid var(--adm-border);
+}
+
+/* Main column */
+.adm-main {
+  flex: 1;
+  margin-left: var(--adm-sidebar-w);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.25s ease;
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(139, 108, 255, 0.16), transparent),
+    rgba(9, 16, 34, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.adm-shell[data-sidebar='collapsed'] .adm-main {
+  margin-left: var(--adm-sidebar-collapsed);
+}
+
+.adm-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--adm-topbar-h);
+  min-height: var(--adm-topbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 clamp(16px, 2vw, 28px);
+  background: rgba(12, 15, 20, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--adm-border);
+}
+
+.adm-topbar__left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.adm-topbar__icon-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--adm-text);
+  cursor: pointer;
+}
+
+.adm-topbar__titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.adm-topbar__eyebrow {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--adm-muted);
+}
+
+.adm-topbar__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.adm-topbar__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--adm-muted);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.adm-topbar__link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--adm-text);
+}
+
+@media (max-width: 520px) {
+  .adm-topbar__link span {
+    display: none;
+  }
+}
+
+.adm-topbar__user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.65rem 0.35rem 0.35rem;
+  border-radius: 999px;
+  background: var(--adm-surface2);
+  border: 1px solid var(--adm-border);
+  max-width: 220px;
+}
+
+.adm-topbar__avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--adm-accent), #45c5f3);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.adm-topbar__name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-outlet {
+  flex: 1;
+  padding: clamp(16px, 2vw, 28px);
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  /* Token dùng chung cho các trang con (Dashboard, AccountManagement, …) */
+  --adm-page-card: #121c34;
+  --adm-page-card2: #1a2746;
+  --adm-page-border: rgba(132, 170, 255, 0.2);
+  --adm-page-muted: #9fb4d6;
+  --adm-page-text: #eef5ff;
+  --adm-page-accent: #8b6cff;
+}
+
+/* Mobile drawer */
+.adm-backdrop {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .adm-sidebar {
+    transform: translateX(-100%);
+    width: min(288px, 88vw);
+  }
+
+  .adm-shell[data-sidebar='open'] .adm-sidebar {
+    transform: translateX(0);
+  }
+
+  .adm-shell[data-sidebar='collapsed'] .adm-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .adm-main {
+    margin-left: 0 !important;
+  }
+
+  .adm-topbar__icon-btn {
+    display: flex;
+  }
+
+  .adm-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    background: rgba(0, 0, 0, 0.55);
+    border: none;
+    cursor: pointer;
+  }
+
+  .adm-shell[data-sidebar='open'] .adm-backdrop {
+    animation: admFade 0.2s ease;
+  }
+
+  .adm-shell[data-sidebar='collapsed'] .adm-backdrop {
+    display: none;
+  }
+
+  /* On mobile, "collapsed" means drawer closed; open = drawer visible */
+  .adm-sidebar__collapse {
+    display: none;
+  }
+}
+
+@keyframes admFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Tooltip khi sidebar thu gọn (desktop) */
+@media (min-width: 1025px) {
+  .adm-shell[data-sidebar='collapsed'] .adm-nav__link[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: calc(var(--adm-sidebar-collapsed) + 8px);
+    padding: 0.4rem 0.65rem;
+    background: #1a2230;
+    border: 1px solid var(--adm-border);
+    border-radius: 8px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    z-index: 300;
+    pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .adm-nav__link {
+    position: relative;
+  }
+}
+
+/* Modal behavior: fixed center + no background scroll */
+.adm-shell [class$='__modal'],
+.adm-shell .mvf-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  display: flex;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding: clamp(12px, 3vh, 28px) 16px 16px !important;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+.adm-shell [class$='__modal'] > [class*='__panel'],
+.adm-shell .mvf-modal-overlay > .mvf-modal-content {
+  max-height: calc(100vh - 32px);
+  max-width: min(100%, 1200px);
+  margin: 0 !important;
+}
+
+body:has(.adm-shell [class$='__modal']),
+body:has(.adm-shell .mvf-modal-overlay) {
+  overflow: hidden;
+}
+
+/* Checkbox chips unified style across Admin pages */
+.adm-shell :is(
+  .adm-cin__field--check label,
+  .adm-ch__check,
+  .adm-myc__check,
+  .adm-ucm__check label,
+  .adm-cit__check,
+  .adm-chm__field > label:has(input[type='checkbox'])
+) {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+  padding: 0.5rem 0.65rem !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  color: var(--adm-page-text, #e8eaed) !important;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.adm-shell :is(
+  .adm-cin__field--check label,
+  .adm-ch__check,
+  .adm-myc__check,
+  .adm-ucm__check label,
+  .adm-cit__check,
+  .adm-chm__field > label:has(input[type='checkbox'])
+):hover {
+  border-color: rgba(139, 108, 255, 0.5) !important;
+  background: rgba(139, 108, 255, 0.12) !important;
+}
+
+.adm-shell :is(
+  .adm-cin__field--check label,
+  .adm-ch__check,
+  .adm-myc__check,
+  .adm-ucm__check label,
+  .adm-cit__check,
+  .adm-chm__field > label:has(input[type='checkbox'])
+) input[type='checkbox'] {
+  width: 14px !important;
+  height: 14px !important;
+  margin: 0 !important;
+  flex-shrink: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.35);
+  display: inline-grid;
+  place-content: center;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.adm-shell :is(
+  .adm-cin__field--check label,
+  .adm-ch__check,
+  .adm-myc__check,
+  .adm-ucm__check label,
+  .adm-cit__check,
+  .adm-chm__field > label:has(input[type='checkbox'])
+) input[type='checkbox']::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  transform: scale(0);
+  transition: transform 0.12s ease-in-out;
+  background: var(--adm-page-accent, #e50914);
+  border-radius: 2px;
+}
+
+.adm-shell :is(
+  .adm-cin__field--check label,
+  .adm-ch__check,
+  .adm-myc__check,
+  .adm-ucm__check label,
+  .adm-cit__check,
+  .adm-chm__field > label:has(input[type='checkbox'])
+) input[type='checkbox']:checked {
+  border-color: var(--adm-page-accent, #e50914);
+  box-shadow: 0 0 0 2px rgba(139, 108, 255, 0.22);
+}
+
+.adm-shell :is(
+  .adm-cin__field--check label,
+  .adm-ch__check,
+  .adm-myc__check,
+  .adm-ucm__check label,
+  .adm-cit__check,
+  .adm-chm__field > label:has(input[type='checkbox'])
+) input[type='checkbox']:checked::before {
+  transform: scale(1);
+}
+
+.adm-shell :is(
+  .adm-cin__field--check label,
+  .adm-ch__check,
+  .adm-myc__check,
+  .adm-ucm__check label,
+  .adm-cit__check,
+  .adm-chm__field > label:has(input[type='checkbox'])
+):has(input[type='checkbox']:checked) {
+  border-color: var(--adm-page-accent, #e50914) !important;
+  background: rgba(139, 108, 255, 0.16) !important;
+}
+
+/* Action buttons: gradient by function (edit / delete / neutral) */
+.adm-shell :is(
+  .adm-acc__act--edit,
+  .adm-cit__btn--edit,
+  .adm-ctg__btn--edit,
+  .adm-prm__btn--edit,
+  .adm-ch__icon-btn--edit,
+  .adm-myc__icon--edit,
+  .adm-mv__icon-btn--edit,
+  .adm-cnc__icon-btn--edit,
+  .adm-msm__icon-btn--edit,
+  .adm-ucm__icon-btn--edit,
+  .adm-chm__icon-btn--edit
+) {
+  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%) !important;
+  border-color: rgba(137, 180, 255, 0.45) !important;
+  color: #f3f8ff !important;
+  box-shadow: 0 8px 18px rgba(73, 198, 243, 0.22) !important;
+}
+
+.adm-shell :is(
+  .adm-acc__act--edit,
+  .adm-cit__btn--edit,
+  .adm-ctg__btn--edit,
+  .adm-prm__btn--edit,
+  .adm-ch__icon-btn--edit,
+  .adm-myc__icon--edit,
+  .adm-mv__icon-btn--edit,
+  .adm-cnc__icon-btn--edit,
+  .adm-msm__icon-btn--edit,
+  .adm-ucm__icon-btn--edit,
+  .adm-chm__icon-btn--edit
+):hover {
+  background: linear-gradient(135deg, #8a70ff 0%, #5bd1fa 100%) !important;
+  filter: brightness(1.04);
+  box-shadow: 0 10px 22px rgba(91, 209, 250, 0.28) !important;
+}
+
+.adm-shell :is(
+  .adm-acc__act--del,
+  .adm-cit__btn--del,
+  .adm-ctg__btn--del,
+  .adm-prm__btn--del,
+  .adm-ch__icon-btn--del,
+  .adm-myc__icon--del,
+  .adm-mv__icon-btn--del,
+  .adm-cnc__icon-btn--del,
+  .adm-ucm__icon-btn--del,
+  .adm-msm__icon-btn--danger,
+  .adm-chm__icon-btn--danger,
+  .adm-st__btn--danger
+) {
+  background: linear-gradient(135deg, #ff5d6c 0%, #ff8f3f 100%) !important;
+  border-color: rgba(255, 157, 117, 0.46) !important;
+  color: #fff7f2 !important;
+  box-shadow: 0 8px 18px rgba(255, 108, 85, 0.26) !important;
+}
+
+.adm-shell :is(
+  .adm-acc__act--del,
+  .adm-cit__btn--del,
+  .adm-ctg__btn--del,
+  .adm-prm__btn--del,
+  .adm-ch__icon-btn--del,
+  .adm-myc__icon--del,
+  .adm-mv__icon-btn--del,
+  .adm-cnc__icon-btn--del,
+  .adm-ucm__icon-btn--del,
+  .adm-msm__icon-btn--danger,
+  .adm-chm__icon-btn--danger,
+  .adm-st__btn--danger
+):hover {
+  background: linear-gradient(135deg, #ff6f7c 0%, #ffa255 100%) !important;
+  filter: brightness(1.03);
+  box-shadow: 0 10px 22px rgba(255, 122, 98, 0.3) !important;
+}
+
+.adm-shell :is(
+  .mvf-btn-cancel,
+  .adm-prm__btn--cancel
+) {
+  background: linear-gradient(135deg, #4f5d79 0%, #65769b 100%) !important;
+  border-color: rgba(160, 182, 219, 0.42) !important;
+  color: #eef4ff !important;
+  box-shadow: 0 8px 16px rgba(56, 72, 104, 0.28) !important;
+}
+
+.adm-shell :is(
+  .mvf-btn-cancel,
+  .adm-prm__btn--cancel
+):hover {
+  background: linear-gradient(135deg, #5a6a88 0%, #7387af 100%) !important;
+  filter: brightness(1.03);
+}

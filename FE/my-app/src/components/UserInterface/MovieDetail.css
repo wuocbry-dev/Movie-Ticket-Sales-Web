@@ -1,0 +1,1492 @@
+/* Movie Detail Styles */
+.movie-detail {
+  background: transparent;
+  min-height: 100vh;
+  padding-top: 80px;
+  overflow-x: hidden;
+}
+
+/* Banner */
+.detail-banner {
+  position: relative;
+  height: 750px;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 40px;
+}
+
+.detail-banner .banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.95) 50%, rgba(0,0,0,0.85) 80%, rgba(0,0,0,0.7) 100%);
+  display: flex;
+  align-items: stretch;
+  padding: 40px 0;
+}
+
+.detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  width: 100%;
+}
+
+.detail-content {
+  display: flex;
+  gap: 40px;
+  align-items: stretch;
+  height: 100%;
+}
+
+/* Movie Poster */
+.movie-poster-large {
+  flex: 0 0 400px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.movie-poster-large img {
+  width: 100%;
+  height: 580px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.btn-trailer {
+  width: 100%;
+  margin-top: 20px;
+  padding: 15px;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 0.3s ease;
+}
+
+.btn-trailer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4);
+}
+
+/* Desktop: nút trailer nằm bên phải (trong .movie-details) */
+.detail-desktop-trailer {
+  margin-top: 20px;
+  width: 100%;
+}
+
+/* Movie Details */
+.movie-details {
+  flex: 0 0 400px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.movie-details h1 {
+  font-size: 32px;
+  margin-bottom: 5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+  line-height: 1.2;
+}
+
+.title-en {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+  margin-bottom: 15px;
+  font-weight: 400;
+}
+
+.movie-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding: 0;
+  border-bottom: none;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #ffffff;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 14px;
+  border-radius: 25px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.meta-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.meta-icon {
+  color: #ff4b2b;
+  font-size: 14px;
+}
+
+.movie-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.md-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.2s ease;
+}
+
+.md-info-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.md-info-row:first-child {
+  padding-top: 0;
+}
+
+.md-info-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+  margin: 0 -10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 6px;
+}
+
+.md-info-label {
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-weight: 500;
+  min-width: 80px;
+  flex-shrink: 0;
+  text-shadow: none;
+  font-size: 13px;
+}
+
+.md-info-value {
+  color: #ffffff !important;
+  font-weight: 500;
+  text-shadow: none;
+  flex: 1;
+  line-height: 1.4;
+  font-size: 13px;
+  word-break: break-word;
+}
+
+.md-info-value.rated {
+  color: #ff4b2b !important;
+  font-weight: 600;
+  background: rgba(255, 75, 43, 0.15);
+  padding: 3px 10px;
+  border-radius: 5px;
+  display: inline-block;
+  font-size: 12px;
+}
+
+/* Movie Description */
+.movie-description {
+  margin-bottom: 50px;
+  color: white;
+}
+
+.movie-description h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: white;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.movie-description h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+}
+
+.movie-description p {
+  line-height: 1.8;
+  color: #ffffff;
+  font-size: 15px;
+}
+
+/* ===== Lịch chiếu: đồng bộ nền Aurora (xanh navy + tím/cyan) ===== */
+.movie-schedule {
+  --md-sch-panel-a: rgba(8, 16, 36, 0.52);
+  --md-sch-panel-b: rgba(16, 28, 58, 0.62);
+  --md-sch-surface: rgba(10, 20, 44, 0.35);
+  --md-sch-raised: rgba(28, 42, 78, 0.96);
+  --md-sch-card-face: rgba(24, 38, 74, 0.94);
+  --md-sch-border: rgba(136, 170, 255, 0.24);
+  --md-sch-border-strong: rgba(96, 165, 250, 0.48);
+  --md-sch-text: #fcfdff;
+  --md-sch-muted: rgba(220, 234, 255, 0.82);
+  --md-sch-accent-a: #9b6bff;
+  --md-sch-accent-b: #4ccfff;
+  --md-sch-soft: rgba(173, 205, 255, 0.92);
+  --md-sch-warn: #fbbf24;
+
+  margin-bottom: 50px;
+  color: var(--md-sch-text);
+}
+
+.movie-schedule h2 {
+  font-size: 24px;
+  margin: 0 0 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  position: relative;
+  padding-bottom: 12px;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.movie-schedule h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 56px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--md-sch-coral-a), var(--md-sch-coral-b));
+}
+
+.movie-schedule-panel {
+  background: linear-gradient(165deg, var(--md-sch-panel-a) 0%, var(--md-sch-panel-b) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  padding: 20px 20px 22px;
+  box-shadow:
+    0 16px 44px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(22px) saturate(1.12);
+  -webkit-backdrop-filter: blur(22px) saturate(1.12);
+  -webkit-font-smoothing: antialiased;
+}
+
+.schedule-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 48px 24px;
+  color: var(--md-sch-muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.schedule-placeholder {
+  padding: 36px 20px;
+  text-align: center;
+  color: var(--md-sch-muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.schedule-placeholder p {
+  margin: 0 0 10px;
+}
+
+.schedule-placeholder p:last-child {
+  margin-bottom: 0;
+}
+
+.schedule-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.date-selector {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 0;
+  scrollbar-color: var(--md-sch-border) var(--md-sch-surface);
+}
+
+.date-selector::-webkit-scrollbar {
+  height: 8px;
+}
+
+.date-selector::-webkit-scrollbar-track {
+  background: var(--md-sch-surface);
+  border-radius: 4px;
+}
+
+.date-selector::-webkit-scrollbar-thumb {
+  background: var(--md-sch-border);
+  border-radius: 4px;
+}
+
+.date-selector::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 170, 255, 0.45);
+}
+
+.schedule-date-selector {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.date-btn {
+  flex: 0 0 auto;
+  min-width: 88px;
+  padding: 12px 14px;
+  background: var(--md-sch-raised);
+  border: 1px solid var(--md-sch-border);
+  color: var(--md-sch-text);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit;
+}
+
+.date-btn:hover {
+  background: rgba(40, 58, 102, 0.88);
+  border-color: var(--md-sch-border-strong);
+}
+
+.date-btn.active {
+  background: linear-gradient(145deg, var(--md-sch-accent-a), var(--md-sch-accent-b));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 6px 22px rgba(56, 189, 248, 0.32);
+}
+
+.date-btn.active .date-day,
+.date-btn.active .date-month {
+  color: rgba(255, 255, 255, 0.88);
+  opacity: 1;
+}
+
+.date-day {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--md-sch-muted);
+  font-weight: 600;
+}
+
+.date-number {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+  color: inherit;
+}
+
+.date-month {
+  font-size: 11px;
+  color: var(--md-sch-muted);
+  font-weight: 500;
+}
+
+.cinema-showtimes {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.cinema-group {
+  background: var(--md-sch-surface);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 18px 18px 20px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.cinema-group:hover {
+  border-color: var(--md-sch-border-strong);
+}
+
+.cinema-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: rgba(238, 246, 255, 0.98);
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(116, 164, 255, 0.3);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.showtimes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+/* ===== Desktop: cột ngày trái, suất chiếu phải ===== */
+@media (min-width: 1024px) {
+  .schedule-content {
+    display: grid;
+    grid-template-columns: 132px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .date-selector {
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-bottom: 0;
+    max-height: 440px;
+    position: sticky;
+    top: 96px;
+  }
+
+  .date-btn {
+    width: 100%;
+    min-width: 0;
+    align-items: flex-start;
+    padding: 12px 12px;
+  }
+
+  .date-day,
+  .date-number,
+  .date-month {
+    display: block;
+  }
+
+  .cinema-showtimes {
+    min-width: 0;
+  }
+
+  .cinema-name {
+    text-align: left;
+  }
+
+  .showtimes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+.showtime-card {
+  background: var(--md-sch-card-face);
+  border: 1px solid rgba(136, 170, 255, 0.3);
+  border-radius: 12px;
+  padding: 14px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  /* Blur mạnh + nền gần kín → màu nền trang chỉ thoáng mờ, không rõ hình */
+  backdrop-filter: blur(28px) saturate(1.05);
+  -webkit-backdrop-filter: blur(28px) saturate(1.05);
+}
+
+.showtime-card:hover {
+  background: rgba(30, 48, 92, 0.97);
+  border-color: rgba(96, 165, 250, 0.52);
+  box-shadow: 0 8px 26px rgba(56, 189, 248, 0.18);
+}
+
+.showtime-time {
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(116, 164, 255, 0.36);
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-shadow: 0 0 24px rgba(96, 165, 250, 0.3);
+}
+
+.showtime-hall {
+  font-size: 13px;
+  color: rgba(239, 247, 255, 0.95);
+  text-align: center;
+  font-weight: 700;
+}
+
+.showtime-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.showtime-format,
+.showtime-subtitle {
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.showtime-format {
+  background: rgba(56, 189, 248, 0.12);
+  color: rgba(220, 242, 255, 0.98);
+  border: 1px solid rgba(96, 165, 250, 0.5);
+}
+
+.showtime-subtitle {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(242, 248, 255, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  text-transform: none;
+  font-weight: 600;
+  max-width: 100%;
+}
+
+.showtime-price {
+  font-size: 17px;
+  font-weight: 800;
+  color: #ffffff;
+  text-align: center;
+  padding: 4px 0 2px;
+  text-shadow: 0 0 14px rgba(140, 190, 255, 0.22);
+}
+
+.showtime-seats {
+  text-align: center;
+  font-size: 13px;
+  margin-bottom: 2px;
+  min-height: 1.35em;
+}
+
+.seats-available {
+  color: rgba(200, 224, 255, 0.98);
+  font-weight: 800;
+}
+
+.seats-full {
+  color: var(--md-sch-warn);
+  font-weight: 700;
+}
+
+.btn-book-showtime {
+  width: 100%;
+  padding: 11px 12px;
+  margin-top: 2px;
+  background: linear-gradient(135deg, var(--md-sch-accent-a), var(--md-sch-accent-b));
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: inherit;
+  box-shadow: 0 5px 20px rgba(76, 207, 255, 0.42);
+}
+
+.btn-book-showtime:hover:not(:disabled) {
+  filter: brightness(1.12) saturate(1.05);
+  box-shadow: 0 8px 28px rgba(102, 177, 255, 0.56);
+  transform: translateY(-2px);
+}
+
+.btn-book-showtime:disabled {
+  background: rgba(24, 34, 62, 0.9);
+  color: var(--md-sch-muted);
+  border: 1px solid var(--md-sch-border);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+/* Theaters List */
+.theaters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.theater-schedule {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.theater-schedule:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theater-schedule h3 {
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: white;
+  font-weight: 600;
+}
+
+.time-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.time-slot {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.time-slot:hover {
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  border-color: transparent;
+  transform: translateY(-2px);
+}
+
+/* Other Movies Section */
+.other-movies-section {
+  margin-bottom: 50px;
+  padding-bottom: 50px;
+  color: white;
+}
+
+.other-movies-section h2 {
+  font-size: 24px;
+  margin-bottom: 25px;
+  font-weight: 700;
+  text-transform: uppercase;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.other-movies-section h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+}
+
+.other-movies-carousel {
+  position: relative;
+}
+
+.other-movies-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+  align-items: stretch;
+  transition: transform 0.5s ease;
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.carousel-arrow:hover {
+  background: rgba(0, 0, 0, 0.62);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.carousel-arrow-left {
+  left: -20px;
+}
+
+.carousel-arrow-right {
+  right: -20px;
+}
+
+.other-movie-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: linear-gradient(
+    165deg,
+    rgba(120, 60, 180, 0.22) 0%,
+    rgba(40, 20, 70, 0.35) 50%,
+    rgba(25, 12, 48, 0.42) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.other-movie-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 36px rgba(140, 80, 200, 0.25);
+  border-color: rgba(255, 255, 255, 0.26);
+}
+
+/* Chỉ carousel Phim khác (MovieDetail): poster thấp hơn — aspect-ratio 4/5 (w:h theo CSS) */
+.other-movie-poster {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #1a1a2e;
+}
+
+.other-movie-poster::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.22) 82%, rgba(30, 12, 50, 0.45) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.other-movie-badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.other-movie-age {
+  background: rgba(210, 50, 45, 0.95);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.other-movie-featured-star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  min-width: 22px;
+  padding: 0 5px;
+  border-radius: 5px;
+  background: rgba(13, 17, 23, 0.88);
+  border: 1px solid rgba(255, 215, 0, 0.55);
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.other-movie-poster img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  z-index: 0;
+}
+
+.other-movie-card:hover .other-movie-poster img {
+  transform: scale(1.05);
+}
+
+.other-movie-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.other-movie-card:hover .other-movie-overlay {
+  opacity: 1;
+}
+
+.btn-play-small {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ff3b30, #c62828);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 14px rgba(198, 40, 40, 0.45);
+}
+
+.btn-play-small:hover {
+  transform: scale(1.08);
+}
+
+.other-movie-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 12px 12px 11px;
+  min-height: 0;
+  background: rgba(18, 8, 36, 0.52);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.other-movie-info h3 {
+  width: 100%;
+  font-size: 14px;
+  margin: 0 0 2px;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.55em;
+  flex-shrink: 0;
+}
+
+/* Giống Home / MovieBrowse: thể loại trái — điểm phải — ngày giữa — nút dưới */
+.other-movie-meta-foot {
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 6px;
+}
+
+.other-movie-row-split {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.other-movie-genres {
+  margin: 0;
+  font-size: 0.76rem;
+  color: rgba(230, 237, 243, 0.72);
+  line-height: 1.3;
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.other-movie-imdb-slot {
+  flex-shrink: 0;
+  min-width: 3.6em;
+  min-height: 1.15em;
+  text-align: right;
+}
+
+.other-movie-imdb {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #ffd700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.other-movie-release {
+  margin: 0;
+  font-size: 0.76rem;
+  color: rgba(230, 237, 243, 0.72);
+  line-height: 1.35;
+  text-align: center;
+  width: 100%;
+}
+
+.other-movie-release strong {
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 600;
+}
+
+.btn-book-small {
+  margin-top: 8px;
+  flex-shrink: 0;
+  width: 100%;
+  padding: 10px 8px;
+  background: linear-gradient(135deg, #ff4d2e 0%, #ff7a00 55%, #ff9500 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 16px rgba(255, 77, 46, 0.35);
+}
+
+.btn-book-small:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 122, 0, 0.45);
+}
+
+/* Chỉ hiện trên mobile */
+.detail-mobile-header {
+  display: none;
+}
+
+.detail-mobile-info {
+  display: none;
+}
+
+.detail-mobile-mota {
+  display: none;
+}
+
+.date-btn-mobile-label {
+  display: none;
+}
+
+/* Badge tuổi trên poster */
+.poster-age-badge {
+  display: none;
+}
+
+/* Responsive - Mobile: layout theo ảnh mẫu (tiêu đề trên, poster trái ~1/3, info phải có icon) */
+@media (max-width: 768px) {
+  .movie-detail {
+    padding-top: 56px;
+    padding-bottom: 70px;
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  .detail-mobile-header {
+    display: block;
+    padding: 12px 16px 8px;
+    background: rgba(20, 12, 40, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .detail-mobile-header h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .detail-banner {
+    height: auto;
+    min-height: 200px;
+    margin-bottom: 0;
+    overflow: visible;
+    width: 100%;
+  }
+
+  .detail-banner .banner-overlay {
+    position: relative;
+    padding: 12px 0 16px;
+    align-items: stretch;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-height: 180px;
+  }
+
+  .detail-container {
+    padding: 0 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-height: 0;
+  }
+
+  .detail-content {
+    flex-direction: row;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    gap: 14px;
+    align-items: flex-start;
+    min-height: 160px;
+  }
+
+  /* Poster ~1/3 màn hình, có badge tuổi */
+  .movie-poster-large {
+    flex: 0 0 32%;
+    width: 32%;
+    min-width: 0;
+    margin: 0;
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .poster-age-badge {
+    display: block;
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 2;
+    background: #e50914;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .movie-poster-large img {
+    width: 100%;
+    height: auto;
+    min-height: 160px;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    background: #1a1a2e;
+  }
+
+
+  .movie-details {
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    order: 2;
+  }
+
+  .movie-details .detail-desktop-title,
+  .movie-details .title-en,
+  .movie-meta,
+  .detail-desktop-grid {
+    display: none !important;
+  }
+
+  /* Mobile: ẩn nút hồng XEM TRAILER, chỉ giữ link "Xem Trailer" trong danh sách */
+  .detail-desktop-trailer,
+  .btn-trailer {
+    display: none !important;
+  }
+
+  .detail-mobile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .mobile-info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12px;
+    color: #fff;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    width: 100%;
+    cursor: default;
+  }
+
+  .mobile-info-row.mobile-info-trailer {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #fff;
+  }
+
+  .mobile-info-icon {
+    flex-shrink: 0;
+    width: 18px;
+    margin-top: 2px;
+    color: #ff4b2b;
+  }
+
+  .mobile-info-icon-play {
+    color: #e50914;
+  }
+
+  .mobile-info-rated .mobile-rated-text {
+    background: rgba(255, 193, 7, 0.25);
+    color: #ffc107;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .detail-mobile-mota {
+    display: block;
+    color: #fff;
+    margin-bottom: 20px;
+    padding: 0 12px;
+  }
+
+  .detail-mobile-mota h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    color: #fff;
+    text-transform: uppercase;
+  }
+
+  .detail-mobile-mota h2::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+    margin-top: 6px;
+  }
+
+  .detail-mobile-mota p {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .detail-mobile-mota strong {
+    color: #fff;
+  }
+
+  /* Nút ngày: active vàng, không active viền vàng chữ vàng */
+  .date-btn-mobile-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .date-selector .date-btn .date-day,
+  .date-selector .date-btn .date-number,
+  .date-selector .date-btn .date-month {
+    display: none;
+  }
+
+  .movie-schedule-panel {
+    padding: 14px 12px 16px;
+    border-radius: 12px;
+  }
+
+  .date-btn {
+    padding: 10px 14px;
+    min-width: 0;
+    border-radius: 10px;
+    background: rgba(52, 26, 72, 0.85);
+    border: 1px solid rgba(255, 130, 160, 0.35);
+    color: #fff7fa;
+  }
+
+  .date-btn.active {
+    background: linear-gradient(145deg, #ff416c, #ff4b2b);
+    border-color: transparent;
+    color: #fff;
+  }
+
+  .date-btn:hover:not(.active) {
+    background: rgba(62, 32, 82, 0.92);
+    border-color: rgba(255, 150, 170, 0.5);
+  }
+
+  /* Nút XEM TRAILER full width dưới 2 cột (trong .detail-content có thể đặt sau) - đang nằm trong .movie-poster-large nên chỉ dưới poster. Để nút rộng full dưới cả 2 cột cần đổi cấu trúc HTML hoặc dùng grid. Giữ nút trong poster trên mobile cũng ok. */
+
+  /* Phần dưới: Nội dung phim, Lịch chiếu, Phim khác - vẫn scroll bình thường */
+  .movie-description,
+  .movie-schedule,
+  .other-movies-section {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .movie-description {
+    margin-bottom: 24px;
+  }
+
+  .movie-description h2,
+  .movie-schedule h2,
+  .other-movies-section h2 {
+    font-size: 1.1rem;
+    text-transform: uppercase;
+  }
+
+  .movie-description p {
+    font-size: 13px;
+  }
+
+  .schedule-date-selector {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .theater-schedule {
+    padding: 12px;
+  }
+
+  .cinema-name {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .time-slots {
+    gap: 6px;
+  }
+
+  .time-slot {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .showtimes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .showtime-card {
+    padding: 10px 10px 8px;
+  }
+
+  .showtime-time {
+    font-size: 1.15rem;
+  }
+
+  .showtime-hall {
+    font-size: 12px;
+  }
+
+  .showtime-price {
+    font-size: 14px;
+  }
+
+  .showtime-format,
+  .showtime-subtitle {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .showtime-seats {
+    font-size: 12px;
+  }
+
+  .btn-book-showtime {
+    padding: 9px 8px;
+    font-size: 11px;
+  }
+
+  .other-movies-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+  }
+
+  .other-movies-section h2 {
+    margin-bottom: 12px;
+  }
+
+  .other-movies-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .other-movie-info {
+    padding: 9px 7px 8px;
+  }
+
+  .other-movie-info h3 {
+    font-size: 10px;
+    min-height: 2.45em;
+    margin-bottom: 2px;
+  }
+
+  .other-movie-meta-foot {
+    gap: 3px;
+    padding-top: 4px;
+  }
+
+  .other-movie-genres {
+    font-size: 9px;
+  }
+
+  .other-movie-imdb {
+    font-size: 8px;
+  }
+
+  .other-movie-release {
+    font-size: 9px;
+  }
+
+  .btn-book-small {
+    padding: 8px 6px;
+    font-size: 9px;
+    border-radius: 8px;
+  }
+
+  .other-movie-badges {
+    top: 6px;
+    left: 6px;
+    gap: 4px;
+  }
+
+  .other-movie-age {
+    font-size: 0.62rem;
+    padding: 3px 6px;
+  }
+
+  .other-movie-featured-star {
+    height: 18px;
+    min-width: 18px;
+    font-size: 0.65rem;
+  }
+
+  .btn-play-small {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+
+  .carousel-arrow {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  .carousel-arrow-left {
+    left: 2px;
+  }
+
+  .carousel-arrow-right {
+    right: 2px;
+  }
+}
+
+/* Màn hình mobile rất thấp: ép block banner vừa 1 viewport */
+@media (max-width: 768px) and (max-height: 600px) {
+  .detail-banner .banner-overlay {
+    padding: 6px 0 8px;
+  }
+
+  .movie-poster-large {
+    flex: 0 0 80px;
+    width: 80px;
+    min-width: 80px;
+  }
+
+  .movie-poster-large img {
+    height: 110px;
+    max-height: 110px;
+  }
+
+  .movie-details h1 {
+    font-size: 0.85rem;
+    -webkit-line-clamp: 1;
+  }
+
+  .movie-info-grid {
+    padding: 6px 8px;
+  }
+
+  .md-info-row {
+    padding: 2px 0;
+    font-size: 9px;
+  }
+
+  .md-info-label,
+  .md-info-value {
+    font-size: 9px;
+  }
+
+  .btn-trailer {
+    padding: 6px 4px;
+    font-size: 10px;
+  }
+}

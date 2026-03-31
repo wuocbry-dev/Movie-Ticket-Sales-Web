@@ -1,0 +1,20 @@
+@startuml UC17_ChatbotAI
+
+left to right direction
+
+actor "Khách hàng" as User
+actor "AI Gemini (Google)" as GeminiAI
+
+rectangle "UC17: Trợ lý AI tư vấn phim" {
+    usecase "Chat với AI tư vấn phim" as UC_ChatAI
+    usecase "Nhận gợi ý phim theo sở thích" as UC_GetRecommendations
+    usecase "Hỏi thông tin về phim" as UC_AskMovieInfo
+}
+
+User -- UC_ChatAI
+User -- UC_AskMovieInfo
+
+UC_ChatAI --> GeminiAI
+UC_ChatAI ..> UC_GetRecommendations : <<include>>
+
+@enduml

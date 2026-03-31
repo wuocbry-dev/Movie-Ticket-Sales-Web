@@ -1,0 +1,42 @@
+@startuml UC12_DatHangBapNuoc
+
+left to right direction
+
+actor "Khách hàng" as User
+actor "Nhân viên rạp" as Staff
+actor "Quản lý rạp" as Manager
+
+Manager -|> Staff
+
+rectangle "UC12: Đặt hàng bắp nước" {
+    usecase "Đặt bắp nước kèm vé" as UC_OrderConcession
+    usecase "Xem đơn bắp nước của tôi" as UC_ViewMyOrders
+    usecase "Xem chi tiết đơn bắp nước" as UC_ViewOrderDetail
+    usecase "Xem đơn theo mã đơn hàng" as UC_ViewOrderByNumber
+    usecase "Hủy đơn bắp nước" as UC_CancelOrder
+    usecase "Xem đơn bắp nước tại rạp" as UC_ViewCinemaOrders
+    usecase "Xác nhận đơn bắp nước" as UC_ConfirmOrder
+    usecase "Bắt đầu chuẩn bị" as UC_PrepareOrder
+    usecase "Đánh dấu sẵn sàng lấy" as UC_MarkReady
+    usecase "Hoàn thành đơn bắp nước" as UC_CompleteOrder
+    usecase "Cập nhật ghi chú đơn hàng" as UC_UpdateNotes
+}
+
+User -- UC_OrderConcession
+User -- UC_ViewMyOrders
+User -- UC_ViewOrderDetail
+User -- UC_ViewOrderByNumber
+User -- UC_CancelOrder
+
+Staff -- UC_ViewCinemaOrders
+Staff -- UC_ConfirmOrder
+Staff -- UC_PrepareOrder
+Staff -- UC_MarkReady
+Staff -- UC_CompleteOrder
+Staff -- UC_UpdateNotes
+
+UC_ConfirmOrder ..> UC_PrepareOrder : <<extend>>
+UC_PrepareOrder ..> UC_MarkReady : <<extend>>
+UC_MarkReady ..> UC_CompleteOrder : <<extend>>
+
+@enduml

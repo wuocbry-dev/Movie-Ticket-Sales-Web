@@ -1,0 +1,33 @@
+@startuml SQ01_ThanhToan_TrucTuyen
+
+title Quy trình Thanh toán Trực tuyến (Tối giản)
+
+actor "Khách hàng" as User
+participant "Giao diện (Frontend)" as FE
+participant "Hệ thống (Backend)" as BE
+database "Cơ sở dữ liệu" as DB
+participant "Cổng thanh toán" as Payment
+
+User -> FE: Chọn thanh toán & xác nhận
+FE -> BE: Yêu cầu xử lý thanh toán
+activate BE
+
+BE -> DB: Kiểm tra trạng thái đơn hàng (Booking)
+DB --> BE: Thông tin hợp lệ
+
+BE -> Payment: Gói lệnh thanh toán
+Payment --> BE: Phản hồi thành công
+
+group Cập nhật sau thanh toán
+    BE -> DB: Đổi trạng thái Đơn & Vé thành "ĐÃ THANH TOÁN"
+    BE -> BE: Tạo mã QR & Xuất hóa đơn
+    BE -> BE: Gửi Email xác nhận cho khách
+    BE -> BE: Tích điểm vào thẻ thành viên
+end
+
+BE --> FE: Trả về kết quả thành công
+deactivate BE
+
+FE --> User: Hiển thị Đơn vé & Mã QR thành công
+
+@enduml

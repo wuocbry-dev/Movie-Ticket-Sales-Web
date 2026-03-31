@@ -1,0 +1,27 @@
+@startuml UC03_QuanLyPhim
+
+left to right direction
+
+actor "Khách" as Guest
+actor "Quản trị viên" as Admin
+
+rectangle "UC03: Quản lý phim" {
+    usecase "Xem danh sách phim" as UC_ViewMovies
+    usecase "Xem chi tiết phim" as UC_ViewMovieDetail
+    usecase "Xem danh sách thể loại" as UC_ViewGenres
+    usecase "Thêm phim mới" as UC_CreateMovie
+    usecase "Cập nhật thông tin phim" as UC_UpdateMovie
+    usecase "Xóa phim (xóa mềm)" as UC_DeleteMovie
+    usecase "Khôi phục phim đã xóa" as UC_RestoreMovie
+}
+
+Guest -- UC_ViewMovies
+Guest -- UC_ViewMovieDetail
+Guest -- UC_ViewGenres
+
+Admin -- UC_CreateMovie
+Admin -- UC_UpdateMovie
+Admin -- UC_DeleteMovie
+Admin -- UC_RestoreMovie
+
+@enduml

@@ -1,0 +1,26 @@
+@startuml UC16_QuanLyNhanVien
+
+left to right direction
+
+actor "Nhân viên rạp" as Staff
+actor "Quản lý rạp" as Manager
+actor "Quản trị viên" as Admin
+
+Admin -|> Manager
+
+rectangle "UC16: Quản lý nhân viên rạp" {
+    usecase "Gán nhân viên vào rạp" as UC_AssignStaff
+    usecase "Xem danh sách nhân viên của rạp" as UC_ViewCinemaStaff
+    usecase "Xem thông tin rạp của tôi" as UC_ViewMyStaffCinema
+    usecase "Cho nhân viên nghỉ việc" as UC_RemoveStaff
+    usecase "Kiểm tra nhân viên thuộc rạp" as UC_CheckStaffCinema
+}
+
+Staff -- UC_ViewMyStaffCinema
+Staff -- UC_CheckStaffCinema
+
+Manager -- UC_AssignStaff
+Manager -- UC_ViewCinemaStaff
+Manager -- UC_RemoveStaff
+
+@enduml

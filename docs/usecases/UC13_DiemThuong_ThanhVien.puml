@@ -1,0 +1,29 @@
+@startuml UC13_DiemThuong_ThanhVien
+
+left to right direction
+
+actor "Khách hàng" as User
+actor "Quản trị viên" as Admin
+
+rectangle "UC13: Điểm thưởng & Hạng thành viên" {
+    usecase "Xem số dư điểm thưởng" as UC_ViewBalance
+    usecase "Xem lịch sử tích điểm" as UC_ViewHistory
+    usecase "Xem trước giảm giá khi dùng điểm" as UC_PreviewDiscount
+    usecase "Quy đổi điểm để giảm giá" as UC_RedeemPoints
+    usecase "Xem hạng thành viên" as UC_ViewMembership
+    usecase "Xem danh sách hạng thành viên" as UC_ViewTiers
+    usecase "Cập nhật hạng thành viên" as UC_UpdateTier
+}
+
+User -- UC_ViewBalance
+User -- UC_ViewHistory
+User -- UC_PreviewDiscount
+User -- UC_RedeemPoints
+User -- UC_ViewMembership
+
+Admin -- UC_ViewTiers
+Admin -- UC_UpdateTier
+
+UC_RedeemPoints ..> UC_PreviewDiscount : <<include>>
+
+@enduml

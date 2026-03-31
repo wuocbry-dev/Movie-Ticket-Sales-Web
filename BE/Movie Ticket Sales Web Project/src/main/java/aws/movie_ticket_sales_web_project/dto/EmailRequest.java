@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.Map;
 
 /**
- * DTO for email requests published to SNS Topic
- * Lambda will process this and send via SES
+ * DTO for email template data (used with Java Mail / SMTP).
  */
 @Data
 @Builder

@@ -1,0 +1,442 @@
+/* Staff counter payment — BEM: stf-pay__* */
+
+.stf-pay {
+  --stf-pay-bg: #0f1713;
+  --stf-pay-surface: #141f1a;
+  --stf-pay-elev: #1a2620;
+  --stf-pay-border: rgba(34, 197, 94, 0.16);
+  --stf-pay-accent: #22c55e;
+  --stf-pay-accent-soft: rgba(34, 197, 94, 0.12);
+  --stf-pay-text: #e8f5ef;
+  --stf-pay-muted: #8fa399;
+  --stf-pay-blue: #38bdf8;
+
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.stf-pay__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding: 22px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, var(--stf-pay-surface) 0%, #0d1411 100%);
+  border: 1px solid var(--stf-pay-border);
+}
+
+.stf-pay__head-ico {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--stf-pay-accent-soft);
+  color: var(--stf-pay-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  flex-shrink: 0;
+}
+
+.stf-pay__title {
+  margin: 0 0 6px;
+  font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+  font-weight: 800;
+  color: var(--stf-pay-text);
+}
+
+.stf-pay__sub {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--stf-pay-muted);
+}
+
+.stf-pay__search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 22px;
+  padding: 18px;
+  border-radius: 14px;
+  background: var(--stf-pay-surface);
+  border: 1px solid var(--stf-pay-border);
+}
+
+.stf-pay__input {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--stf-pay-border);
+  background: var(--stf-pay-elev);
+  color: var(--stf-pay-text);
+  font-size: 0.95rem;
+}
+
+.stf-pay__input::placeholder {
+  color: var(--stf-pay-muted);
+}
+
+.stf-pay__input:focus {
+  outline: none;
+  border-color: rgba(34, 197, 94, 0.45);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.stf-pay__input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.stf-pay__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: filter 0.15s, opacity 0.15s;
+}
+
+.stf-pay__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.stf-pay__btn--scan {
+  background: var(--stf-pay-accent-soft);
+  color: var(--stf-pay-accent);
+  border-color: var(--stf-pay-border);
+}
+
+.stf-pay__btn--go {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: #fff;
+}
+
+.stf-pay__card {
+  padding: 22px;
+  border-radius: 16px;
+  background: var(--stf-pay-surface);
+  border: 1px solid var(--stf-pay-border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+}
+
+.stf-pay__card-title {
+  margin: 0 0 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--stf-pay-border);
+  font-size: 1.1rem;
+  color: var(--stf-pay-text);
+}
+
+.stf-pay__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 20px;
+  margin: 0 0 20px;
+}
+
+.stf-pay__row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stf-pay__row dt {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--stf-pay-muted);
+  font-weight: 700;
+}
+
+.stf-pay__row dd {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--stf-pay-text);
+}
+
+.stf-pay__summary {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--stf-pay-elev);
+  border: 1px solid var(--stf-pay-border);
+  margin-bottom: 20px;
+}
+
+.stf-pay__sum-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.92rem;
+  color: var(--stf-pay-muted);
+}
+
+.stf-pay__sum-row--total {
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--stf-pay-border);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--stf-pay-accent);
+}
+
+.stf-pay__methods {
+  margin-bottom: 18px;
+}
+
+.stf-pay__methods-title {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  color: var(--stf-pay-text);
+}
+
+.stf-pay__method-btns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.stf-pay__method {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--stf-pay-border);
+  background: var(--stf-pay-elev);
+  color: var(--stf-pay-muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.stf-pay__method svg {
+  font-size: 1.5rem;
+  color: var(--stf-pay-blue);
+}
+
+.stf-pay__method.is-active {
+  border-color: rgba(34, 197, 94, 0.45);
+  background: var(--stf-pay-accent-soft);
+  color: var(--stf-pay-text);
+}
+
+.stf-pay__method.is-active svg {
+  color: var(--stf-pay-accent);
+}
+
+.stf-pay__qr-block {
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px dashed rgba(34, 197, 94, 0.35);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.stf-pay__qr-inner {
+  text-align: center;
+}
+
+.stf-pay__qr-ico {
+  font-size: 2.5rem;
+  color: var(--stf-pay-blue);
+  margin-bottom: 8px;
+}
+
+.stf-pay__qr-inner h3 {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  color: var(--stf-pay-text);
+}
+
+.stf-pay__qr-img-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  background: #fff;
+  border-radius: 12px;
+  margin: 12px 0;
+}
+
+.stf-pay__qr-img-wrap img {
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+}
+
+.stf-pay__qr-hint {
+  font-size: 0.88rem;
+  color: var(--stf-pay-muted);
+  margin: 0 0 10px;
+}
+
+.stf-pay__amount {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--stf-pay-accent);
+}
+
+.stf-pay__bank {
+  text-align: left;
+  max-width: 420px;
+  margin: 0 auto 16px;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--stf-pay-elev);
+  border: 1px solid var(--stf-pay-border);
+}
+
+.stf-pay__bank-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.88rem;
+}
+
+.stf-pay__bank-row:last-child {
+  border-bottom: none;
+}
+
+.stf-pay__bank-row span:first-child {
+  color: var(--stf-pay-muted);
+  font-weight: 600;
+}
+
+.stf-pay__bank-row span:last-child {
+  color: var(--stf-pay-text);
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+}
+
+.stf-pay__bank-amt {
+  color: var(--stf-pay-accent) !important;
+  font-size: 1.05rem;
+}
+
+.stf-pay__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.stf-pay__btn--confirm {
+  flex: 1;
+  min-width: 200px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #fff;
+  padding: 14px 20px;
+}
+
+.stf-pay__btn--ghost {
+  flex: 1;
+  background: transparent;
+  color: var(--stf-pay-muted);
+  border-color: var(--stf-pay-border);
+}
+
+.stf-pay__success {
+  text-align: center;
+  padding: 48px 24px;
+  border-radius: 16px;
+  background: var(--stf-pay-surface);
+  border: 1px solid var(--stf-pay-border);
+}
+
+.stf-pay__success-ico {
+  font-size: 4rem;
+  color: var(--stf-pay-accent);
+  margin-bottom: 12px;
+}
+
+.stf-pay__success h2 {
+  margin: 0 0 12px;
+  color: var(--stf-pay-accent);
+  font-size: 1.4rem;
+}
+
+.stf-pay__success p {
+  margin: 6px 0;
+  color: var(--stf-pay-text);
+}
+
+.stf-pay__modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.88);
+}
+
+.stf-pay__modal-inner {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  padding: 28px 22px 22px;
+  border-radius: 16px;
+  background: #f8fafc;
+  color: #0f172a;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+
+.stf-pay__modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: none;
+  background: #ef4444;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.stf-pay__modal-title {
+  margin: 0 0 18px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.stf-pay__scanner-hint {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .stf-pay__search {
+    flex-direction: column;
+  }
+
+  .stf-pay__btn {
+    width: 100%;
+  }
+
+  .stf-pay__actions {
+    flex-direction: column;
+  }
+}

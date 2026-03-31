@@ -1,0 +1,27 @@
+@startuml SQ02_ThanhToan_TienMat
+
+title Quy trình Thanh toán Tiền mặt (Tối giản)
+
+actor "Nhân viên rạp" as Staff
+participant "Giao diện (Frontend)" as FE
+participant "Hệ thống (Backend)" as BE
+database "Cơ sở dữ liệu" as DB
+
+Staff -> FE: Nhập mã đơn & Chọn "Thanh toán tiền mặt"
+FE -> BE: Xác nhận thanh toán tiền mặt
+activate BE
+
+BE -> DB: Kiểm tra đơn hàng & quyền nhân viên
+DB --> BE: Hợp lệ
+
+group Cập nhật phía Backend
+    BE -> DB: Lưu trạng thái "ĐÃ THANH TOÁN"
+    BE -> DB: Ghi nhận thanh toán: TIỀN MẶT
+end
+
+BE --> FE: Trả về kết quả thành công
+deactivate BE
+
+FE --> Staff: Thông báo thành công & In vé cho khách
+
+@enduml

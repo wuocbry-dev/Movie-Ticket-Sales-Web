@@ -1,0 +1,101 @@
+@startuml UC_QuanTriVien
+
+' ============================================================
+' USE CASE - QUẢN TRỊ VIÊN HỆ THỐNG (SYSTEM_ADMIN)
+' ============================================================
+
+left to right direction
+
+actor "Quản trị viên" as Admin
+
+rectangle "Quản lý phim" {
+    usecase "Thêm phim mới" as UC01
+    usecase "Cập nhật thông tin phim" as UC02
+    usecase "Xóa phim (xóa mềm)" as UC03
+    usecase "Khôi phục phim đã xóa" as UC04
+}
+
+rectangle "Quản lý chuỗi rạp" {
+    usecase "Xem tất cả chuỗi rạp (kể cả ẩn)" as UC05
+    usecase "Thêm chuỗi rạp mới" as UC06
+    usecase "Cập nhật thông tin chuỗi rạp" as UC07
+    usecase "Xóa chuỗi rạp (xóa mềm)" as UC08
+    usecase "Xóa vĩnh viễn chuỗi rạp" as UC09
+}
+
+rectangle "Quản lý rạp" {
+    usecase "Xem tất cả rạp" as UC10
+    usecase "Thêm rạp mới" as UC11
+    usecase "Cập nhật thông tin rạp" as UC12
+    usecase "Xóa rạp" as UC13
+}
+
+rectangle "Quản lý đơn đặt vé" {
+    usecase "Xem tất cả đơn đặt vé" as UC14
+    usecase "Lọc đơn theo trạng thái" as UC15
+    usecase "Xóa đơn đặt vé" as UC16
+}
+
+rectangle "Quản lý sản phẩm bắp nước" {
+    usecase "Thêm sản phẩm bắp nước mới" as UC17
+    usecase "Cập nhật sản phẩm bắp nước" as UC18
+    usecase "Xóa sản phẩm bắp nước" as UC19
+    usecase "Bật/tắt sản phẩm" as UC20
+    usecase "Upload hình ảnh sản phẩm" as UC21
+    usecase "Xóa hình ảnh sản phẩm" as UC22
+    usecase "Xem thống kê sản phẩm" as UC23
+    usecase "Đồng bộ sản phẩm vào rạp mới" as UC24
+}
+
+rectangle "Quản trị người dùng & vai trò" {
+    usecase "Xem danh sách tất cả người dùng" as UC25
+    usecase "Xem người dùng theo vai trò" as UC26
+    usecase "Cập nhật vai trò người dùng" as UC27
+    usecase "Vô hiệu hóa tài khoản" as UC28
+    usecase "Kích hoạt lại tài khoản" as UC29
+    usecase "Xem danh sách vai trò" as UC30
+    usecase "Thêm vai trò mới" as UC31
+    usecase "Kiểm tra quyền Admin" as UC32
+}
+
+rectangle "Quản lý hạng thành viên" {
+    usecase "Xem danh sách hạng thành viên" as UC33
+    usecase "Cập nhật hạng thành viên cho user" as UC34
+}
+
+Admin -- UC01
+Admin -- UC02
+Admin -- UC03
+Admin -- UC04
+Admin -- UC05
+Admin -- UC06
+Admin -- UC07
+Admin -- UC08
+Admin -- UC09
+Admin -- UC10
+Admin -- UC11
+Admin -- UC12
+Admin -- UC13
+Admin -- UC14
+Admin -- UC15
+Admin -- UC16
+Admin -- UC17
+Admin -- UC18
+Admin -- UC19
+Admin -- UC20
+Admin -- UC21
+Admin -- UC22
+Admin -- UC23
+Admin -- UC24
+Admin -- UC25
+Admin -- UC26
+Admin -- UC27
+Admin -- UC28
+Admin -- UC29
+Admin -- UC30
+Admin -- UC31
+Admin -- UC32
+Admin -- UC33
+Admin -- UC34
+
+@enduml

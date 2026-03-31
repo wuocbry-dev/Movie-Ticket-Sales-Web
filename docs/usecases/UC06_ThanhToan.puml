@@ -1,0 +1,25 @@
+@startuml UC06_ThanhToan
+
+left to right direction
+
+actor "Khách hàng" as User
+actor "Nhân viên rạp" as Staff
+actor "Hệ thống thanh toán\n(VNPay/MoMo)" as PaymentGateway
+
+rectangle "UC06: Thanh toán" {
+    usecase "Thanh toán trực tuyến" as UC_ProcessPayment
+    usecase "Kiểm tra trạng thái thanh toán" as UC_CheckPaymentStatus
+    usecase "Thanh toán tiền mặt tại rạp" as UC_CashPayment
+    usecase "Quy đổi điểm giảm giá" as UC_RedeemPoints
+}
+
+User -- UC_ProcessPayment
+User -- UC_CheckPaymentStatus
+User -- UC_RedeemPoints
+Staff -- UC_CashPayment
+
+UC_ProcessPayment --> PaymentGateway
+UC_CheckPaymentStatus --> PaymentGateway
+UC_ProcessPayment ..> UC_RedeemPoints : <<extend>>
+
+@enduml

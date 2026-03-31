@@ -1,0 +1,563 @@
+/* ==============================
+   SeatSelection (rebuild UI/UX)
+   Không trùng layout cũ
+   ============================== */
+
+.ssx {
+  --ssx-bg: #0b0f15;
+  --ssx-surface: #101826;
+  --ssx-surface-2: rgba(255, 255, 255, 0.04);
+  --ssx-border: rgba(255, 255, 255, 0.10);
+  --ssx-text: rgba(255, 255, 255, 0.92);
+  --ssx-muted: rgba(255, 255, 255, 0.62);
+  --ssx-accent: #f0b429;
+  --ssx-danger: #e50914;
+  --ssx-ok: #30c26a;
+  --ssx-radius: 14px;
+  min-height: 100vh;
+  background: transparent;
+  color: var(--ssx-text);
+  padding: 84px 18px 18px;
+  box-sizing: border-box;
+}
+
+.ssx--state {
+  display: grid;
+  place-items: center;
+  padding: 84px 18px;
+}
+
+.ssx__state-card {
+  width: min(520px, 92vw);
+  background: rgba(16, 24, 38, 0.88);
+  border: 1px solid var(--ssx-border);
+  border-radius: var(--ssx-radius);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  padding: 22px 18px;
+  text-align: center;
+}
+
+.ssx__spinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  margin: 0 auto 14px;
+  border: 4px solid rgba(240, 180, 41, 0.18);
+  border-top-color: var(--ssx-accent);
+  animation: ssx-spin 0.8s linear infinite;
+}
+
+@keyframes ssx-spin { to { transform: rotate(360deg); } }
+
+.ssx__state-title { font-weight: 800; font-size: 1.05rem; margin-bottom: 4px; }
+.ssx__state-sub { color: var(--ssx-muted); font-size: 0.9rem; margin-bottom: 12px; }
+
+.ssx__topbar {
+  width: min(1320px, 100%);
+  margin: 0 auto 14px;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1.3fr;
+  gap: 12px;
+  align-items: center;
+  background: rgba(16, 24, 38, 0.70);
+  border: 1px solid var(--ssx-border);
+  border-radius: var(--ssx-radius);
+  padding: 10px 12px;
+  backdrop-filter: blur(10px);
+}
+
+.ssx__topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ssx__where { min-width: 0; }
+.ssx__where-title { font-weight: 800; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ssx__where-sub { color: var(--ssx-muted); font-size: 0.82rem; }
+
+.ssx__topbar-center {
+  text-align: center;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ssx__topbar-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ssx__pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ssx__hold {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(48, 194, 106, 0.35);
+  background: rgba(48, 194, 106, 0.10);
+  color: rgba(48, 194, 106, 0.95);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.ssx__hold--warn {
+  border-color: rgba(229, 9, 20, 0.45);
+  background: rgba(229, 9, 20, 0.14);
+  color: rgba(255, 108, 108, 0.95);
+}
+
+.ssx__layout {
+  width: min(1320px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 14px;
+  align-items: start;
+}
+
+.ssx__stage,
+.ssx__summary {
+  background: rgba(16, 24, 38, 0.55);
+  border: 1px solid var(--ssx-border);
+  border-radius: var(--ssx-radius);
+  backdrop-filter: blur(10px);
+}
+
+/* Cho phép stage co lại theo viewport, không bị kẹt bởi dòng chú thích */
+.ssx__stage {
+  padding: 14px;
+  min-width: 0;
+}
+.ssx__summary { padding: 14px; position: sticky; top: 98px; }
+
+.ssx__stage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  min-width: 0;
+}
+
+.ssx__legend {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.78rem;
+  min-width: 0;
+}
+
+.ssx__legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.ssx__swatch { width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.18); }
+.ssx__swatch--std { background: rgba(48, 194, 106, 0.9); }
+.ssx__swatch--vip { background: rgba(240, 180, 41, 0.95); }
+.ssx__swatch--couple { background: rgba(233, 30, 99, 0.90); }
+.ssx__swatch--wheel { background: rgba(33, 150, 243, 0.90); }
+.ssx__swatch--sel { background: rgba(229, 9, 20, 0.95); }
+.ssx__swatch--sold { background: rgba(255, 255, 255, 0.20); }
+
+.ssx__seatmap {
+  --ssx-map-scale: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  padding: 14px 10px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.ssx__seatmap-inner {
+  width: max-content;
+  margin: 0 auto;
+  transform: scale(var(--ssx-map-scale, 1));
+  transform-origin: top center;
+  transition: transform 160ms ease;
+}
+
+.ssx__screen-wrap {
+  width: 100%;
+  display: grid;
+  place-items: center;
+  padding: 10px 0 18px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.22), rgba(0,0,0,0));
+}
+
+.ssx__screen-tv {
+  width: min(520px, 86%);
+  height: 54px;
+  border-radius: 18px 18px 40px 40px;
+  border: 1px solid rgba(240, 180, 41, 0.35);
+  background:
+    radial-gradient(120% 140% at 50% 30%, rgba(240, 180, 41, 0.22), rgba(255,255,255,0.04) 55%, rgba(0,0,0,0.22) 100%),
+    rgba(16, 24, 38, 0.45);
+  box-shadow:
+    0 10px 26px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.ssx__screen-tv-text {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.82);
+  text-shadow: 0 6px 16px rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+}
+
+/* “Cong như TV”: tạo viền cong dưới */
+.ssx__screen-tv::after {
+  content: "";
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: -10px;
+  height: 18px;
+  border-radius: 0 0 999px 999px;
+  border-bottom: 2px solid rgba(240, 180, 41, 0.28);
+  filter: blur(0.2px);
+  opacity: 0.9;
+}
+
+.ssx__screen-tv svg {
+  font-size: 20px;
+  color: rgba(240, 180, 41, 0.95);
+  filter: drop-shadow(0 6px 14px rgba(240, 180, 41, 0.25));
+}
+
+.ssx__row { display: grid; grid-template-columns: 22px auto 22px; gap: 10px; align-items: center; }
+.ssx__row-label { color: rgba(255, 255, 255, 0.55); font-weight: 900; text-align: center; font-size: 0.82rem; }
+.ssx__row-seats { display: flex; gap: 6px; }
+
+.ssx__v-aisle {
+  width: 16px;
+  height: 1px;
+  flex: 0 0 16px;
+}
+
+.ssx__aisle {
+  width: 100%;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  font-size: 0.68rem;
+  padding: 10px 0;
+}
+
+.ssx__seat {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px 10px 7px 7px;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.12s ease, opacity 0.12s ease;
+  padding: 0;
+  box-shadow: none !important;
+}
+
+.ssx__seat:focus { outline: none; box-shadow: 0 0 0 2px rgba(88, 207, 248, 0.4) !important; }
+.ssx__seat:active:not(:disabled) { transform: translateY(1px) scale(0.98); }
+.ssx__seat:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.ssx__seat-ico { font-size: 13px; opacity: 0.9; }
+.ssx__seat-no { font-size: 9px; font-weight: 900; margin-top: -2px; opacity: 0.95; }
+
+.ssx__seat--std {
+  background: rgba(56, 189, 248, 0.16) !important;
+  border-color: rgba(56, 189, 248, 0.44) !important;
+}
+.ssx__seat--vip {
+  background: rgba(250, 204, 21, 0.22) !important;
+  border-color: rgba(250, 204, 21, 0.56) !important;
+  color: #fff8df !important;
+}
+.ssx__seat--couple {
+  background: rgba(244, 114, 182, 0.2) !important;
+  border-color: rgba(244, 114, 182, 0.54) !important;
+}
+.ssx__seat--wheel {
+  background: rgba(96, 165, 250, 0.2) !important;
+  border-color: rgba(96, 165, 250, 0.52) !important;
+}
+.ssx__seat--sel {
+  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%) !important;
+  border-color: rgba(147, 197, 253, 0.86) !important;
+  color: #f4f9ff !important;
+  filter: drop-shadow(0 0 10px rgba(91, 209, 250, 0.35));
+}
+.ssx__seat--sold {
+  background: rgba(148, 163, 184, 0.24) !important;
+  border-color: rgba(148, 163, 184, 0.38) !important;
+  color: rgba(226, 232, 240, 0.78) !important;
+}
+.ssx__seat--gap { visibility: hidden; pointer-events: none; }
+
+.ssx__summary-head { margin-bottom: 10px; }
+.ssx__summary-title { font-weight: 900; font-size: 1.05rem; }
+.ssx__summary-sub { color: var(--ssx-muted); font-size: 0.86rem; margin-top: 2px; }
+
+.ssx__picked {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 4px;
+  margin: 10px 0 12px;
+}
+
+.ssx__picked-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ssx__picked-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ssx__picked-code { font-weight: 900; }
+.ssx__picked-type { font-size: 0.78rem; color: var(--ssx-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.ssx__picked-price { font-weight: 900; color: rgba(48, 194, 106, 0.95); white-space: nowrap; }
+.ssx__picked-type--standard { color: rgba(125, 211, 252, 0.94); }
+.ssx__picked-type--vip { color: rgba(253, 224, 71, 0.96); }
+.ssx__picked-type--couple { color: rgba(251, 182, 206, 0.96); }
+.ssx__picked-type--wheelchair { color: rgba(147, 197, 253, 0.96); }
+.ssx__empty { color: var(--ssx-muted); padding: 14px 10px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.12); border-radius: 12px; }
+
+.ssx__total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 12px;
+  border-radius: 12px;
+  background: rgba(240, 180, 41, 0.08);
+  border: 1px solid rgba(240, 180, 41, 0.20);
+  margin-bottom: 10px;
+}
+
+.ssx__total strong { color: rgba(240, 180, 41, 0.98); font-size: 1.05rem; }
+.ssx__hint { color: rgba(255, 255, 255, 0.55); font-size: 0.78rem; line-height: 1.5; margin-top: 10px; }
+
+.ssx__btn {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.ssx__btn:hover { background: rgba(255, 255, 255, 0.10); border-color: rgba(255, 255, 255, 0.24); }
+.ssx__btn:active { transform: translateY(1px); }
+.ssx__btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.ssx__btn--ghost { background: rgba(255,255,255,0.03); }
+.ssx__btn--primary {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(240, 180, 41, 1), rgba(245, 197, 66, 1));
+  color: #0b0f15;
+  border-color: rgba(0, 0, 0, 0.25);
+}
+.ssx__btn--primary:hover { filter: brightness(1.05); }
+
+.ssx__bottom {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .ssx__layout {
+    grid-template-columns: 1fr;
+  }
+  .ssx__summary {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .ssx {
+    /* Chừa chỗ cho bottom bar để không che hàng ghế cuối */
+    --ssx-bottom-h: 74px;
+    padding: 70px 12px calc(var(--ssx-bottom-h) + 18px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ssx__topbar {
+    grid-template-columns: 1fr;
+    text-align: left;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .ssx__topbar-center { text-align: left; }
+
+  .ssx__topbar-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .ssx__where-title { font-size: 0.92rem; }
+  .ssx__where-sub { font-size: 0.78rem; }
+
+  /* Mobile: ưu tiên timer, ẩn bớt pill để gọn UI */
+  .ssx__topbar-right {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .ssx__topbar-right .ssx__pill {
+    display: none;
+  }
+
+  .ssx__hold {
+    padding: 6px 10px;
+    font-size: 0.82rem;
+  }
+
+  .ssx__layout { grid-template-columns: 1fr; }
+  .ssx__summary { display: none; }
+
+  .ssx__stage { padding: 10px; }
+
+  .ssx__stage-head {
+    margin-bottom: 10px;
+    gap: 10px;
+  }
+
+  /* Legend mobile: 2 hàng, mỗi hàng 3 cái — không bị che "Đã bán/giữ" */
+  .ssx__legend {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 10px;
+    padding-bottom: 6px;
+    overflow: visible;
+  }
+
+  .ssx__legend-item {
+    font-size: 0.74rem;
+    white-space: nowrap;
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ssx__legend-item .ssx__swatch { flex-shrink: 0; }
+  .ssx__swatch { width: 12px; height: 12px; border-radius: 4px; }
+
+  .ssx__seatmap { 
+    padding: 10px 6px;
+    width: 100%;
+    align-items: center;
+  }
+  .ssx__seatmap-inner {
+    width: max-content;
+    margin: 0 auto;
+  }
+  .ssx__screen-wrap { padding: 6px 0 10px; }
+  .ssx__screen-tv { height: 44px; border-radius: 16px 16px 34px 34px; }
+  .ssx__screen-tv svg { font-size: 18px; }
+  .ssx__screen-tv-text { bottom: 6px; font-size: 0.64rem; }
+  .ssx__row { 
+    grid-template-columns: 18px auto 18px;
+    gap: 8px;
+    width: max-content;
+  }
+  .ssx__row-seats { gap: clamp(2px, 1.1vw, 4px); justify-content: center; }
+  .ssx__v-aisle { width: clamp(8px, 2.8vw, 12px); flex-basis: clamp(8px, 2.8vw, 12px); }
+
+  /* Ghế co giãn theo màn hình (đỡ bị tràn/che) */
+  .ssx__seat { 
+    width: clamp(24px, 5.8vw, 30px);
+    height: clamp(24px, 5.8vw, 30px);
+    border-radius: 9px 9px 6px 6px;
+  }
+  .ssx__seat-ico { font-size: clamp(10px, 2.5vw, 12px); }
+  .ssx__seat-no { font-size: clamp(6.5px, 1.9vw, 8px); }
+
+  .ssx__bottom {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    padding: 10px 12px;
+    background: rgba(16, 24, 38, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    z-index: 50;
+    /* iPhone safe area */
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ssx__bottom-line { font-size: 0.82rem; color: rgba(255,255,255,0.78); }
+  .ssx__bottom-line strong { color: rgba(255,255,255,0.95); }
+  .ssx__bottom-cta { width: auto; padding: 10px 14px; border-radius: 14px; }
+}
+
+/* Mobile màn hình thấp: ưu tiên hiển thị đủ sơ đồ ghế */
+@media (max-width: 768px) and (max-height: 740px) {
+  .ssx {
+    padding-top: 64px;
+  }
+
+  .ssx__topbar {
+    margin-bottom: 10px;
+  }
+
+  .ssx__stage { padding: 8px; }
+  .ssx__seatmap { padding: 8px 6px; }
+  .ssx__aisle { padding: 8px 0; }
+}

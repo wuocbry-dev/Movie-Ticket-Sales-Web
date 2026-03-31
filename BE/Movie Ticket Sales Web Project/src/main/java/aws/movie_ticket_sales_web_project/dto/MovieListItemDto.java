@@ -20,6 +20,7 @@ public class MovieListItemDto {
     private LocalDate releaseDate;
     private String status;
     private String posterUrl;
+    private String backdropUrl;
     private List<GenreDto> genres;
     private List<String> formats;
     private BigDecimal imdbRating;

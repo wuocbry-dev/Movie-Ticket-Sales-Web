@@ -1,0 +1,24 @@
+@startuml UC02_HoSoCaNhan
+
+left to right direction
+
+actor "Khách hàng" as User
+actor "AWS S3" as S3
+
+rectangle "UC02: Quản lý hồ sơ cá nhân" {
+    usecase "Xem hồ sơ cá nhân" as UC_ViewProfile
+    usecase "Cập nhật thông tin cá nhân" as UC_UpdateProfile
+    usecase "Cập nhật ảnh đại diện" as UC_UpdateAvatar
+    usecase "Đổi mật khẩu" as UC_ChangePassword
+    usecase "Upload ảnh lên S3" as UC_Upload
+}
+
+User -- UC_ViewProfile
+User -- UC_UpdateProfile
+User -- UC_UpdateAvatar
+User -- UC_ChangePassword
+
+UC_UpdateAvatar ..> UC_Upload : <<include>>
+UC_Upload --> S3
+
+@enduml

@@ -18,6 +18,7 @@ import java.util.Map;
 @Table(name = "promotions")
 public class Promotion {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "promotion_id", nullable = false)
     private Integer id;
 
@@ -26,6 +27,9 @@ public class Promotion {
 
     @Column(name = "promotion_name", nullable = false)
     private String promotionName;
+
+    @Column(name = "image_url", length = 512)
+    private String imageUrl;
 
     @Lob
     @Column(name = "description", columnDefinition = "TEXT")

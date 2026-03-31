@@ -1,0 +1,56 @@
+services:
+  backend:
+    build:
+      context: ./BE/Movie Ticket Sales Web Project
+      dockerfile: Dockerfile
+    image: movie-ticket-backend:latest
+    container_name: movie-ticket-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      # Ghi đè bằng file .env hoặc env trên server
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:mysql://host.docker.internal:3306/movie_ticket_sales?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&useUnicode=true&characterEncoding=utf8}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-root}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_REDIS_HOST: ${SPRING_REDIS_HOST:-redis}
+      SPRING_REDIS_PORT: ${SPRING_REDIS_PORT:-6379}
+      SPRING_REDIS_PASSWORD: ${SPRING_REDIS_PASSWORD:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./FE/my-app
+      dockerfile: Dockerfile
+    image: movie-ticket-frontend:latest
+    container_name: movie-ticket-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  # Redis (optional - bỏ comment nếu dùng Redis trong Docker)
+  redis:
+    image: redis:7-alpine
+    container_name: movie-ticket-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  redis-data:

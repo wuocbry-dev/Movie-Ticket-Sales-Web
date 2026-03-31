@@ -68,12 +68,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // PRODUCTION: Specify allowed origins instead of "*"
+        // Thêm origin bạn truy cập (IP/domain). Dùng "*" = cho phép mọi origin (tránh 403 khi login).
         configuration.setAllowedOriginPatterns(Arrays.asList(
-            "http://localhost:3000",      // Local development
-            "http://localhost:8080",      // Backend local
-            "http://q2k.click*",    // TODO: Replace with actual production domain
-            "https://*.your-domain.com"   // TODO: Replace with actual production subdomain
+            "http://localhost:3000",
+            "http://localhost:8080",
+            "http://192.168.1.120",
+            "http://192.168.1.120:80",
+            "http://cinema.q2k.click",
+            "https://cinema.q2k.click",
+            "*"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList(
@@ -115,7 +118,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/movies/{movieId}").hasRole("SYSTEM_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/movies/{movieId}").hasRole("SYSTEM_ADMIN")
 
-                        // Admin-only upload endpoints
+                        // Upload: promotion image cho ADMIN + CINEMA_MANAGER, còn lại SYSTEM_ADMIN
+                        .requestMatchers(HttpMethod.POST, "/api/upload/promotion").hasAnyRole("SYSTEM_ADMIN", "CINEMA_MANAGER")
                         .requestMatchers("/api/upload/**").hasRole("SYSTEM_ADMIN")
 
                         // Public movie endpoints (GET only)
@@ -224,6 +228,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/concessions/orders/*/cancel").hasAnyRole("SYSTEM_ADMIN", "CHAIN_ADMIN", "CINEMA_MANAGER", "CINEMA_STAFF")
                         .requestMatchers(HttpMethod.PUT, "/api/concessions/orders/*/notes").hasAnyRole("SYSTEM_ADMIN", "CHAIN_ADMIN", "CINEMA_MANAGER", "CINEMA_STAFF")
                         .requestMatchers(HttpMethod.GET, "/api/concessions/orders/**").authenticated()
+                        
+                        // Promotions: admin trước, sau đó public GET (list + by id)
+                        .requestMatchers(HttpMethod.GET, "/api/promotions/admin/**").hasAnyRole("SYSTEM_ADMIN", "CINEMA_MANAGER")
+                        .requestMatchers(HttpMethod.POST, "/api/promotions").hasAnyRole("SYSTEM_ADMIN", "CINEMA_MANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/api/promotions/**").hasAnyRole("SYSTEM_ADMIN", "CINEMA_MANAGER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/promotions/**").hasAnyRole("SYSTEM_ADMIN", "CINEMA_MANAGER")
+                        .requestMatchers(HttpMethod.GET, "/api/promotions", "/api/promotions/*").permitAll()
                         
                         // Loyalty points (public balance check for booking, authenticated for history)
                         .requestMatchers(HttpMethod.GET, "/api/loyalty/points/balance/**").permitAll()

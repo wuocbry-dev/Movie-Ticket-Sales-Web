@@ -96,12 +96,6 @@
             <artifactId>s3</artifactId>
             <version>2.20.26</version>
         </dependency>
-        <!-- AWS SNS SDK for Email via SNS -> Lambda -> SES -->
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>sns</artifactId>
-            <version>2.20.26</version>
-        </dependency>
         <!-- Redis for seat hold/locking -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

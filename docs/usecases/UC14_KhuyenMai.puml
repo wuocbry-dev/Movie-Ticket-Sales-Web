@@ -1,0 +1,28 @@
+@startuml UC14_KhuyenMai
+
+left to right direction
+
+actor "Khách" as Guest
+actor "Quản lý rạp" as Manager
+actor "Quản trị viên" as Admin
+
+Admin -|> Manager
+
+rectangle "UC14: Quản lý khuyến mãi" {
+    usecase "Xem khuyến mãi hiện hành" as UC_ViewPromotions
+    usecase "Xem chi tiết khuyến mãi" as UC_ViewDetail
+    usecase "Xem tất cả khuyến mãi (Admin)" as UC_ViewAll
+    usecase "Thêm khuyến mãi mới" as UC_Create
+    usecase "Cập nhật khuyến mãi" as UC_Update
+    usecase "Xóa khuyến mãi" as UC_Delete
+}
+
+Guest -- UC_ViewPromotions
+Guest -- UC_ViewDetail
+
+Manager -- UC_ViewAll
+Manager -- UC_Create
+Manager -- UC_Update
+Manager -- UC_Delete
+
+@enduml
