@@ -52,16 +52,91 @@ const ManagerShowtimeManagement = () => {
     [token]
   );
 
+  const getAuthHeaders = (tokenValue = Cookies.get('accessToken')) => {
+    return {
+      ...(tokenValue ? { Authorization: `Bearer ${tokenValue}` } : {}),
+      'Content-Type': 'application/json',
+    };
+  };
+
+  const isTokenExpired = (tokenValue) => {
+    try {
+      const [, payload] = tokenValue.split('.');
+      if (!payload) return true;
+      const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+      if (!decoded?.exp) return true;
+      return Date.now() >= decoded.exp * 1000;
+    } catch {
+      return true;
+    }
+  };
+
+  const handleUnauthorized = useCallback(() => {
+    Cookies.remove('accessToken');
+    Cookies.remove('refreshToken');
+    localStorage.removeItem('user');
+    window.dispatchEvent(new Event('userChanged'));
+    toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+    navigate('/login');
+  }, [navigate]);
+
+  const ensureToken = useCallback(async () => {
+    const latestToken = Cookies.get('accessToken');
+    if (latestToken && !isTokenExpired(latestToken)) {
+      return latestToken;
+    }
+
+    const refreshToken = Cookies.get('refreshToken');
+    if (!refreshToken) {
+      handleUnauthorized();
+      return null;
+    }
+
+    try {
+      const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!refreshResponse.ok) {
+        handleUnauthorized();
+        return null;
+      }
+
+      const refreshResult = await refreshResponse.json().catch(() => null);
+      const nextAccessToken = refreshResult?.data?.accessToken;
+      const nextRefreshToken = refreshResult?.data?.refreshToken;
+
+      if (!nextAccessToken) {
+        handleUnauthorized();
+        return null;
+      }
+
+      Cookies.set('accessToken', nextAccessToken);
+      if (nextRefreshToken) {
+        Cookies.set('refreshToken', nextRefreshToken);
+      }
+
+      return nextAccessToken;
+    } catch {
+      handleUnauthorized();
+      return null;
+    }
+  }, [API_BASE_URL, handleUnauthorized]);
+
   const bumpList = () => setListTick((t) => t + 1);
 
   const fetchMyCinemas = useCallback(async () => {
-    if (!token) {
+    const validToken = await ensureToken();
+    if (!validToken) {
       navigate('/login');
       return;
     }
+
     try {
       const response = await fetch(`${API_BASE_URL}/cinemas/my-cinemas`, {
-        headers: authHeaders,
+        headers: getAuthHeaders(validToken),
       });
       if (!response.ok) throw new Error('Không thể tải danh sách rạp');
       const data = await response.json();
@@ -78,15 +153,19 @@ const ManagerShowtimeManagement = () => {
       toast.error('Không thể tải danh sách rạp của bạn');
       setMyCinemas([]);
     }
-  }, [token, API_BASE_URL, authHeaders, navigate]);
+  }, [API_BASE_URL, ensureToken, navigate]);
 
   const fetchShowtimesByCinema = useCallback(async () => {
-    if (!token || !selectedCinema) return;
+    if (!selectedCinema) return;
+
+    const validToken = await ensureToken();
+    if (!validToken) return;
+
     setLoading(true);
     try {
       const response = await fetch(
         `${API_BASE_URL}/showtimes/manager/my-showtimes?page=${page}&size=10&cinemaId=${selectedCinema}`,
-        { headers: authHeaders }
+        { headers: getAuthHeaders(validToken) }
       );
       if (!response.ok) {
         let msg = 'Không thể tải suất chiếu';
@@ -112,7 +191,7 @@ const ManagerShowtimeManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [token, selectedCinema, page, API_BASE_URL, authHeaders]);
+  }, [selectedCinema, page, API_BASE_URL, ensureToken]);
 
   const fetchMovies = useCallback(async () => {
     try {
@@ -134,14 +213,21 @@ const ManagerShowtimeManagement = () => {
 
   const fetchHallsForCinema = useCallback(
     async (cinemaId) => {
-      if (!token || !cinemaId) {
+      if (!cinemaId) {
         setHalls([]);
         return;
       }
+
+      const validToken = await ensureToken();
+      if (!validToken) {
+        setHalls([]);
+        return;
+      }
+
       try {
         const response = await fetch(
           `${API_BASE_URL}/cinema-halls/manager/my-halls?cinemaId=${cinemaId}`,
-          { headers: authHeaders }
+          { headers: getAuthHeaders(validToken) }
         );
         if (!response.ok) throw new Error('Không thể tải danh sách phòng chiếu');
         const data = await response.json();
@@ -155,7 +241,7 @@ const ManagerShowtimeManagement = () => {
         setHalls([]);
       }
     },
-    [token, API_BASE_URL, authHeaders]
+    [API_BASE_URL, ensureToken]
   );
 
   useEffect(() => {
@@ -235,10 +321,19 @@ const ManagerShowtimeManagement = () => {
   const handleDelete = async (showtimeId) => {
     if (!window.confirm('Bạn có chắc chắn muốn xóa suất chiếu này?')) return;
     try {
+      const validToken = await ensureToken();
+      if (!validToken) {
+        return;
+      }
+
       const response = await fetch(`${API_BASE_URL}/showtimes/admin/${showtimeId}`, {
         method: 'DELETE',
-        headers: authHeaders,
+        headers: getAuthHeaders(validToken),
       });
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
+      }
       if (!response.ok) throw new Error('Không thể xóa suất chiếu');
       toast.success('Xóa suất chiếu thành công');
       bumpList();
@@ -251,6 +346,12 @@ const ManagerShowtimeManagement = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
+      const validToken = await ensureToken();
+      if (!validToken) {
+        setSubmitting(false);
+        return;
+      }
+
       let normalizedFormat = formData.formatType;
       if (
         normalizedFormat &&
@@ -278,9 +379,13 @@ const ManagerShowtimeManagement = () => {
       };
       const response = await fetch(url, {
         method,
-        headers: authHeaders,
+        headers: getAuthHeaders(validToken),
         body: JSON.stringify(body),
       });
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
+      }
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || 'Có lỗi xảy ra');

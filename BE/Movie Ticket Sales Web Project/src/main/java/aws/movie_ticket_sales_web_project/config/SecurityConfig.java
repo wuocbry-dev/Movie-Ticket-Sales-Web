@@ -109,7 +109,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/health/**").permitAll()
 
                         // Public authentication endpoints
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/auth/refresh").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/password/**").permitAll() // Password reset endpoints
                         .requestMatchers(HttpMethod.GET, "/api/auth/check-admin").authenticated()
 
@@ -247,9 +247,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/payments/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/payments/**").authenticated()
 
+                        // ==================== GLOBAL SEARCH ====================
+                        // Public access for autocomplete search (no login required)
+                        .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
+
                         // ==================== AI CHATBOT ====================
-                        // Public access for chatbot
+                        // Public access for chatbot (phân quyền nội bộ qua PermissionNode)
                         .requestMatchers("/api/chat/**").permitAll()
+                        .requestMatchers("/api/chatbot/**").permitAll()
 
                         // ==================== USER MANAGEMENT ====================
                         // Admin only - user management

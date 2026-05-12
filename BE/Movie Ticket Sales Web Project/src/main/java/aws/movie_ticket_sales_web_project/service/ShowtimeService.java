@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class ShowtimeService {
 
     private final ShowtimeRepository showtimeRepository;

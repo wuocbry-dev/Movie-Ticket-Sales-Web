@@ -107,16 +107,16 @@ class BookingControllerTest {
         void shouldReturnAllBookingsWithoutStatusFilter() {
             // Arrange
             PagedBookingResponse expectedResponse = createTestPagedResponse();
-            when(bookingService.getAllBookings(0, 10)).thenReturn(expectedResponse);
+            when(bookingService.getAllBookings(0, 10, null)).thenReturn(expectedResponse);
 
             // Act
-            ResponseEntity<PagedBookingResponse> response = bookingController.getAllBookings(0, 10, null);
+            ResponseEntity<PagedBookingResponse> response = bookingController.getAllBookings(0, 10, null, null);
 
             // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getBody()).isNotNull();
             assertThat(response.getBody().getTotalElements()).isEqualTo(1L);
-            verify(bookingService).getAllBookings(0, 10);
+            verify(bookingService).getAllBookings(0, 10, null);
             verify(bookingService, never()).getBookingsByStatus(any(), anyInt(), anyInt());
         }
 
@@ -128,24 +128,24 @@ class BookingControllerTest {
             when(bookingService.getBookingsByStatus(StatusBooking.PENDING, 0, 10)).thenReturn(expectedResponse);
 
             // Act
-            ResponseEntity<PagedBookingResponse> response = bookingController.getAllBookings(0, 10, StatusBooking.PENDING);
+            ResponseEntity<PagedBookingResponse> response = bookingController.getAllBookings(0, 10, StatusBooking.PENDING, null);
 
             // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getBody()).isNotNull();
             assertThat(response.getBody().getTotalElements()).isEqualTo(1L);
             verify(bookingService).getBookingsByStatus(StatusBooking.PENDING, 0, 10);
-            verify(bookingService, never()).getAllBookings(anyInt(), anyInt());
+            verify(bookingService, never()).getAllBookings(anyInt(), anyInt(), anyString());
         }
 
         @Test
         @DisplayName("Should handle exception when getting all bookings")
         void shouldHandleExceptionWhenGettingAllBookings() {
             // Arrange
-            when(bookingService.getAllBookings(0, 10)).thenThrow(new RuntimeException("Database error"));
+            when(bookingService.getAllBookings(0, 10, null)).thenThrow(new RuntimeException("Database error"));
 
             // Act
-            ResponseEntity<PagedBookingResponse> response = bookingController.getAllBookings(0, 10, null);
+            ResponseEntity<PagedBookingResponse> response = bookingController.getAllBookings(0, 10, null, null);
 
             // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);

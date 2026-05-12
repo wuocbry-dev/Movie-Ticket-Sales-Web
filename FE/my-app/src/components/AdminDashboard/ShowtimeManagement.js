@@ -62,6 +62,79 @@ const ShowtimeManagement = () => {
     [token]
   );
 
+  const getAuthHeaders = (tokenValue = Cookies.get('accessToken')) => {
+    return {
+      ...(tokenValue ? { Authorization: `Bearer ${tokenValue}` } : {}),
+      'Content-Type': 'application/json',
+    };
+  };
+
+  const isTokenExpired = (tokenValue) => {
+    try {
+      const [, payload] = tokenValue.split('.');
+      if (!payload) return true;
+      const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+      if (!decoded?.exp) return true;
+      return Date.now() >= decoded.exp * 1000;
+    } catch {
+      return true;
+    }
+  };
+
+  const handleUnauthorized = useCallback(() => {
+    Cookies.remove('accessToken');
+    Cookies.remove('refreshToken');
+    localStorage.removeItem('user');
+    window.dispatchEvent(new Event('userChanged'));
+    toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+    navigate('/login');
+  }, [navigate]);
+
+  const ensureToken = useCallback(async () => {
+    const latestToken = Cookies.get('accessToken');
+    if (latestToken && !isTokenExpired(latestToken)) {
+      return latestToken;
+    }
+
+    const refreshToken = Cookies.get('refreshToken');
+    if (!refreshToken) {
+      handleUnauthorized();
+      return null;
+    }
+
+    try {
+      const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!refreshResponse.ok) {
+        handleUnauthorized();
+        return null;
+      }
+
+      const refreshResult = await refreshResponse.json().catch(() => null);
+      const nextAccessToken = refreshResult?.data?.accessToken;
+      const nextRefreshToken = refreshResult?.data?.refreshToken;
+
+      if (!nextAccessToken) {
+        handleUnauthorized();
+        return null;
+      }
+
+      Cookies.set('accessToken', nextAccessToken);
+      if (nextRefreshToken) {
+        Cookies.set('refreshToken', nextRefreshToken);
+      }
+
+      return nextAccessToken;
+    } catch {
+      handleUnauthorized();
+      return null;
+    }
+  }, [API_BASE_URL, handleUnauthorized]);
+
   const bumpList = useCallback(() => setListTick((t) => t + 1), []);
 
   const fetchShowtimes = useCallback(async () => {
@@ -117,11 +190,13 @@ const ShowtimeManagement = () => {
   }, [token, API_BASE_URL]);
 
   const fetchCinemas = useCallback(async () => {
-    if (!token) return;
+    const validToken = await ensureToken();
+    if (!validToken) return;
+
     try {
       const response = await fetch(`${API_BASE_URL}/cinemas/admin/all?page=0&size=100`, {
         method: 'GET',
-        headers: authHeaders,
+        headers: getAuthHeaders(validToken),
       });
       const result = await response.json();
       if (result.success && result.data) {
@@ -131,20 +206,27 @@ const ShowtimeManagement = () => {
     } catch {
       /* dropdown */
     }
-  }, [token, API_BASE_URL, authHeaders]);
+  }, [API_BASE_URL, ensureToken]);
 
   const fetchHalls = useCallback(
     async (cinemaId) => {
-      if (!token || !cinemaId) {
+      if (!cinemaId) {
         setHalls([]);
         return;
       }
+
+      const validToken = await ensureToken();
+      if (!validToken) {
+        setHalls([]);
+        return;
+      }
+
       try {
         const response = await fetch(
           `${API_BASE_URL}/cinema-halls/cinema/${cinemaId}/admin?page=0&size=100`,
           {
             method: 'GET',
-            headers: authHeaders,
+            headers: getAuthHeaders(validToken),
           }
         );
         const result = await response.json();
@@ -156,7 +238,7 @@ const ShowtimeManagement = () => {
         setHalls([]);
       }
     },
-    [token, API_BASE_URL, authHeaders]
+    [API_BASE_URL, ensureToken]
   );
 
   useEffect(() => {
@@ -289,6 +371,12 @@ const ShowtimeManagement = () => {
   const handleCreateShowtime = async () => {
     try {
       setSubmitting(true);
+
+      const validToken = await ensureToken();
+      if (!validToken) {
+        setSubmitting(false);
+        return;
+      }
       
       // Validate required fields
       if (!formData.movieId || !formData.hallId || !formData.showDate || !formData.startTime) {
@@ -305,8 +393,8 @@ const ShowtimeManagement = () => {
       }
 
       const requestData = {
-        movieId: parseInt(formData.movieId),
-        hallId: parseInt(formData.hallId),
+        movieId: parseInt(formData.movieId, 10),
+        hallId: parseInt(formData.hallId, 10),
         showDate: formData.showDate,
         startTime: formData.startTime,
         endTime: formData.endTime || null,
@@ -318,11 +406,16 @@ const ShowtimeManagement = () => {
 
       const response = await fetch(`${API_BASE_URL}/showtimes/admin`, {
         method: 'POST',
-        headers: authHeaders,
+        headers: getAuthHeaders(validToken),
         body: JSON.stringify(requestData),
       });
 
-      const result = await response.json();
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+
+      const result = await response.json().catch(() => ({}));
 
       if (response.ok && result.success) {
         toast.success(result.message || 'Tạo suất chiếu thành công!');
@@ -347,6 +440,12 @@ const ShowtimeManagement = () => {
   const handleUpdateShowtime = async () => {
     try {
       setSubmitting(true);
+
+      const validToken = await ensureToken();
+      if (!validToken) {
+        setSubmitting(false);
+        return;
+      }
       
       // Normalize formatType - ensure it has underscore prefix for 2D, 3D, 4DX
       let normalizedFormatType = formData.formatType;
@@ -357,8 +456,8 @@ const ShowtimeManagement = () => {
       
       const requestData = {
         showtimeId: selectedShowtime.showtimeId,
-        movieId: parseInt(formData.movieId),
-        hallId: parseInt(formData.hallId),
+        movieId: parseInt(formData.movieId, 10),
+        hallId: parseInt(formData.hallId, 10),
         showDate: formData.showDate,
         startTime: formData.startTime,
         endTime: formData.endTime || null,
@@ -370,11 +469,16 @@ const ShowtimeManagement = () => {
 
       const response = await fetch(`${API_BASE_URL}/showtimes/admin/${selectedShowtime.showtimeId}`, {
         method: 'PUT',
-        headers: authHeaders,
+        headers: getAuthHeaders(validToken),
         body: JSON.stringify(requestData),
       });
 
-      const result = await response.json();
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+
+      const result = await response.json().catch(() => ({}));
 
       if (response.ok && result.success) {
         toast.success(result.message || 'Cập nhật suất chiếu thành công!');
@@ -402,12 +506,22 @@ const ShowtimeManagement = () => {
     }
 
     try {
+      const validToken = await ensureToken();
+      if (!validToken) {
+        return;
+      }
+
       const response = await fetch(`${API_BASE_URL}/showtimes/admin/${showtimeId}`, {
         method: 'DELETE',
-        headers: authHeaders,
+        headers: getAuthHeaders(validToken),
       });
 
-      const result = await response.json();
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+
+      const result = await response.json().catch(() => ({}));
 
       if (response.ok && result.success) {
         toast.success('Xóa suất chiếu thành công!');

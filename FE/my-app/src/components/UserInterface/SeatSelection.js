@@ -10,6 +10,23 @@ import './SeatSelection.css';
 const SeatSelection = () => {
   const { showtimeId } = useParams();
   const navigate = useNavigate();
+
+  const isDevMode = process.env.NODE_ENV === 'development';
+  const devLog = (message, payload) => {
+    if (!isDevMode) return;
+    if (payload === undefined) {
+      console.log(`[SeatSelection] ${message}`);
+      return;
+    }
+    console.log(`[SeatSelection] ${message}`, payload);
+  };
+  const devError = (message, error) => {
+    if (!isDevMode) return;
+    console.error(`[SeatSelection] ${message}`, {
+      message: error?.response?.data?.message || error?.message || 'Unknown error',
+      status: error?.response?.status || null,
+    });
+  };
   
   const [showtime, setShowtime] = useState(null);
   const [hallInfo, setHallInfo] = useState(null);
@@ -22,6 +39,13 @@ const SeatSelection = () => {
   const [userEmail, setUserEmail] = useState(null);
   const seatmapViewportRef = useRef(null);
   const seatmapInnerRef = useRef(null);
+  
+  const isNavigatingForward = useRef(false);
+  const selectedSeatsRef = useRef(selectedSeats);
+
+  useEffect(() => {
+    selectedSeatsRef.current = selectedSeats;
+  }, [selectedSeats]);
 
   useEffect(() => {
     // Lấy email user nếu đã đăng nhập
@@ -32,21 +56,26 @@ const SeatSelection = () => {
         setUserEmail(user.email || null);
       }
     } catch (e) {
-      console.error('Error getting user email:', e);
+      devError('Không thể đọc email người dùng từ localStorage', e);
     }
 
     fetchShowtimeAndSeats();
     
-    return () => {
-      // Cleanup: release seats khi rời trang
-      if (selectedSeats.length > 0) {
-        releaseAllSeats();
-      }
-      if (holdTimer) {
-        clearInterval(holdTimer);
+    const handleBeforeUnload = () => {
+      if (selectedSeatsRef.current.length > 0) {
+        seatService.releaseSeatsBeacon(sessionId, parseInt(showtimeId), selectedSeatsRef.current.map(s => s.seatId));
       }
     };
-  }, [showtimeId]);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      // Cleanup: release seats khi rời trang (Quay lại, Đóng tab), NHƯNG không thả ghế nếu chọn Tiếp tục
+      if (!isNavigatingForward.current && selectedSeatsRef.current.length > 0) {
+        seatService.releaseSeatsBeacon(sessionId, parseInt(showtimeId), selectedSeatsRef.current.map(s => s.seatId));
+      }
+    };
+  }, [showtimeId, sessionId]);
 
   // Countdown timer
   useEffect(() => {
@@ -84,21 +113,29 @@ const SeatSelection = () => {
         const hallResponse = await cinemaHallService.getHallById(showtimeResponse.data.hallId);
         if (hallResponse.success) {
           setHallInfo(hallResponse.data);
-          console.log('Hall info:', hallResponse.data);
+          devLog('Đã tải thông tin phòng chiếu', {
+            hallId: hallResponse.data?.hallId,
+            seatsPerRow: hallResponse.data?.seatsPerRow || null,
+            rowsCount: hallResponse.data?.rowsCount || null,
+          });
         }
       }
 
       // Lấy sơ đồ ghế
       const seatsResponse = await seatService.getSeatAvailability(showtimeId, sessionId);
-      console.log('Seats response:', seatsResponse);
       if (seatsResponse && seatsResponse.seats) {
         setSeats(seatsResponse.seats);
-        console.log('Loaded seats:', seatsResponse.seats.length);
+        devLog('Đã tải trạng thái ghế', {
+          showtimeId: Number(showtimeId),
+          seatCount: seatsResponse.seats.length,
+          availableCount: Array.isArray(seatsResponse.availableSeatIds) ? seatsResponse.availableSeatIds.length : 0,
+          heldCount: Array.isArray(seatsResponse.heldSeats) ? seatsResponse.heldSeats.length : 0,
+        });
       } else {
         toast.warning('Không có ghế nào trong phòng chiếu này');
       }
     } catch (error) {
-      console.error('Error fetching seats:', error);
+      devError('Không thể tải sơ đồ ghế', error);
       toast.error('Không thể tải sơ đồ ghế');
     } finally {
       setLoading(false);
@@ -106,12 +143,12 @@ const SeatSelection = () => {
   };
 
   const handleSeatClick = async (seat) => {
-    console.log('=== Seat Clicked ===');
-    console.log('Seat Object:', seat);
-    console.log('Seat ID:', seat.seatId);
-    console.log('Seat Position:', `${seat.seatRow}${seat.seatNumber}`);
-    console.log('Seat Type:', seat.seatType);
-    console.log('Seat Status:', seat.status);
+    devLog('Người dùng tương tác ghế', {
+      seatId: seat.seatId,
+      seatPosition: `${seat.seatRow}${seat.seatNumber}`,
+      seatType: seat.seatType,
+      seatStatus: seat.status,
+    });
     
     // Không cho chọn ghế đã bán hoặc đang giữ bởi người khác
     if (seat.status === 'SOLD' || seat.status === 'BOOKED') {
@@ -135,7 +172,7 @@ const SeatSelection = () => {
     if (isSelected) {
       // Bỏ chọn ghế
       try {
-        console.log('🔓 Releasing seat:', seat.seatId);
+        devLog('Đang thả ghế', { seatId: seat.seatId });
         await seatService.releaseSeats(sessionId, parseInt(showtimeId), [seat.seatId]);
         setSelectedSeats(selectedSeats.filter(s => s.seatId !== seat.seatId));
         
@@ -146,7 +183,7 @@ const SeatSelection = () => {
         
         toast.success(`Đã bỏ chọn ghế ${seat.seatRow}${seat.seatNumber}`);
       } catch (error) {
-        console.error('❌ Error releasing seat:', error);
+        devError('Không thể thả ghế', error);
         toast.error('Không thể bỏ chọn ghế');
       }
     } else {
@@ -161,14 +198,18 @@ const SeatSelection = () => {
           sessionId: sessionId,
           customerEmail: userEmail
         };
-        
-        console.log('🔒 === HOLD ALL SEATS REQUEST ===');
-        console.log('Request Body:', JSON.stringify(holdRequest, null, 2));
-        console.log(`Holding ${allSeatIds.length} seat(s) including new: ${seat.seatRow}${seat.seatNumber}`);
+
+        devLog('Đang giữ ghế tạm thời', {
+          showtimeId: Number(showtimeId),
+          holdCount: allSeatIds.length,
+          latestSeat: `${seat.seatRow}${seat.seatNumber}`,
+        });
         
         const holdResponse = await seatService.holdSeats(holdRequest);
-        
-        console.log('✅ Hold Response:', holdResponse);
+
+        devLog('Giữ ghế thành công', {
+          holdCount: Array.isArray(holdResponse?.seatIds) ? holdResponse.seatIds.length : allSeatIds.length,
+        });
         toast.success(`Đã chọn ghế ${seat.seatRow}${seat.seatNumber}`);
 
         setSelectedSeats(newSelectedSeats);
@@ -183,8 +224,7 @@ const SeatSelection = () => {
           setTimeLeft(300);
         }
       } catch (error) {
-        console.error('❌ Error holding seats:', error);
-        console.error('Error details:', error.response?.data || error.message);
+        devError('Không thể giữ ghế', error);
         toast.error(`Không thể giữ ghế ${seat.seatRow}${seat.seatNumber}: ${error.response?.data?.message || error.message}`);
       }
     }
@@ -197,7 +237,7 @@ const SeatSelection = () => {
         await seatService.extendHold(sessionId, parseInt(showtimeId), seatIds, 5);
         setTimeLeft(300); // Reset về 5 phút
       } catch (error) {
-        console.error('Error extending hold:', error);
+        devError('Không thể gia hạn giữ ghế', error);
       }
     }
   };
@@ -208,7 +248,7 @@ const SeatSelection = () => {
         const seatIds = selectedSeats.map(s => s.seatId);
         await seatService.releaseSeats(sessionId, parseInt(showtimeId), seatIds);
       } catch (error) {
-        console.error('Error releasing seats:', error);
+        devError('Không thể thả toàn bộ ghế', error);
       }
     }
   };
@@ -342,7 +382,10 @@ const SeatSelection = () => {
     
     navigator.clipboard.writeText(JSON.stringify(requestBody, null, 2));
     toast.success('Đã copy request body vào clipboard!');
-    console.log('📋 Request Body Copied:', requestBody);
+    devLog('Đã copy request body giữ ghế (debug)', {
+      showtimeId: Number(showtimeId),
+      seatCount: selectedSeats.length,
+    });
   };
 
   const handleContinue = () => {
@@ -351,12 +394,14 @@ const SeatSelection = () => {
       return;
     }
 
-    console.log('🎬 Navigating to booking confirmation with data:', {
-      selectedSeats: selectedSeats.map(s => ({ seatId: s.seatId, row: s.seatRow, number: s.seatNumber })),
+    devLog('Điều hướng sang xác nhận đặt vé', {
+      selectedSeatCount: selectedSeats.length,
       totalPrice: getTotalPrice(),
-      sessionId,
-      showtime
+      showtimeId: Number(showtimeId),
     });
+
+    // Đánh dấu là đang chuyển hướng sang trang thanh toán để không bị thu hồi ghế
+    isNavigatingForward.current = true;
 
     // Chuyển sang trang xác nhận booking
     navigate(`/booking-confirmation`, {

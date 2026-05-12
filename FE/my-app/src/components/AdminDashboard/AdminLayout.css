@@ -6,8 +6,10 @@
   --adm-border: rgba(132, 170, 255, 0.18);
   --adm-text: #eef5ff;
   --adm-muted: #9fb4d6;
-  --adm-accent: #8b6cff;
-  --adm-accent-dim: rgba(139, 108, 255, 0.18);
+  /* Admin core tones */
+  --adm-accent: #f0b429;
+  --adm-accent-hover: #f5c542;
+  --adm-accent-dim: rgba(240, 180, 41, 0.15);
   --adm-sidebar-w: 268px;
   --adm-sidebar-collapsed: 72px;
   --adm-topbar-h: 56px;
@@ -94,7 +96,7 @@
 }
 
 .adm-sidebar__collapse:hover {
-  background: rgba(139, 108, 255, 0.24);
+  background: var(--adm-accent-dim);
   color: var(--adm-text);
 }
 
@@ -149,7 +151,7 @@
 
 .adm-nav__link.is-active {
   background: var(--adm-accent-dim);
-  border-color: rgba(139, 108, 255, 0.45);
+  border-color: var(--adm-accent);
   color: #fff;
 }
 
@@ -220,7 +222,7 @@
   display: flex;
   flex-direction: column;
   transition: margin-left 0.25s ease;
-  background: radial-gradient(1200px 600px at 10% -10%, rgba(139, 108, 255, 0.16), transparent),
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(240, 180, 41, 0.1), transparent),
     rgba(9, 16, 34, 0.82);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -337,7 +339,7 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--adm-accent), #45c5f3);
+  background: linear-gradient(135deg, var(--adm-accent), #f5c542);
   color: #fff;
   display: flex;
   align-items: center;
@@ -362,12 +364,13 @@
   margin: 0 auto;
   box-sizing: border-box;
   /* Token dùng chung cho các trang con (Dashboard, AccountManagement, …) */
-  --adm-page-card: #121c34;
-  --adm-page-card2: #1a2746;
+  --adm-page-bg: #0d1117;
+  --adm-page-card: #161b22;
+  --adm-page-card2: #21262d;
   --adm-page-border: rgba(132, 170, 255, 0.2);
   --adm-page-muted: #9fb4d6;
   --adm-page-text: #eef5ff;
-  --adm-page-accent: #8b6cff;
+  --adm-page-accent: #e50914;
 }
 
 /* Mobile drawer */
@@ -506,8 +509,8 @@ body:has(.adm-shell .mvf-modal-overlay) {
   .adm-cit__check,
   .adm-chm__field > label:has(input[type='checkbox'])
 ):hover {
-  border-color: rgba(139, 108, 255, 0.5) !important;
-  background: rgba(139, 108, 255, 0.12) !important;
+  border-color: rgba(229, 9, 20, 0.5) !important;
+  background: rgba(229, 9, 20, 0.12) !important;
 }
 
 .adm-shell :is(
@@ -558,7 +561,7 @@ body:has(.adm-shell .mvf-modal-overlay) {
   .adm-chm__field > label:has(input[type='checkbox'])
 ) input[type='checkbox']:checked {
   border-color: var(--adm-page-accent, #e50914);
-  box-shadow: 0 0 0 2px rgba(139, 108, 255, 0.22);
+  box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.22);
 }
 
 .adm-shell :is(
@@ -581,7 +584,7 @@ body:has(.adm-shell .mvf-modal-overlay) {
   .adm-chm__field > label:has(input[type='checkbox'])
 ):has(input[type='checkbox']:checked) {
   border-color: var(--adm-page-accent, #e50914) !important;
-  background: rgba(139, 108, 255, 0.16) !important;
+  background: rgba(229, 9, 20, 0.16) !important;
 }
 
 /* Action buttons: gradient by function (edit / delete / neutral) */
@@ -598,10 +601,10 @@ body:has(.adm-shell .mvf-modal-overlay) {
   .adm-ucm__icon-btn--edit,
   .adm-chm__icon-btn--edit
 ) {
-  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%) !important;
-  border-color: rgba(137, 180, 255, 0.45) !important;
-  color: #f3f8ff !important;
-  box-shadow: 0 8px 18px rgba(73, 198, 243, 0.22) !important;
+  background: var(--ui-btn-info) !important;
+  border-color: rgba(49, 130, 206, 0.45) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 18px var(--ui-btn-info-shadow) !important;
 }
 
 .adm-shell :is(
@@ -617,9 +620,9 @@ body:has(.adm-shell .mvf-modal-overlay) {
   .adm-ucm__icon-btn--edit,
   .adm-chm__icon-btn--edit
 ):hover {
-  background: linear-gradient(135deg, #8a70ff 0%, #5bd1fa 100%) !important;
+  background: var(--ui-btn-info-hover) !important;
   filter: brightness(1.04);
-  box-shadow: 0 10px 22px rgba(91, 209, 250, 0.28) !important;
+  box-shadow: 0 10px 22px var(--ui-btn-info-shadow) !important;
 }
 
 .adm-shell :is(
@@ -636,10 +639,10 @@ body:has(.adm-shell .mvf-modal-overlay) {
   .adm-chm__icon-btn--danger,
   .adm-st__btn--danger
 ) {
-  background: linear-gradient(135deg, #ff5d6c 0%, #ff8f3f 100%) !important;
-  border-color: rgba(255, 157, 117, 0.46) !important;
-  color: #fff7f2 !important;
-  box-shadow: 0 8px 18px rgba(255, 108, 85, 0.26) !important;
+  background: var(--ui-btn-danger) !important;
+  border-color: rgba(229, 62, 62, 0.46) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 18px var(--ui-btn-danger-shadow) !important;
 }
 
 .adm-shell :is(
@@ -656,25 +659,25 @@ body:has(.adm-shell .mvf-modal-overlay) {
   .adm-chm__icon-btn--danger,
   .adm-st__btn--danger
 ):hover {
-  background: linear-gradient(135deg, #ff6f7c 0%, #ffa255 100%) !important;
+  background: var(--ui-btn-danger-hover) !important;
   filter: brightness(1.03);
-  box-shadow: 0 10px 22px rgba(255, 122, 98, 0.3) !important;
+  box-shadow: 0 10px 22px var(--ui-btn-danger-shadow) !important;
 }
 
 .adm-shell :is(
   .mvf-btn-cancel,
   .adm-prm__btn--cancel
 ) {
-  background: linear-gradient(135deg, #4f5d79 0%, #65769b 100%) !important;
+  background: var(--ui-btn-secondary) !important;
   border-color: rgba(160, 182, 219, 0.42) !important;
-  color: #eef4ff !important;
-  box-shadow: 0 8px 16px rgba(56, 72, 104, 0.28) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 16px var(--ui-btn-secondary-shadow) !important;
 }
 
 .adm-shell :is(
   .mvf-btn-cancel,
   .adm-prm__btn--cancel
 ):hover {
-  background: linear-gradient(135deg, #5a6a88 0%, #7387af 100%) !important;
+  background: var(--ui-btn-secondary-hover) !important;
   filter: brightness(1.03);
 }

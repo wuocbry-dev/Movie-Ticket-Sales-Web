@@ -9,15 +9,34 @@
     linear-gradient(135deg, #0b1224 0%, #17233f 48%, #243a61 100%);
   --app-page-bg-fallback: #0b1224;
 
-  /* Nút, viền, highlight — cùng palette đăng nhập (thay thế #667eea / #764ba2 cũ) */
-  --ui-gradient-primary: linear-gradient(135deg, #6b3fd4 0%, #c23d9a 52%, #ff7b5c 100%);
-  --ui-gradient-primary-hover: linear-gradient(135deg, #7d52e0 0%, #d14faa 50%, #ff9070 100%);
-  --ui-gradient-soft: linear-gradient(135deg, rgba(107, 63, 212, 0.22) 0%, rgba(194, 61, 154, 0.18) 52%, rgba(255, 123, 92, 0.14) 100%);
-  --ui-gradient-fade: linear-gradient(135deg, rgba(107, 63, 212, 0.14) 0%, rgba(194, 61, 154, 0.12) 100%);
-  --ui-accent-mid: #b565d8;
-  --ui-accent-deep: #8b4dc4;
-  --ui-btn-grad: linear-gradient(90deg, #8b6cff 0%, #45c5f3 100%);
-  --ui-btn-grad-hover: linear-gradient(90deg, #9a7bff 0%, #58cff8 100%);
+  /* Nút, viền, highlight — vàng cam cinema đồng nhất với btn-primary */
+  --ui-gradient-primary: linear-gradient(135deg, #f0b429 0%, #e69c10 100%);
+  --ui-gradient-primary-hover: linear-gradient(135deg, #f5c542 0%, #ecb01d 100%);
+  --ui-gradient-soft: linear-gradient(135deg, rgba(240, 180, 41, 0.22) 0%, rgba(230, 156, 16, 0.14) 100%);
+  --ui-gradient-fade: linear-gradient(135deg, rgba(240, 180, 41, 0.14) 0%, rgba(230, 156, 16, 0.08) 100%);
+  --ui-accent-mid: #f0b429;
+  --ui-accent-deep: #d4960f;
+
+  /* Button Gradients - Functional Colors */
+  --ui-btn-primary: linear-gradient(135deg, #f0b429 0%, #e69c10 100%);
+  --ui-btn-primary-hover: linear-gradient(135deg, #f5c542 0%, #ecb01d 100%);
+  --ui-btn-primary-shadow: rgba(240, 180, 41, 0.3);
+
+  --ui-btn-secondary: linear-gradient(135deg, #4f5d79 0%, #3b465e 100%);
+  --ui-btn-secondary-hover: linear-gradient(135deg, #5a6a88 0%, #46536e 100%);
+  --ui-btn-secondary-shadow: rgba(79, 93, 121, 0.3);
+
+  --ui-btn-danger: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  --ui-btn-danger-hover: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+  --ui-btn-danger-shadow: rgba(229, 62, 62, 0.3);
+
+  --ui-btn-success: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+  --ui-btn-success-hover: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  --ui-btn-success-shadow: rgba(56, 161, 105, 0.3);
+
+  --ui-btn-info: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+  --ui-btn-info-hover: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  --ui-btn-info-shadow: rgba(49, 130, 206, 0.3);
 
   /* Admin: nền card / sidebar pha tím (trên nền app) */
   --adm-ui-card-tint: linear-gradient(
@@ -86,26 +105,27 @@ select option {
   color: rgba(247, 251, 255, 0.96) !important;
 }
 
-/* Nút bấm đồng bộ toàn web theo tông tím-xanh */
+/* Global default button base (no !important) */
 button,
 input[type='button'],
 input[type='submit'],
 input[type='reset'] {
-  background: var(--ui-btn-grad) !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(69, 197, 243, 0.3);
-  transition: filter 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  background: var(--ui-btn-primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px var(--ui-btn-primary-shadow);
+  transition: filter 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+  cursor: pointer;
 }
 
 button:hover:not(:disabled),
 input[type='button']:hover:not(:disabled),
 input[type='submit']:hover:not(:disabled),
 input[type='reset']:hover:not(:disabled) {
-  background: var(--ui-btn-grad-hover) !important;
-  filter: brightness(1.04);
-  box-shadow: 0 6px 20px rgba(69, 197, 243, 0.4);
+  background: var(--ui-btn-primary-hover);
+  filter: brightness(1.05);
+  box-shadow: 0 6px 20px var(--ui-btn-primary-shadow);
   transform: translateY(-1px);
 }
 
@@ -113,39 +133,54 @@ button:disabled,
 input[type='button']:disabled,
 input[type='submit']:disabled,
 input[type='reset']:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
 }
 
-/* Function-based button gradients for non-admin pages */
-.btn-cancel {
-  background: linear-gradient(135deg, #4f5d79 0%, #65769b 100%) !important;
-  border-color: rgba(160, 182, 219, 0.42) !important;
-  color: #eef4ff !important;
+/* Functional Button Classes (Can be used across the app) */
+.btn-primary {
+  background: var(--ui-btn-primary) !important;
+  box-shadow: 0 4px 16px var(--ui-btn-primary-shadow) !important;
+  color: #fff !important;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--ui-btn-primary-hover) !important;
 }
 
-.btn-cancel:hover:not(:disabled) {
-  background: linear-gradient(135deg, #5a6a88 0%, #7387af 100%) !important;
+.btn-secondary, .btn-cancel {
+  background: var(--ui-btn-secondary) !important;
+  box-shadow: 0 4px 16px var(--ui-btn-secondary-shadow) !important;
+  color: #fff !important;
+}
+.btn-secondary:hover:not(:disabled), .btn-cancel:hover:not(:disabled) {
+  background: var(--ui-btn-secondary-hover) !important;
 }
 
-.bcf__btn--success,
-.csx__btn--add,
-.pp-btn-save-all,
-.qbm-btn-book,
-.btn-book-showtime,
-.btn-book-small {
-  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%) !important;
-  border-color: rgba(137, 180, 255, 0.45) !important;
-  color: #f3f8ff !important;
+.btn-danger, .bcf__btn--delete {
+  background: var(--ui-btn-danger) !important;
+  box-shadow: 0 4px 16px var(--ui-btn-danger-shadow) !important;
+  color: #fff !important;
+}
+.btn-danger:hover:not(:disabled), .bcf__btn--delete:hover:not(:disabled) {
+  background: var(--ui-btn-danger-hover) !important;
 }
 
-.bcf__btn--success:hover:not(:disabled),
-.csx__btn--add:hover:not(:disabled),
-.pp-btn-save-all:hover:not(:disabled),
-.qbm-btn-book:hover:not(:disabled),
-.btn-book-showtime:hover:not(:disabled),
-.btn-book-small:hover:not(:disabled) {
-  background: linear-gradient(135deg, #8a70ff 0%, #5bd1fa 100%) !important;
+.btn-success, .bcf__btn--success, .csx__btn--add, .pp-btn-save-all {
+  background: var(--ui-btn-success) !important;
+  box-shadow: 0 4px 16px var(--ui-btn-success-shadow) !important;
+  color: #fff !important;
+}
+.btn-success:hover:not(:disabled), .bcf__btn--success:hover:not(:disabled), .csx__btn--add:hover:not(:disabled), .pp-btn-save-all:hover:not(:disabled) {
+  background: var(--ui-btn-success-hover) !important;
+}
+
+.btn-info {
+  background: var(--ui-btn-info) !important;
+  box-shadow: 0 4px 16px var(--ui-btn-info-shadow) !important;
+  color: #fff !important;
+}
+.btn-info:hover:not(:disabled) {
+  background: var(--ui-btn-info-hover) !important;
 }

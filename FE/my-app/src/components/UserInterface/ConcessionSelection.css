@@ -5,7 +5,7 @@
   --csx-surface: rgba(13, 26, 52, 0.86);
   --csx-text: #eef5ff;
   --csx-text-muted: rgba(205, 223, 255, 0.72);
-  --csx-accent: #49c6f3;
+  --csx-accent: #e69c10;
   --csx-accent-hover: #5bd1fa;
   --csx-border: rgba(132, 170, 255, 0.22);
   --csx-radius: 14px;
@@ -101,7 +101,7 @@
 
 .csx__btn--add {
   width: 100%;
-  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%);
+  background: var(--ui-btn-primary);
   color: #f3f8ff;
   border-color: rgba(137, 180, 255, 0.5);
 }
@@ -180,7 +180,7 @@
 }
 
 .csx__tab--active {
-  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%);
+  background: var(--ui-btn-primary);
   border-color: rgba(137, 180, 255, 0.5);
   color: #f3f8ff;
 }
@@ -399,7 +399,7 @@
   margin: 0 0 clamp(14px, 2.5vw, 20px);
   padding: 12px 16px;
   border-radius: var(--csx-radius-sm);
-  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%);
+  background: var(--ui-btn-primary);
   color: #f4f9ff;
   box-shadow: 0 8px 22px rgba(91, 209, 250, 0.3);
   box-sizing: border-box;

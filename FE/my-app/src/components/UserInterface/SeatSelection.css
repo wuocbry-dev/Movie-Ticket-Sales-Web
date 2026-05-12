@@ -321,7 +321,7 @@
   border-color: rgba(96, 165, 250, 0.52) !important;
 }
 .ssx__seat--sel {
-  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%) !important;
+  background: var(--ui-btn-primary) !important;
   border-color: rgba(147, 197, 253, 0.86) !important;
   color: #f4f9ff !important;
   filter: drop-shadow(0 0 10px rgba(91, 209, 250, 0.35));

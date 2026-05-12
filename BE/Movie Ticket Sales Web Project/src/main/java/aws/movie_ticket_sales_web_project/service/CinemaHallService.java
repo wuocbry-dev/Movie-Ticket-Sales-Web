@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class CinemaHallService {
 
     private final CinemaHallRepository cinemaHallRepository;

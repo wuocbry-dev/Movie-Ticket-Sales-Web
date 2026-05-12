@@ -50,4 +50,7 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, Integer> {
            "JOIN FETCH h.cinema c " +
            "WHERE c.manager.id = :managerId")
     Page<Showtime> findByHallCinemaManagerId(@Param("managerId") Integer managerId, Pageable pageable);
+
+    @Query("SELECT COUNT(s) FROM Showtime s WHERE s.showDate = :date")
+    Long countActiveShowtimesByDate(@Param("date") java.time.LocalDate date);
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaSearch, FaUser, FaSignOutAlt, FaTachometerAlt, FaBars, FaHistory } from 'react-icons/fa';
 import Cookies from 'js-cookie';
@@ -23,6 +23,13 @@ const Header = () => {
   const [selectedLanguage, setSelectedLanguage] = useState(() => {
     return localStorage.getItem('language') || 'vi';
   });
+
+  // Search states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const searchContainerRef = useRef(null);
 
   const languages = [
     { code: 'vi', name: 'Tiếng Việt', flag: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20"%3E%3Crect width="30" height="20" fill="%23da251d"/%3E%3Cpolygon points="15,4 11.47,14.85 20.71,8.15 9.29,8.15 18.53,14.85" fill="%23ff0"/%3E%3C/svg%3E' },
@@ -118,6 +125,29 @@ const Header = () => {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.trim().length >= 2) {
+        setIsSearching(true);
+        fetch(`http://localhost:8080/api/search?q=${encodeURIComponent(searchQuery.trim())}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              setSearchResults(data.data);
+              setShowSearchDropdown(true);
+            }
+          })
+          .catch(err => console.error("Search error:", err))
+          .finally(() => setIsSearching(false));
+      } else {
+        setSearchResults(null);
+        setShowSearchDropdown(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -130,11 +160,14 @@ const Header = () => {
       if (showMobileMenu && !event.target.closest('.header')) {
         setShowMobileMenu(false);
       }
+      if (showSearchDropdown && searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setShowSearchDropdown(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showUserMenu, showLanguageMenu, showMobileMenu]);
+  }, [showUserMenu, showLanguageMenu, showMobileMenu, showSearchDropdown]);
 
   const handleLogout = () => {
     // Xóa token và user data
@@ -178,16 +211,106 @@ const Header = () => {
           />
         )}
 
-        {/* Search Bar - ẩn trên mobile (vào hamburger) */}
-        <div className="search-bar header-search">
-          <input 
-            type="text" 
-            placeholder="Tìm phim, rạp" 
-            className="search-input"
-          />
-          <button className="search-button">
-            <FaSearch />
-          </button>
+        {/* Search Bar */}
+        <div className="search-bar header-search" ref={searchContainerRef}>
+          <div className="search-input-wrapper">
+            <input 
+              type="text" 
+              placeholder="Tìm phim, khuyến mãi, dịch vụ..." 
+              className="search-input"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                if (!showSearchDropdown && e.target.value.length >= 2 && searchResults) {
+                  setShowSearchDropdown(true);
+                }
+              }}
+              onFocus={() => {
+                if (searchQuery.length >= 2 && searchResults) {
+                  setShowSearchDropdown(true);
+                }
+              }}
+            />
+            <button className="search-button">
+              {isSearching ? <div className="header-search-spinner"></div> : <FaSearch />}
+            </button>
+          </div>
+
+          {/* Autocomplete Dropdown */}
+          {showSearchDropdown && searchResults && (
+            <div className="search-dropdown-overlay">
+              {searchResults.movies?.length > 0 && (
+                <div className="search-category-group">
+                  <div className="search-category-title">Phim nổi bật</div>
+                  {searchResults.movies.map(movie => (
+                    <Link 
+                      to={`/movie/${movie.id}`} 
+                      key={`m-${movie.id}`} 
+                      className="search-result-item"
+                      onClick={() => setShowSearchDropdown(false)}
+                    >
+                      <div className="search-item-img">
+                        <img src={movie.posterUrl} alt={movie.title} />
+                      </div>
+                      <div className="search-item-info">
+                        <h4>{movie.title}</h4>
+                        <p>{movie.duration} phút</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {searchResults.promotions?.length > 0 && (
+                <div className="search-category-group">
+                  <div className="search-category-title">Khuyến mãi</div>
+                  {searchResults.promotions.map(promo => (
+                    <Link 
+                      to="/promotions" 
+                      key={`p-${promo.id}`} 
+                      className="search-result-item"
+                      onClick={() => setShowSearchDropdown(false)}
+                    >
+                      <div className="search-item-info">
+                        <h4>{promo.promotionName}</h4>
+                        <p>Mã: <strong>{promo.promotionCode}</strong> - Giảm {promo.discountValue}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {searchResults.concessions?.length > 0 && (
+                <div className="search-category-group">
+                  <div className="search-category-title">Dịch vụ rạp (Bắp nước)</div>
+                  {searchResults.concessions.map(concession => (
+                    <Link 
+                      to="/concessions" 
+                      key={`c-${concession.id}`} 
+                      className="search-result-item"
+                      onClick={() => setShowSearchDropdown(false)}
+                    >
+                      {concession.imageUrl && (
+                        <div className="search-item-img">
+                          <img src={concession.imageUrl} alt={concession.itemName} />
+                        </div>
+                      )}
+                      <div className="search-item-info">
+                        <h4>{concession.itemName}</h4>
+                        <p>{concession.price.toLocaleString('vi-VN')} ₫</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {(!searchResults.movies?.length && !searchResults.promotions?.length && !searchResults.concessions?.length) && (
+                <div className="search-no-results">
+                  Không tìm thấy kết quả nào cho "{searchQuery}"
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right Menu - Desktop | Mobile: Hamburger */}

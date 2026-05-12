@@ -54,6 +54,21 @@ public class AuthController {
     }
 
     /**
+     * Refresh access token
+     * POST /api/auth/refresh
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<LoginResponse>> refresh(@RequestBody RefreshTokenRequest request) {
+        ApiResponse<LoginResponse> response = authenticationService.refreshAccessToken(request);
+
+        if (response.getSuccess()) {
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    /**
      * Check if current user is admin
      * GET /api/auth/check-admin
      */

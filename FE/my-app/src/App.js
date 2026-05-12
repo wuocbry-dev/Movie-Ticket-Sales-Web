@@ -51,6 +51,8 @@ import { QuickBookingProvider } from './components/UserInterface/QuickBookingCon
 import { ROLES } from './utils/roleUtils';
 // Import LoadingSpinner.css last to override other loading-spinner styles
 import './components/UserInterface/LoadingSpinner.css';
+import GeminiChatbot from './components/UserInterface/GeminiChatbot';
+import { BookingGuidePage, FAQPage, TermsPage, PrivacyPage } from './components/UserInterface/SupportPages';
 
 // Component to conditionally render Footer
 const ConditionalFooter = () => {
@@ -134,8 +136,13 @@ function App() {
           <Route path="/cinemas" element={<CinemaListingPage />} />
           <Route path="/concessions" element={<ConcessionsPage />} />
           <Route path="/promotions" element={<PromotionsPage />} />
+
+          {/* Support Pages */}
+          <Route path="/huong-dan-dat-ve" element={<BookingGuidePage />} />
+          <Route path="/cau-hoi-thuong-gap" element={<FAQPage />} />
+          <Route path="/dieu-khoan-su-dung" element={<TermsPage />} />
+          <Route path="/chinh-sach-bao-mat" element={<PrivacyPage />} />
           
-          {/* Protected Customer Routes */}
           <Route path="/profile" element={
             <ProtectedRoute allowedRoles={[ROLES.CUSTOMER, ROLES.CINEMA_STAFF, ROLES.CINEMA_MANAGER, ROLES.SYSTEM_ADMIN]}>
               <ProfilePage />
@@ -216,6 +223,7 @@ function App() {
         </Routes>
         <ConditionalFooter />
         <ConditionalBottomNav />
+        <GeminiChatbot />
       </div>
       </QuickBookingProvider>
     </Router>

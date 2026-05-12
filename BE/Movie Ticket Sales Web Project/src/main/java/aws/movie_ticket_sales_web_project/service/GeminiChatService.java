@@ -28,6 +28,9 @@ public class GeminiChatService {
     @Value("${gemini.api.key:}")
     private String geminiApiKey;
 
+    @Value("${gemini.models:gemini-2.5-flash,gemini-2.0-flash}")
+    private String[] geminiModels;
+
     private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
     /**
@@ -129,31 +132,78 @@ public class GeminiChatService {
     }
 
     /**
-     * Call Gemini API
+     * Public method cho chatbot nodes gọi Gemini API.
+     * Trả về text response từ Gemini.
+     * @param prompt Prompt gửi cho Gemini
+     * @return Text response
+     */
+    public String callGeminiForText(String prompt) {
+        try {
+            return callGeminiAPI(prompt);
+        } catch (Exception e) {
+            log.error("Error calling Gemini for text", e);
+            throw new RuntimeException("Failed to get response from Gemini", e);
+        }
+    }
+
+    /**
+     * Call Gemini API with retry and model fallback for rate limiting.
      */
     private String callGeminiAPI(String prompt) throws Exception {
-        String url = GEMINI_API_URL + "?key=" + geminiApiKey;
-        
+        // Danh sách models để fallback khi bị rate limit (đọc từ config)
+        String[] models = geminiModels != null && geminiModels.length > 0 
+            ? geminiModels 
+            : new String[]{"gemini-2.5-flash", "gemini-2.0-flash"};
+
+        Exception lastException = null;
+
+        for (String model : models) {
+            try {
+                String result = callGeminiWithModel(prompt, model);
+                if (result != null) return result;
+            } catch (org.springframework.web.client.HttpClientErrorException.TooManyRequests e) {
+                log.warn("⚠️ Gemini rate limited (429) for model={}, trying next...", model);
+                lastException = e;
+                // Chờ 1 giây trước khi thử model khác
+                Thread.sleep(1000);
+            } catch (org.springframework.web.client.HttpClientErrorException e) {
+                log.error("❌ Gemini API error: status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString());
+                lastException = e;
+            } catch (Exception e) {
+                log.error("❌ Gemini API error for model={}: {}", model, e.getMessage());
+                lastException = e;
+            }
+        }
+
+        throw lastException != null ? lastException : new RuntimeException("All Gemini models failed");
+    }
+
+    /**
+     * Gọi Gemini API với model cụ thể.
+     */
+    private String callGeminiWithModel(String prompt, String model) throws Exception {
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + geminiApiKey;
+
         Map<String, Object> requestBody = new HashMap<>();
         Map<String, Object> content = new HashMap<>();
         Map<String, String> part = new HashMap<>();
         part.put("text", prompt);
-        
+
         content.put("parts", Collections.singletonList(part));
         requestBody.put("contents", Collections.singletonList(content));
-        
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        
+
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-        
+
         ResponseEntity<String> response = restTemplate.exchange(
             url,
             HttpMethod.POST,
             request,
             String.class
         );
-        
+
         if (response.getStatusCode() == HttpStatus.OK) {
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode candidates = root.path("candidates");
@@ -165,8 +215,8 @@ public class GeminiChatService {
                 }
             }
         }
-        
-        throw new RuntimeException("Failed to get response from Gemini");
+
+        throw new RuntimeException("Failed to get response from Gemini model: " + model);
     }
 
     /**

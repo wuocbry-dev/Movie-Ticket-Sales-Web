@@ -118,4 +118,11 @@ public class JwtTokenProvider {
     public long getTokenExpirationTime() {
         return jwtExpirationMs;
     }
+
+    /**
+     * Get refresh token expiration time
+     */
+    public long getRefreshTokenExpirationTime() {
+        return jwtRefreshExpirationMs;
+    }
 }

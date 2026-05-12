@@ -16,8 +16,8 @@
   --bh-border: rgba(132, 170, 255, 0.22);
   --bh-text: rgba(246, 250, 255, 0.95);
   --bh-muted: rgba(205, 223, 255, 0.72);
-  --bh-accent-a: #7b5cff;
-  --bh-accent-b: #49c6f3;
+  --bh-accent-a: #f0b429;
+  --bh-accent-b: #e69c10;
   --bh-danger: #ff6b6b;
   color: var(--bh-text);
 }

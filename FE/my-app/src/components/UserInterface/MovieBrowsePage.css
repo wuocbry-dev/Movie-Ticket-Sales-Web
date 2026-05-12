@@ -277,7 +277,7 @@
   width: 39px;
   height: 39px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%);
+  background: var(--ui-btn-primary);
   color: #f3f8ff;
   display: flex;
   align-items: center;
@@ -399,7 +399,7 @@
   padding: 8px 11px;
   border: none;
   border-radius: var(--mbp-sm);
-  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%);
+  background: var(--ui-btn-primary);
   border: 1px solid rgba(137, 180, 255, 0.45);
   color: #f3f8ff;
   font-size: 0.8125rem;
@@ -501,7 +501,7 @@
 }
 
 .mbp__num--on {
-  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%);
+  background: var(--ui-btn-primary);
   border-color: rgba(137, 180, 255, 0.5);
   color: #f3f8ff;
   font-weight: 800;

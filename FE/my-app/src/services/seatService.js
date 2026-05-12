@@ -24,6 +24,18 @@ export const seatService = {
     return response.data;
   },
 
+  // Thả ghế sử dụng sendBeacon (để gọi khi unmount/đóng tab)
+  releaseSeatsBeacon: (sessionId, showtimeId, seatIds) => {
+    if (!sessionId || !showtimeId || !seatIds || seatIds.length === 0) return;
+    const params = new URLSearchParams();
+    params.append('sessionId', sessionId);
+    params.append('showtimeId', showtimeId);
+    seatIds.forEach(id => params.append('seatIds', id));
+    
+    const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+    navigator.sendBeacon(`${baseUrl}/seats/release?${params.toString()}`);
+  },
+
   // Gia hạn thời gian giữ ghế
   extendHold: async (sessionId, showtimeId, seatIds, additionalMinutes = 5) => {
     const params = new URLSearchParams();

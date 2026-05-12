@@ -31,6 +31,7 @@ const BookingManagement = () => {
   const [seats, setSeats] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
@@ -83,8 +84,8 @@ const BookingManagement = () => {
     setLoading(true);
     try {
       let url = `${API_BASE_URL}/bookings/admin/all?page=${page}&size=10`;
-      if (searchTerm) {
-        url += `&search=${encodeURIComponent(searchTerm)}`;
+      if (debouncedSearchTerm) {
+        url += `&search=${encodeURIComponent(debouncedSearchTerm)}`;
       }
       const response = await fetch(url, {
         method: 'GET',
@@ -107,7 +108,7 @@ const BookingManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [token, page, searchTerm, API_BASE_URL, authHeaders, navigate]);
+  }, [token, page, debouncedSearchTerm, API_BASE_URL, authHeaders, navigate]);
 
   const fetchShowtimes = useCallback(async () => {
     if (!token) return;
@@ -151,6 +152,13 @@ const BookingManagement = () => {
     }
     fetchShowtimes();
   }, [token, fetchShowtimes]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   useEffect(() => {
     fetchBookings();
@@ -277,6 +285,27 @@ const BookingManagement = () => {
     setPage(0);
   };
 
+  const handleUpdateBookingStatus = async (bookingId, newStatus) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn ${newStatus === 'CANCELLED' ? 'hủy' : 'kích hoạt lại'} vé này không?`)) {
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE_URL}/bookings/${bookingId}`, {
+        method: 'PUT',
+        headers: authHeaders,
+        body: JSON.stringify({ status: newStatus })
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Không thể cập nhật trạng thái vé');
+      }
+      toast.success('Cập nhật trạng thái vé thành công!');
+      bumpList();
+    } catch (error) {
+      toast.error(error.message || 'Có lỗi xảy ra khi cập nhật vé');
+    }
+  };
+
   const handleOpenModal = () => {
     setShowModal(true);
     setFormData({
@@ -388,17 +417,7 @@ const BookingManagement = () => {
 
   return (
     <div className="adm-bm">
-      <div className="adm-bm__hero">
-        <div className="adm-bm__titles">
-          <h1 className="adm-bm__title">
-            <FaTicketAlt /> Quản lý vé
-          </h1>
-          <p className="adm-bm__sub">Quản lý đặt vé và bán vé tại quầy</p>
-        </div>
-        <button type="button" className="adm-bm__btn adm-bm__btn--primary" onClick={handleOpenModal}>
-          <FaPlus /> Đặt vé mới
-        </button>
-      </div>
+
 
       <div className="adm-bm__toolbar">
         <div className="adm-bm__search">
@@ -431,7 +450,28 @@ const BookingManagement = () => {
               <div key={booking.bookingId} className="adm-bm__card">
                 <div className="adm-bm__card-head">
                   <span className="adm-bm__id">#{booking.bookingId}</span>
-                  {getStatusBadge(booking.status)}
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    {getStatusBadge(booking.status)}
+                    {booking.status === 'CANCELLED' ? (
+                      <button
+                        type="button"
+                        className="adm-bm__btn adm-bm__btn--primary"
+                        style={{ padding: '4px 8px', fontSize: '12px', minHeight: 'unset' }}
+                        onClick={() => handleUpdateBookingStatus(booking.bookingId, booking.paymentStatus === 'COMPLETED' ? 'PAID' : 'CONFIRMED')}
+                      >
+                        Kích hoạt
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="adm-bm__btn adm-bm__btn--ghost"
+                        style={{ padding: '4px 8px', fontSize: '12px', minHeight: 'unset', color: 'red' }}
+                        onClick={() => handleUpdateBookingStatus(booking.bookingId, 'CANCELLED')}
+                      >
+                        Hủy vé
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className="adm-bm__card-body">
                   <div className="adm-bm__row">
@@ -462,7 +502,7 @@ const BookingManagement = () => {
                   </div>
                   <div className="adm-bm__row">
                     <FaChair className="adm-bm__ico" />
-                    <span>Ghế: {booking.seatNumbers?.join(', ')}</span>
+                    <span>Ghế: {booking.tickets?.map(t => `${t.seatRow}${t.seatNumber}`).join(', ') || 'N/A'}</span>
                   </div>
                   <div className="adm-bm__row">
                     <FaCreditCard className="adm-bm__ico" />

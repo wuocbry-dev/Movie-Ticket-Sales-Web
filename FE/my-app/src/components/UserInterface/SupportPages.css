@@ -1,0 +1,291 @@
+/* ============================================================
+   SUPPORT PAGES — Dark Cinema Premium Theme
+   ============================================================ */
+
+.support-page {
+  min-height: 100vh;
+  background: transparent;
+  padding-bottom: 60px;
+  font-family: 'Inter', 'Poppins', sans-serif;
+  color: #e8eaf6;
+}
+
+/* Hero */
+.support-hero {
+  padding: 130px 20px 50px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(124,58,237,0.15) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  margin-bottom: 40px;
+}
+
+.support-hero-title {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffd700, #f0b429);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Container */
+.support-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Section */
+.support-section {
+  margin-bottom: 48px;
+}
+
+.support-section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffd700;
+  margin: 0 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,215,0,0.2);
+}
+
+/* ── Guide Steps ── */
+.guide-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.guide-step {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 24px 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.guide-step:hover {
+  background: rgba(255,215,0,0.06);
+  border-color: rgba(255,215,0,0.25);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.guide-step-num {
+  position: absolute;
+  top: -12px;
+  left: 20px;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #f0b429, #e69c10);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #1a1a2e;
+}
+
+.guide-step-icon {
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+}
+
+.guide-step h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 8px;
+}
+
+.guide-step p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ── Grid layouts ── */
+.support-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.support-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* ── Support Card ── */
+.support-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 18px;
+  color: #e8eaf6;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.support-card:hover {
+  background: rgba(255,215,0,0.07);
+  border-color: rgba(255,215,0,0.3);
+  transform: translateY(-3px);
+}
+
+.support-card strong {
+  font-size: 14px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.support-card span {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+}
+
+.support-card-icon {
+  font-size: 1.8rem;
+  margin-bottom: 4px;
+}
+
+/* Movie card */
+.support-movie-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.support-movie-poster {
+  width: 48px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+/* Promo card */
+.support-promo-card {
+  border-color: rgba(255,215,0,0.15);
+}
+
+.support-promo-code {
+  font-size: 12px;
+  color: #ffd700 !important;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ── CTA ── */
+.support-cta {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.support-cta-btn {
+  display: inline-block;
+  padding: 14px 36px;
+  background: linear-gradient(135deg, #f0b429, #e69c10);
+  color: #1a1a2e;
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(240,180,41,0.4);
+}
+
+.support-cta-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(240,180,41,0.55);
+}
+
+/* ── FAQ ── */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.25s ease;
+}
+
+.faq-item.open {
+  border-color: rgba(255,215,0,0.3);
+}
+
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  gap: 12px;
+}
+
+.faq-arrow {
+  color: #ffd700;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.faq-answer {
+  padding: 0 20px 18px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.65;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 14px;
+}
+
+/* ── Terms / Privacy ── */
+.support-terms-section {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.support-text {
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.8;
+  margin: 0;
+}
+
+.support-last-updated {
+  text-align: right;
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 32px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .guide-steps {
+    grid-template-columns: 1fr;
+  }
+  .support-grid-3,
+  .support-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}

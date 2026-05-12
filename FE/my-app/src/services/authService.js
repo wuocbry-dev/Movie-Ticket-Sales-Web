@@ -20,13 +20,14 @@ export const authService = {
   logout: () => {
     // Xóa token khỏi cookies
     const Cookies = require('js-cookie');
-    Cookies.remove('authToken');
+    Cookies.remove('accessToken');
+    Cookies.remove('refreshToken');
   },
 
   // Kiểm tra xem user đã đăng nhập chưa
   isAuthenticated: () => {
     const Cookies = require('js-cookie');
-    return !!Cookies.get('authToken');
+    return !!Cookies.get('accessToken');
   },
 
   // Lấy thông tin user hiện tại

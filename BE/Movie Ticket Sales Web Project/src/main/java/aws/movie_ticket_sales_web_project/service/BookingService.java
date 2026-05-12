@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class BookingService {
     
     private final BookingRepository bookingRepository;
@@ -47,11 +48,17 @@ public class BookingService {
     private static final BigDecimal POINTS_TO_VND_RATE = new BigDecimal("1000"); // 1 point = 1000 VND
     
     /**
-     * Get all bookings with pagination (excluding CANCELLED)
+     * Get all bookings with pagination (excluding CANCELLED) and optional search
      */
-    public PagedBookingResponse getAllBookings(int page, int size) {
+    public PagedBookingResponse getAllBookings(int page, int size, String search) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("bookingDate").descending());
-        Page<Booking> bookingPage = bookingRepository.findByStatusNot(StatusBooking.CANCELLED, pageable);
+        Page<Booking> bookingPage;
+        
+        if (search != null && !search.trim().isEmpty()) {
+            bookingPage = bookingRepository.searchBookings(search.trim(), pageable);
+        } else {
+            bookingPage = bookingRepository.findAll(pageable);
+        }
         
         return buildPagedResponse(bookingPage);
     }
@@ -398,10 +405,34 @@ public class BookingService {
             
             // Update fields if provided
             if (request.getStatus() != null) {
+                StatusBooking oldStatus = booking.getStatus();
                 booking.setStatus(request.getStatus());
                 
-                // If status is CANCELLED, update seat availability and refund points
-                if (request.getStatus() == StatusBooking.CANCELLED) {
+                // Transitioning FROM Cancelled TO Active
+                if (oldStatus == StatusBooking.CANCELLED && (request.getStatus() == StatusBooking.PAID || request.getStatus() == StatusBooking.CONFIRMED)) {
+                    List<Ticket> tickets = ticketRepository.findByBookingId(bookingId);
+                    Showtime showtime = booking.getShowtime();
+                    
+                    // Verify seats are still available
+                    for (Ticket ticket : tickets) {
+                        if (ticketRepository.findActiveBySeatIdAndShowtimeId(ticket.getSeat().getId(), showtime.getId()).isPresent()) {
+                            throw new RuntimeException("Không thể kích hoạt lại vé. Ghế " + ticket.getSeat().getSeatRow() + ticket.getSeat().getSeatNumber() + " đã được đặt bởi người khác.");
+                        }
+                    }
+                    
+                    showtime.setAvailableSeats(showtime.getAvailableSeats() - tickets.size());
+                    showtimeRepository.save(showtime);
+                    
+                    tickets.forEach(ticket -> ticket.setStatus(TicketStatus.BOOKED));
+                    ticketRepository.saveAll(tickets);
+                    
+                    // Re-deduct points if any were used
+                    if (booking.getPointsUsed() != null && booking.getPointsUsed() > 0 && booking.getUser() != null) {
+                        loyaltyPointsService.redeemPoints(booking.getUser().getId(), booking.getPointsUsed(), "Trừ điểm do kích hoạt lại booking " + booking.getBookingCode());
+                    }
+                }
+                // Transitioning TO Cancelled FROM Active
+                else if (oldStatus != StatusBooking.CANCELLED && request.getStatus() == StatusBooking.CANCELLED) {
                     List<Ticket> tickets = ticketRepository.findByBookingId(bookingId);
                     Showtime showtime = booking.getShowtime();
                     showtime.setAvailableSeats(showtime.getAvailableSeats() + tickets.size());
@@ -413,17 +444,7 @@ public class BookingService {
                     
                     // Refund points if any were used
                     if (booking.getPointsUsed() != null && booking.getPointsUsed() > 0 && booking.getUser() != null) {
-                        boolean pointsRefunded = loyaltyPointsService.refundPoints(
-                                booking.getUser().getId(),
-                                booking.getPointsUsed(),
-                                "Hoàn điểm do huỷ booking " + booking.getBookingCode()
-                        );
-                        if (pointsRefunded) {
-                            log.info("✅ Refunded {} points for cancelled booking {}", 
-                                    booking.getPointsUsed(), booking.getBookingCode());
-                        } else {
-                            log.warn("⚠️ Failed to refund points for booking {}", booking.getBookingCode());
-                        }
+                        loyaltyPointsService.refundPoints(booking.getUser().getId(), booking.getPointsUsed(), "Hoàn điểm do huỷ booking " + booking.getBookingCode());
                     }
                 }
                 

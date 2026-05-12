@@ -55,6 +55,11 @@
   max-width: 500px;
   margin-left: auto;
   margin-right: 20px;
+  position: relative;
+}
+
+/* Inner wrapper: holds the visual styling (bg, border, radius, overflow) */
+.search-input-wrapper {
   display: flex;
   background: rgba(255, 255, 255, 0.12);
   border-radius: 30px;
@@ -64,7 +69,13 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.search-bar:focus-within {
+.search-input-wrapper:focus-within {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 215, 0, 0.4);
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+}
+
+.search-bar:focus-within .search-input-wrapper {
   background: rgba(255, 255, 255, 0.18);
   border-color: rgba(255, 215, 0, 0.4);
   box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
@@ -175,24 +186,19 @@
   transform: none !important;
 }
 
-.user-button:hover {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 215, 0, 0.35);
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.15);
+.user-actions .user-btn.user-login {
+  background: var(--ui-btn-primary);
+  border: none;
   color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px var(--ui-btn-primary-shadow);
+  transition: filter 0.2s, box-shadow 0.2s, transform 0.15s;
 }
 
-.user-button::after {
-  display: none;
-}
-
-.user-button.menu-item:hover {
-  color: #fff;
-}
-
-.user-button svg {
-  color: rgba(255, 255, 255, 0.95);
-  flex-shrink: 0;
+.user-actions .user-btn.user-login:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 6px 18px var(--ui-btn-primary-shadow);
+  transform: translateY(-1px);
 }
 
 /* Tên user: ellipsis khi dài, co theo viewport */
@@ -205,13 +211,13 @@
 
 .user-points {
   flex-shrink: 0;
-  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%);
+  background: var(--ui-btn-primary);
   padding: 3px 8px;
   border-radius: 10px;
   font-size: 12px;
   font-weight: 600;
-  color: #f3f8ff;
-  box-shadow: 0 4px 12px rgba(73, 198, 243, 0.28);
+  color: #fff;
+  box-shadow: 0 4px 12px var(--ui-btn-primary-shadow);
 }
 
 .user-dropdown {
@@ -783,6 +789,9 @@
     max-width: 100%;
     margin: 0;
     min-width: 0;
+  }
+
+  .search-input-wrapper {
     border-radius: 20px;
   }
 
@@ -876,4 +885,132 @@
     width: 18px;
     height: 12px;
   }
+}
+
+/* Autocomplete Search Dropdown */
+.header-search {
+  position: relative;
+}
+
+.header-search-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #ffd700;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.search-dropdown-overlay {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 10px 0;
+}
+
+/* Custom Scrollbar for Dropdown */
+.search-dropdown-overlay::-webkit-scrollbar {
+  width: 6px;
+}
+.search-dropdown-overlay::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+.search-dropdown-overlay::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+.search-dropdown-overlay::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 215, 0, 0.5);
+}
+
+.search-category-group {
+  margin-bottom: 15px;
+}
+
+.search-category-group:last-child {
+  margin-bottom: 0;
+}
+
+.search-category-title {
+  padding: 5px 15px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #ffd700;
+  font-weight: 700;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  margin-bottom: 5px;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  gap: 12px;
+  text-decoration: none;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.search-result-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.search-item-img {
+  width: 40px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.search-item-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.search-item-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+}
+
+.search-item-info p {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.search-item-info strong {
+  color: #ffd700;
+}
+
+.search-no-results {
+  padding: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+  font-size: 14px;
 }

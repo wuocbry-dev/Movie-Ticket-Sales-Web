@@ -26,23 +26,32 @@ public class BookingController {
      * Get all bookings with pagination and optional status filter
      * GET /api/bookings?page=0&size=10&status=PENDING
      */
-    @GetMapping
-    public ResponseEntity<PagedBookingResponse> getAllBookings(
+    @GetMapping({"", "/admin/all"})
+    public ResponseEntity<ApiResponse<PagedBookingResponse>> getAllBookings(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) StatusBooking status) {
+            @RequestParam(required = false) StatusBooking status,
+            @RequestParam(required = false) String search) {
         try {
             PagedBookingResponse response;
             if (status != null) {
                 log.info("Getting bookings with status: {}, page: {}, size: {}", status, page, size);
                 response = bookingService.getBookingsByStatus(status, page, size);
             } else {
-                response = bookingService.getAllBookings(page, size);
+                response = bookingService.getAllBookings(page, size, search);
             }
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.<PagedBookingResponse>builder()
+                    .success(true)
+                    .message("Lấy danh sách thành công")
+                    .data(response)
+                    .build());
         } catch (Exception e) {
             log.error("Error getting all bookings", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.<PagedBookingResponse>builder()
+                            .success(false)
+                            .message(e.getMessage())
+                            .build());
         }
     }
     

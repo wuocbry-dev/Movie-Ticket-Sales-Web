@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Integer> {
     
@@ -29,4 +31,11 @@ public interface MovieRepository extends JpaRepository<Movie, Integer> {
            "(:status IS NULL OR m.status = :status)")
     Page<Movie> findMoviesWithFilters(@Param("status") MovieStatus status, 
                                      Pageable pageable);
+
+    @Query("SELECT m FROM Movie m WHERE LOWER(m.title) LIKE LOWER(CONCAT('%', :title, '%')) " +
+           "AND (m.isDeleted = false OR m.isDeleted IS NULL)")
+    List<Movie> searchByTitle(@Param("title") String title, Pageable pageable);
+
+    @Query("SELECT COUNT(m) FROM Movie m WHERE m.status = :status AND (m.isDeleted = false OR m.isDeleted IS NULL)")
+    Long countMoviesByStatus(@Param("status") MovieStatus status);
 }

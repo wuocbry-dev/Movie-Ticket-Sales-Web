@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from '../../utils/toast';
 import { FaFilm, FaBuilding, FaDoorOpen, FaCalendarAlt, FaWallet, FaCheck, FaUser, FaEnvelope, FaPhone } from 'react-icons/fa';
 import bookingService from '../../services/bookingService';
 import { loyaltyService } from '../../services/loyaltyService';
 import { calculateBookingPrice, formatPrice as formatCurrency } from '../../utils/priceCalculation';
+import seatService from '../../services/seatService';
 import ConcessionSelection from './ConcessionSelection';
 import './BookingConfirmation.css';
 
@@ -29,6 +30,8 @@ const BookingConfirmation = () => {
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
+
+  const isBookingCreated = useRef(false);
 
   const priceDetails = calculateBookingPrice(showtime?.basePrice || 0, selectedSeats?.length || 0);
   const grandTotal = Math.max(0, priceDetails.total + concessionData.total - pointsDiscount);
@@ -81,6 +84,21 @@ const BookingConfirmation = () => {
       toast.error('Thông tin đặt vé không hợp lệ');
       navigate('/');
     }
+
+    const handleBeforeUnload = () => {
+      if (!isBookingCreated.current && selectedSeats?.length > 0 && sessionId && showtime?.showtimeId) {
+        seatService.releaseSeatsBeacon(sessionId, parseInt(showtime.showtimeId), selectedSeats.map(s => s.seatId));
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      // Khi rời trang (Quay lại) mà chưa đặt vé, nhả ghế ngay lập tức
+      if (!isBookingCreated.current && selectedSeats?.length > 0 && sessionId && showtime?.showtimeId) {
+        seatService.releaseSeatsBeacon(sessionId, parseInt(showtime.showtimeId), selectedSeats.map(s => s.seatId));
+      }
+    };
   }, [userLoaded, navigate, selectedSeats, sessionId, showtime]);
 
   const formatDateTime = (dateString) => {
@@ -224,6 +242,10 @@ const BookingConfirmation = () => {
     }
     try {
       const response = await bookingService.createBooking(bookingData);
+      
+      // Đánh dấu đã tạo booking để không nhả ghế khi unmount
+      isBookingCreated.current = true;
+      
       generateVietQR(response.paymentReference || response.bookingCode);
       toast.success('Đặt vé thành công! Vui lòng quét mã QR để thanh toán 🎉');
       upsertBookingNotice({

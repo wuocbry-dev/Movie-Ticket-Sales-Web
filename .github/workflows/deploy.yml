@@ -1,0 +1,25 @@
+name: Deploy Movie Ticket Project
+
+on:
+  push:
+    branches: [ "main" ] # Hoặc branch bạn muốn tự động deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            cd ~/Movie-Ticket-Sales-Web-Project
+            git pull
+            docker-compose down
+            docker-compose up -d --build

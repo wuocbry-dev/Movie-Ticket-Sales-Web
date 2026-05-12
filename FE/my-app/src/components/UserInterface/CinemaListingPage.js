@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './CinemaListingPage.css';
 import { API_BASE_URL, API_ENDPOINTS } from '../../config/api';
+import { toast } from '../../utils/toast';
 
 const CinemaListingPage = () => {
   const navigate = useNavigate();
@@ -27,22 +28,53 @@ const CinemaListingPage = () => {
   /** Chuẩn hóa item từ API (CinemaDto) sang format dùng trong trang */
   const normalizeCinema = (c) => {
     if (!c) return null;
+
+    // facilities từ backend là object: { parking: true, "3D_support": true, ... }
+    const FACILITY_LABELS = {
+      parking: 'Bãi đậu xe',
+      '3D_support': '3D',
+      VIP_lounge: 'VIP Lounge',
+      '4DX_support': '4DX',
+      IMAX_support: 'IMAX',
+      wheelchairAccess: 'Xe lăn',
+    };
     const facilities = c.facilities;
-    const facilitiesList = Array.isArray(facilities)
-      ? facilities
-      : (facilities && typeof facilities === 'object' ? Object.keys(facilities) : []);
+    let facilitiesList = [];
+    if (Array.isArray(facilities)) {
+      facilitiesList = facilities;
+    } else if (facilities && typeof facilities === 'object') {
+      facilitiesList = Object.entries(facilities)
+        .filter(([, val]) => val === true)
+        .map(([key]) => FACILITY_LABELS[key] || key);
+    }
+
+    // Opening hours
+    const openingHours = c.openingHours;
+    let hoursText = '';
+    if (openingHours && typeof openingHours === 'object') {
+      const entries = Object.entries(openingHours);
+      if (entries.length > 0) hoursText = entries.map(([d, h]) => `${d}: ${h}`).join(' | ');
+    } else if (typeof openingHours === 'string') {
+      hoursText = openingHours;
+    }
+
     return {
       id: c.cinemaId ?? c.id,
-      name: c.cinemaName ?? c.name,
+      name: c.cinemaName ?? c.name ?? '',
       address: c.address ?? '',
+      city: c.city ?? '',
       district: c.district ?? c.city ?? 'Khác',
       phone: c.phoneNumber ?? c.phone ?? '',
-      image: c.image ?? 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800',
-      screens: c.screens,
+      email: c.email ?? '',
+      chainName: c.chainName ?? '',
+      image: c.image ?? null,
+      screens: c.screens ?? null,
       facilities: facilitiesList,
+      openingHours: hoursText,
       showtimes: c.showtimes ?? [],
-      rating: c.rating,
-      distance: c.distance
+      rating: c.rating ?? null,
+      distance: c.distance ?? null,
+      isActive: c.isActive ?? true,
     };
   };
 
@@ -56,104 +88,28 @@ const CinemaListingPage = () => {
       }
 
       const result = await response.json();
-      const rawList = result?.data?.data ?? result?.data ?? result;
+      // API trả về: { success, message, data: { content: [...], totalElements, ... } }
+      const rawList =
+        result?.data?.content ??
+        result?.data?.data ??
+        result?.data ??
+        result;
       const list = Array.isArray(rawList) ? rawList : [];
-      const normalized = list.map(normalizeCinema).filter(Boolean);
+      const normalized = list
+        .filter(c => c.isActive !== false)
+        .map(normalizeCinema)
+        .filter(Boolean);
       setCinemas(normalized);
       setFilteredCinemas(normalized);
+      setError(null);
     } catch (err) {
       setError(err.message);
       console.error('Error fetching cinemas:', err);
-      loadMockData();
     } finally {
       setLoading(false);
     }
   };
 
-  const loadMockData = () => {
-    const mockCinemas = [
-      {
-        id: 1,
-        name: 'CGV Vincom Center',
-        address: '72 Lê Thánh Tôn, Quận 1, TP.HCM',
-        district: 'Quận 1',
-        phone: '1900 6017',
-        image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800',
-        screens: 8,
-        facilities: ['IMAX', '4DX', 'Dolby Atmos', 'VIP Lounge'],
-        distance: '2.5 km',
-        rating: 4.5,
-        showtimes: ['10:00', '12:30', '15:00', '17:30', '20:00', '22:30']
-      },
-      {
-        id: 2,
-        name: 'Lotte Cinema Landmark 81',
-        address: '720A Điện Biên Phủ, Bình Thạnh, TP.HCM',
-        district: 'Bình Thạnh',
-        phone: '1900 5454 65',
-        image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=800',
-        screens: 10,
-        facilities: ['4K Laser', 'Premium Seats', 'Dolby Atmos'],
-        distance: '3.8 km',
-        rating: 4.7,
-        showtimes: ['09:30', '12:00', '14:30', '17:00', '19:30', '22:00']
-      },
-      {
-        id: 3,
-        name: 'Galaxy Cinema Nguyễn Du',
-        address: '116 Nguyễn Du, Quận 1, TP.HCM',
-        district: 'Quận 1',
-        phone: '1900 2224',
-        image: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800',
-        screens: 6,
-        facilities: ['Premium', 'Standard', 'Couple Seats'],
-        distance: '1.8 km',
-        rating: 4.3,
-        showtimes: ['10:30', '13:00', '15:30', '18:00', '20:30']
-      },
-      {
-        id: 4,
-        name: 'BHD Star Cineplex',
-        address: '3/2 Street, Quận 10, TP.HCM',
-        district: 'Quận 10',
-        phone: '1900 2099',
-        image: 'https://images.unsplash.com/photo-1595769816263-9b910be24d5f?w=800',
-        screens: 7,
-        facilities: ['Gold Class', 'Dolby Atmos', 'IMAX'],
-        distance: '4.2 km',
-        rating: 4.6,
-        showtimes: ['11:00', '13:30', '16:00', '18:30', '21:00']
-      },
-      {
-        id: 5,
-        name: 'Platinum Cineplex',
-        address: 'Tân Bình, TP.HCM',
-        district: 'Tân Bình',
-        phone: '1800 1234',
-        image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800',
-        screens: 5,
-        facilities: ['Standard', 'VIP'],
-        distance: '5.5 km',
-        rating: 4.2,
-        showtimes: ['10:00', '14:00', '17:00', '20:00']
-      },
-      {
-        id: 6,
-        name: 'MegaStar Cineplex',
-        address: 'Quận 7, TP.HCM',
-        district: 'Quận 7',
-        phone: '028 5413 1881',
-        image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=800',
-        screens: 9,
-        facilities: ['4DX', 'ScreenX', 'Premium'],
-        distance: '6.8 km',
-        rating: 4.4,
-        showtimes: ['09:00', '11:30', '14:00', '16:30', '19:00', '21:30']
-      }
-    ];
-    setCinemas(mockCinemas);
-    setFilteredCinemas(mockCinemas);
-  };
 
   const filterCinemas = () => {
     const list = Array.isArray(cinemas) ? cinemas : [];
@@ -176,13 +132,11 @@ const CinemaListingPage = () => {
 
   const handleCinemaSelect = (cinema) => {
     if (selectedMovie) {
-      // If coming from movie detail, go to showtime selection
-      navigate(`/movie/${selectedMovie.id}/showtimes`, {
-        state: { movie: selectedMovie, cinema: cinema }
-      });
+      // If coming from movie detail, go back to movie detail
+      navigate(`/movie/${selectedMovie.id}`);
     } else {
-      // Otherwise, show cinema details or movies at this cinema
-      navigate(`/cinema/${cinema.id}`);
+      // Show toast because Cinema Detail page is not implemented yet
+      toast.info('Trang chi tiết rạp đang được phát triển. Vui lòng chọn phim để đặt vé!');
     }
   };
 
@@ -269,13 +223,27 @@ const CinemaListingPage = () => {
           {filteredCinemas.map(cinema => (
             <div key={cinema.id} className="cinema-card" onClick={() => handleCinemaSelect(cinema)}>
               <div className="cinema-image">
-                <img src={cinema.image} alt={cinema.name} />
+                {cinema.image ? (
+                  <img
+                    src={cinema.image}
+                    alt={cinema.name}
+                    onError={e => { e.target.style.display = 'none'; e.target.nextSibling?.classList.remove('hidden'); }}
+                  />
+                ) : (
+                  <div className="cinema-image-placeholder">
+                    <i className="fas fa-film"></i>
+                    <span>{cinema.chainName || 'Cinema'}</span>
+                  </div>
+                )}
                 <div className="cinema-overlay">
                   <button className="select-btn">
                     <i className="fas fa-ticket-alt"></i>
                     Chọn Rạp
                   </button>
                 </div>
+                {cinema.chainName && (
+                  <div className="cinema-chain-badge">{cinema.chainName}</div>
+                )}
                 {cinema.distance && (
                   <div className="distance-badge">
                     <i className="fas fa-location-arrow"></i>
@@ -287,25 +255,36 @@ const CinemaListingPage = () => {
               <div className="cinema-content">
                 <div className="cinema-header">
                   <h3>{cinema.name}</h3>
-                  <div className="rating">
-                    <i className="fas fa-star"></i>
-                    <span>{cinema.rating}</span>
-                  </div>
+                  {cinema.rating && (
+                    <div className="rating">
+                      <i className="fas fa-star"></i>
+                      <span>{cinema.rating}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="cinema-info">
                   <div className="info-item">
                     <i className="fas fa-map-marker-alt"></i>
-                    <span>{cinema.address}</span>
+                    <span>{cinema.address}{cinema.city ? `, ${cinema.city}` : ''}</span>
                   </div>
-                  <div className="info-item">
-                    <i className="fas fa-phone"></i>
-                    <span>{cinema.phone}</span>
-                  </div>
-                  <div className="info-item">
-                    <i className="fas fa-door-open"></i>
-                    <span>{cinema.screens} phòng chiếu</span>
-                  </div>
+                  {cinema.phone && (
+                    <div className="info-item">
+                      <i className="fas fa-phone"></i>
+                      <span>{cinema.phone}</span>
+                    </div>
+                  )}
+                  {cinema.openingHours ? (
+                    <div className="info-item">
+                      <i className="fas fa-clock"></i>
+                      <span>{cinema.openingHours.split(' | ')[0]}</span>
+                    </div>
+                  ) : cinema.screens ? (
+                    <div className="info-item">
+                      <i className="fas fa-door-open"></i>
+                      <span>{cinema.screens} phòng chiếu</span>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="facilities">

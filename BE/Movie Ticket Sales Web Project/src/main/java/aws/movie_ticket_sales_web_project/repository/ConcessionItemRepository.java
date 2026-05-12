@@ -71,6 +71,12 @@ public interface ConcessionItemRepository extends JpaRepository<ConcessionItem, 
            "ORDER BY ci.itemName")
     List<ConcessionItem> searchByName(@Param("keyword") String keyword);
 
+    @Query("SELECT ci FROM ConcessionItem ci " +
+           "WHERE LOWER(ci.itemName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "AND ci.isAvailable = true " +
+           "ORDER BY ci.itemName")
+    List<ConcessionItem> searchByNameWithPagination(@Param("keyword") String keyword, org.springframework.data.domain.Pageable pageable);
+
     /**
      * Kiểm tra tên item đã tồn tại chưa
      */

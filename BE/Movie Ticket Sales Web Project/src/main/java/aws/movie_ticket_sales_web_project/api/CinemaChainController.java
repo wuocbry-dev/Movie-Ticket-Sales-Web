@@ -46,11 +46,8 @@ public class CinemaChainController {
 
         ApiResponse<PagedCinemaChainResponse> response = cinemaChainService.getAllCinemaChains(page, size, search, null);
 
-        if (response.getSuccess()) {
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
+        // Luôn trả 200 cho public endpoint — dữ liệu trống vẫn là response hợp lệ
+        return ResponseEntity.ok(response);
     }
 
     /**

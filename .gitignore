@@ -84,4 +84,5 @@ build/
 .vscode/
 
 # Sensitive configurations
-src/main/resources/application-local.properties
+**/application-secret.properties
+**/application-local.properties

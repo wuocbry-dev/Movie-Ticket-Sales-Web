@@ -434,8 +434,8 @@
   --qb-border-strong: rgba(96, 165, 250, 0.5);
   --qb-text: #f6f9ff;
   --qb-muted: rgba(205, 223, 255, 0.72);
-  --qb-accent-a: #8b6cff;
-  --qb-accent-b: #45c5f3;
+  --qb-accent-a: #f0b429;
+  --qb-accent-b: #e69c10;
 }
 
 .quick-booking-overlay {

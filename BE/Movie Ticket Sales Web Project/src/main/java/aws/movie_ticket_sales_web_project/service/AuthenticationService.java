@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +36,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final TokenBlacklistService tokenBlacklistService;
 
     /**
      * Register a new user
@@ -195,24 +197,16 @@ public class AuthenticationService {
             String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail(), user.getId());
             String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail(), user.getId());
 
-            // Get user roles
-            List<UserRole> userRoles = userRoleRepository.findByUserId(user.getId());
-            List<String> roleNames = userRoles.stream()
-                    .map(userRole -> userRole.getRole().getRoleName())
-                    .collect(Collectors.toList());
+            try {
+                tokenBlacklistService.storeRefreshToken(
+                        user.getId(),
+                        refreshToken,
+                        jwtTokenProvider.getRefreshTokenExpirationTime());
+            } catch (Exception ex) {
+                log.warn("Unable to persist refresh token for user {}", user.getId(), ex);
+            }
 
-            // Get membership info
-            Membership membership = membershipRepository.findByUserId(user.getId())
-                    .orElse(null);
-
-            // Build response
-            UserInfo userInfo = new UserInfo();
-            userInfo.setUserId(user.getId());
-            userInfo.setEmail(user.getEmail());
-            userInfo.setFullName(user.getFullName());
-            userInfo.setMembershipTier(membership != null ? membership.getTier().getTierName() : null);
-            userInfo.setAvailablePoints(membership != null ? membership.getAvailablePoints() : 0);
-            userInfo.setRoles(roleNames);
+            UserInfo userInfo = buildUserInfo(user);
 
             LoginResponse loginResponse = new LoginResponse();
             loginResponse.setAccessToken(accessToken);
@@ -246,5 +240,107 @@ public class AuthenticationService {
                     .message("Login failed: " + e.getMessage())
                     .build();
         }
+    }
+
+    /**
+     * Refresh access token using refresh token
+     */
+    @Transactional(readOnly = true)
+    public ApiResponse<LoginResponse> refreshAccessToken(RefreshTokenRequest request) {
+        try {
+            if (request == null || request.getRefreshToken() == null || request.getRefreshToken().isBlank()) {
+                return ApiResponse.<LoginResponse>builder()
+                        .success(false)
+                        .message("Refresh token is required")
+                        .build();
+            }
+
+            String refreshToken = request.getRefreshToken();
+            if (!jwtTokenProvider.validateToken(refreshToken)) {
+                return ApiResponse.<LoginResponse>builder()
+                        .success(false)
+                        .message("Invalid or expired refresh token")
+                        .build();
+            }
+
+            Integer userId = jwtTokenProvider.getUserIdFromToken(refreshToken);
+            if (userId == null) {
+                return ApiResponse.<LoginResponse>builder()
+                        .success(false)
+                        .message("Invalid refresh token payload")
+                        .build();
+            }
+
+            String storedRefreshToken = tokenBlacklistService.getRefreshToken(userId);
+            if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
+                return ApiResponse.<LoginResponse>builder()
+                        .success(false)
+                        .message("Refresh token does not match active session")
+                        .build();
+            }
+
+            Optional<User> userOpt = userRepository.findById(userId);
+            if (userOpt.isEmpty()) {
+                return ApiResponse.<LoginResponse>builder()
+                        .success(false)
+                        .message("User not found")
+                        .build();
+            }
+
+            User user = userOpt.get();
+            if (user.getIsActive() != null && !user.getIsActive()) {
+                return ApiResponse.<LoginResponse>builder()
+                        .success(false)
+                        .message("Account is deactivated")
+                        .build();
+            }
+
+            String newAccessToken = jwtTokenProvider.generateAccessToken(user.getEmail(), user.getId());
+            String newRefreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail(), user.getId());
+
+            tokenBlacklistService.storeRefreshToken(
+                    user.getId(),
+                    newRefreshToken,
+                    jwtTokenProvider.getRefreshTokenExpirationTime());
+
+            LoginResponse response = new LoginResponse();
+            response.setAccessToken(newAccessToken);
+            response.setRefreshToken(newRefreshToken);
+            response.setExpiresIn(jwtTokenProvider.getTokenExpirationTime() / 1000);
+            response.setUser(buildUserInfo(user));
+
+            return ApiResponse.<LoginResponse>builder()
+                    .success(true)
+                    .message("Token refreshed successfully")
+                    .data(response)
+                    .build();
+
+        } catch (Exception e) {
+            log.error("Error refreshing access token", e);
+            return ApiResponse.<LoginResponse>builder()
+                    .success(false)
+                    .message("Refresh token failed: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    private UserInfo buildUserInfo(User user) {
+        List<UserRole> userRoles = userRoleRepository.findByUserId(user.getId());
+        List<String> roleNames = userRoles.stream()
+                .map(userRole -> userRole.getRole().getRoleName())
+                .collect(Collectors.toList());
+
+        Membership membership = membershipRepository.findByUserId(user.getId())
+                .orElse(null);
+
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserId(user.getId());
+        userInfo.setEmail(user.getEmail());
+        userInfo.setFullName(user.getFullName());
+        userInfo.setMembershipTier(membership != null ? membership.getTier().getTierName() : null);
+        userInfo.setAvailablePoints(membership != null ? membership.getAvailablePoints() : 0);
+        userInfo.setRoles(roleNames);
+
+        return userInfo;
     }
 }

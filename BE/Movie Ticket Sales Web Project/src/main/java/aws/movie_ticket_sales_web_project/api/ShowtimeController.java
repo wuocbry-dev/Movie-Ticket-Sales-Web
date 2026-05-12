@@ -38,7 +38,7 @@ public class ShowtimeController {
      * Get all showtimes with pagination (public)
      * GET /api/showtimes
      */
-    @GetMapping
+    @GetMapping({"", "/admin/all"})
     public ResponseEntity<ApiResponse<PagedShowtimeResponse>> getAllShowtimes(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {

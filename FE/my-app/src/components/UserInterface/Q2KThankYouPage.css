@@ -118,7 +118,7 @@
 }
 
 .q2kty__btn--primary {
-  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%) !important;
+  background: var(--ui-btn-primary) !important;
   border: 1px solid rgba(137, 180, 255, 0.45) !important;
   color: #f3f8ff !important;
   box-shadow: 0 14px 34px rgba(73, 198, 243, 0.26) !important;

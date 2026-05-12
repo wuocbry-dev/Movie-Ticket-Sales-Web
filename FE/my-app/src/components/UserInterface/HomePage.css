@@ -120,10 +120,10 @@
   transform: translateY(-50%);
   width: 48px;
   height: 48px;
-  border: none;
+  border: none !important;
   border-radius: 50%;
-  background: transparent;
-  color: #fff;
+  background: transparent !important;
+  color: #fff !important;
   font-size: 1.35rem;
   cursor: pointer;
   z-index: 10;
@@ -132,12 +132,20 @@
   align-items: center;
   justify-content: center;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.65));
+  box-shadow: none !important;
 }
 
 .hp__hero-arrow:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fff !important;
   transform: translateY(-50%) scale(1.08);
+  box-shadow: none !important;
+}
+
+.hp__hero-arrow:active {
+  background: rgba(255, 255, 255, 0.22) !important;
+  transform: translateY(-50%) scale(0.92);
+  box-shadow: none !important;
 }
 
 .hp__hero-arrow--left {
@@ -208,23 +216,23 @@
 
 .hp__see-more {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%);
-  border: 1px solid rgba(137, 180, 255, 0.45);
+  background: var(--ui-btn-primary);
+  border: 1px solid rgba(240, 180, 41, 0.45);
   border-radius: var(--hp-radius-sm);
-  color: #f3f8ff;
+  color: #fff;
   font-size: 0.875rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 8px 18px rgba(73, 198, 243, 0.28);
+  box-shadow: 0 8px 18px var(--ui-btn-primary-shadow);
   transition: background 0.2s, border-color 0.2s, color 0.2s, filter 0.2s, box-shadow 0.2s;
 }
 
 .hp__see-more:hover {
-  background: linear-gradient(135deg, #8a70ff 0%, #5bd1fa 100%);
-  border-color: rgba(160, 208, 255, 0.52);
-  color: #f6fbff;
+  background: var(--ui-btn-primary-hover);
+  border-color: rgba(240, 180, 41, 0.6);
+  color: #fff;
   filter: brightness(1.03);
-  box-shadow: 0 10px 22px rgba(91, 209, 250, 0.34);
+  box-shadow: 0 10px 22px var(--ui-btn-primary-shadow);
 }
 
 .hp__grid {
@@ -379,21 +387,21 @@
 .hp__play {
   width: 39px;
   height: 39px;
-  background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%);
-  color: #f3f8ff;
+  background: var(--ui-btn-primary);
+  color: #fff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
-  box-shadow: 0 8px 18px rgba(73, 198, 243, 0.32);
+  box-shadow: 0 8px 18px var(--ui-btn-primary-shadow);
   transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
 }
 
 .hp__card:hover .hp__play {
   transform: scale(1.08);
   filter: brightness(1.05);
-  box-shadow: 0 10px 22px rgba(91, 209, 250, 0.4);
+  box-shadow: 0 10px 22px var(--ui-btn-primary-shadow);
 }
 
 .hp__card-body {
@@ -687,10 +695,10 @@
   transform: translateY(-50%);
   width: 40px;
   height: 40px;
-  border: none;
+  border: none !important;
   border-radius: 50%;
-  background: transparent;
-  color: #fff;
+  background: transparent !important;
+  color: #fff !important;
   font-size: 1.1rem;
   cursor: pointer;
   z-index: 10;
@@ -699,12 +707,20 @@
   align-items: center;
   justify-content: center;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.65));
+  box-shadow: none !important;
 }
 
 .hp__promo-arrow:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fff !important;
   transform: translateY(-50%) scale(1.08);
+  box-shadow: none !important;
+}
+
+.hp__promo-arrow:active {
+  background: rgba(255, 255, 255, 0.22) !important;
+  transform: translateY(-50%) scale(0.92);
+  box-shadow: none !important;
 }
 
 .hp__promo-arrow--left {
@@ -1285,15 +1301,17 @@
     width: 44px;
     height: 44px;
     font-size: 1.05rem;
-    background: transparent;
-    color: #fff;
+    background: transparent !important;
+    color: #fff !important;
     backdrop-filter: none;
     filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.7));
+    box-shadow: none !important;
   }
 
   .hp__hero-arrow:hover {
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #fff !important;
+    box-shadow: none !important;
   }
 
   /* Dots banner: nhỏ gọn, căn giữa trên mobile */
@@ -1553,10 +1571,10 @@
     flex-shrink: 0;
     width: 100%;
     padding: 10px 12px;
-    background: linear-gradient(135deg, #7b5cff 0%, #49c6f3 100%);
-    border: 1px solid rgba(137, 180, 255, 0.45);
+    background: var(--ui-btn-primary);
+    border: none;
     border-radius: 8px;
-    color: #f3f8ff;
+    color: #fff;
     font-size: 0.8rem;
     font-weight: 700;
     cursor: pointer;
@@ -1565,7 +1583,7 @@
     justify-content: center;
     gap: 6px;
     min-height: 40px;
-    box-shadow: 0 8px 18px rgba(73, 198, 243, 0.28);
+    box-shadow: 0 8px 18px var(--ui-btn-primary-shadow);
     transition: background 0.2s, transform 0.1s, filter 0.2s, box-shadow 0.2s;
   }
 
@@ -1693,6 +1711,8 @@
     width: 36px;
     height: 36px;
     font-size: 0.9rem;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 
   .hp__promo-arrow--left {

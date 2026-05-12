@@ -10,6 +10,8 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.security.access.AccessDeniedException;
+
 /**
  * Global exception handler to return proper JSON error responses
  */
@@ -17,15 +19,28 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException ex) {
+        log.error("AccessDeniedException: {}", ex.getMessage());
+        
+        Map<String, Object> error = new HashMap<>();
+        error.put("timestamp", Instant.now().toString());
+        error.put("status", HttpStatus.FORBIDDEN.value());
+        error.put("error", "Forbidden");
+        error.put("message", "Bạn không có quyền truy cập chức năng này");
+        
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
-        log.error("RuntimeException: {}", ex.getMessage());
+        log.error("RuntimeException: ", ex);
         
         Map<String, Object> error = new HashMap<>();
         error.put("timestamp", Instant.now().toString());
         error.put("status", HttpStatus.BAD_REQUEST.value());
         error.put("error", "Bad Request");
-        error.put("message", ex.getMessage());
+        error.put("message", ex.getClass().getName() + ": " + ex.getMessage());
         
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }

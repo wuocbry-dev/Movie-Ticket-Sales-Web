@@ -48,10 +48,10 @@ const Footer = () => {
         <div className="footer-section">
           <h3 className="footer-title">Hỗ Trợ</h3>
           <ul className="footer-links">
-            <li><Link to="/">Hướng Dẫn Đặt Vé</Link></li>
-            <li><Link to="/">Câu Hỏi Thường Gặp</Link></li>
-            <li><Link to="/">Điều Khoản Sử Dụng</Link></li>
-            <li><Link to="/">Chính Sách Bảo Mật</Link></li>
+            <li><Link to="/huong-dan-dat-ve">Hướng Dẫn Đặt Vé</Link></li>
+            <li><Link to="/cau-hoi-thuong-gap">Câu Hỏi Thường Gặp</Link></li>
+            <li><Link to="/dieu-khoan-su-dung">Điều Khoản Sử Dụng</Link></li>
+            <li><Link to="/chinh-sach-bao-mat">Chính Sách Bảo Mật</Link></li>
           </ul>
         </div>
 
