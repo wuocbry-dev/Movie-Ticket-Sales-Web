@@ -63,10 +63,13 @@ const StaffPaymentManager = () => {
       }
 
       const data = await response.json();
-      const list = Array.isArray(data.data) ? data.data : [];
+      const responseData = data.data;
+      const list = responseData && Array.isArray(responseData.data) 
+        ? responseData.data 
+        : (Array.isArray(responseData) ? responseData : []);
       setBookings(list);
-      setTotalPages(data.totalPages ?? 0);
-      setTotalElements(Number(data.totalElements ?? 0));
+      setTotalPages(responseData?.totalPages ?? data.totalPages ?? 0);
+      setTotalElements(Number(responseData?.totalElements ?? data.totalElements ?? 0));
     } catch {
       toast.error('Không thể tải danh sách booking');
       setBookings([]);

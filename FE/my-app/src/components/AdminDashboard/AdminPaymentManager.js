@@ -62,8 +62,13 @@ const AdminPaymentManager = () => {
         },
       });
 
-      if (response.data.data && Array.isArray(response.data.data)) {
-        setBookings(response.data.data);
+      const responseData = response.data.data;
+      if (responseData && Array.isArray(responseData.data)) {
+        setBookings(responseData.data);
+        setTotalPages(responseData.totalPages ?? 0);
+        setTotalElements(responseData.totalElements ?? 0);
+      } else if (responseData && Array.isArray(responseData)) {
+        setBookings(responseData);
         setTotalPages(response.data.totalPages ?? 0);
         setTotalElements(response.data.totalElements ?? 0);
       } else {
@@ -151,198 +156,198 @@ const AdminPaymentManager = () => {
 
   return (
     <>
-    <section className="adm-pay">
-      <header className="adm-pay__head">
-        <div>
-          <p className="adm-pay__eyebrow">Thanh toán</p>
-          <h1 className="adm-pay__h1">Quản lý thanh toán</h1>
-          <p className="adm-pay__lead">
-            Xác nhận thanh toán cho các booking đang ở trạng thái chờ xử lý.
-          </p>
-        </div>
-        <dl className="adm-pay__kpis">
-          <div className="adm-pay__kpi">
-            <dt className="adm-pay__kpi-label">Chờ thanh toán</dt>
-            <dd className="adm-pay__kpi-value">{totalElements}</dd>
+      <section className="adm-pay">
+        <header className="adm-pay__head">
+          <div>
+            <p className="adm-pay__eyebrow">Thanh toán</p>
+            <h1 className="adm-pay__h1">Quản lý thanh toán</h1>
+            <p className="adm-pay__lead">
+              Xác nhận thanh toán cho các booking đang ở trạng thái chờ xử lý.
+            </p>
           </div>
-          <div className="adm-pay__kpi adm-pay__kpi--warn">
-            <dt className="adm-pay__kpi-label">Đang xử lý</dt>
-            <dd className="adm-pay__kpi-value">{processingBookingId ? 1 : 0}</dd>
-          </div>
-        </dl>
-      </header>
+          <dl className="adm-pay__kpis">
+            <div className="adm-pay__kpi">
+              <dt className="adm-pay__kpi-label">Chờ thanh toán</dt>
+              <dd className="adm-pay__kpi-value">{totalElements}</dd>
+            </div>
+            <div className="adm-pay__kpi adm-pay__kpi--warn">
+              <dt className="adm-pay__kpi-label">Đang xử lý</dt>
+              <dd className="adm-pay__kpi-value">{processingBookingId ? 1 : 0}</dd>
+            </div>
+          </dl>
+        </header>
 
-      {bookings.length === 0 ? (
-        <div className="adm-pay__empty" role="status">
-          <div className="adm-pay__empty-icon" aria-hidden>
-            <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M9 11l3 3L22 4"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <path
-                d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-            </svg>
+        {bookings.length === 0 ? (
+          <div className="adm-pay__empty" role="status">
+            <div className="adm-pay__empty-icon" aria-hidden>
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M9 11l3 3L22 4"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+              </svg>
+            </div>
+            <h2 className="adm-pay__empty-title">Không có booking chờ thanh toán</h2>
+            <p className="adm-pay__empty-desc">Tất cả đơn đã xử lý hoặc chưa có dữ liệu.</p>
           </div>
-          <h2 className="adm-pay__empty-title">Không có booking chờ thanh toán</h2>
-          <p className="adm-pay__empty-desc">Tất cả đơn đã xử lý hoặc chưa có dữ liệu.</p>
-        </div>
-      ) : (
-        <>
-          <div className="adm-pay__scroll">
-            <table className="adm-pay__table">
-              <caption className="adm-pay__caption">
-                Danh sách booking chờ thanh toán
-              </caption>
-              <thead>
-                <tr>
-                  <th scope="col">Mã</th>
-                  <th scope="col">Phim &amp; rạp</th>
-                  <th scope="col">Khách</th>
-                  <th scope="col">Suất</th>
-                  <th scope="col">Ghế</th>
-                  <th scope="col">Tổng tiền</th>
-                  <th scope="col">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.map((booking) => (
-                  <tr key={booking.bookingId}>
-                    <td>
-                      <div className="adm-pay__cell-stack">
-                        <span className="adm-pay__code">{booking.bookingCode}</span>
-                        <span className="adm-pay__pill">Chờ TT</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="adm-pay__cell-stack">
-                        <span className="adm-pay__strong">{booking.movieTitle}</span>
-                        <span className="adm-pay__muted">{booking.cinemaName}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="adm-pay__cell-stack">
-                        <span className="adm-pay__strong">{booking.customerName || 'Guest'}</span>
-                        <span className="adm-pay__muted">{booking.customerEmail || '—'}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="adm-pay__cell-stack">
-                        <span className="adm-pay__strong">
-                          {booking.showDate && booking.startTime
-                            ? `${new Date(booking.showDate).toLocaleDateString('vi-VN')} · ${booking.startTime}`
-                            : '—'}
-                        </span>
-                        <span className="adm-pay__muted">Đặt: {formatDateTime(booking.bookingDate)}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span className="adm-pay__seat">{booking.totalSeats} ghế</span>
-                    </td>
-                    <td>
-                      <span className="adm-pay__money">{formatCurrency(booking.totalAmount)}</span>
-                    </td>
-                    <td>
+        ) : (
+          <>
+            <div className="adm-pay__scroll">
+              <table className="adm-pay__table">
+                <caption className="adm-pay__caption">
+                  Danh sách booking chờ thanh toán
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Mã</th>
+                    <th scope="col">Phim &amp; rạp</th>
+                    <th scope="col">Khách</th>
+                    <th scope="col">Suất</th>
+                    <th scope="col">Ghế</th>
+                    <th scope="col">Tổng tiền</th>
+                    <th scope="col">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bookings.map((booking) => (
+                    <tr key={booking.bookingId}>
+                      <td>
+                        <div className="adm-pay__cell-stack">
+                          <span className="adm-pay__code">{booking.bookingCode}</span>
+                          <span className="adm-pay__pill">Chờ TT</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="adm-pay__cell-stack">
+                          <span className="adm-pay__strong">{booking.movieTitle}</span>
+                          <span className="adm-pay__muted">{booking.cinemaName}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="adm-pay__cell-stack">
+                          <span className="adm-pay__strong">{booking.customerName || 'Guest'}</span>
+                          <span className="adm-pay__muted">{booking.customerEmail || '—'}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="adm-pay__cell-stack">
+                          <span className="adm-pay__strong">
+                            {booking.showDate && booking.startTime
+                              ? `${new Date(booking.showDate).toLocaleDateString('vi-VN')} · ${booking.startTime}`
+                              : '—'}
+                          </span>
+                          <span className="adm-pay__muted">Đặt: {formatDateTime(booking.bookingDate)}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="adm-pay__seat">{booking.totalSeats} ghế</span>
+                      </td>
+                      <td>
+                        <span className="adm-pay__money">{formatCurrency(booking.totalAmount)}</span>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="adm-pay__confirm"
+                          onClick={() => handleConfirmPayment(booking.bookingId)}
+                          disabled={processingBookingId === booking.bookingId}
+                        >
+                          {processingBookingId === booking.bookingId ? (
+                            <>
+                              <span className="adm-pay__confirm-spin" aria-hidden />
+                              Đang xử lý
+                            </>
+                          ) : (
+                            <>
+                              <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                aria-hidden
+                              >
+                                <path d="M20 6L9 17l-5-5" strokeWidth="2" strokeLinecap="round" />
+                              </svg>
+                              Xác nhận
+                            </>
+                          )}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {totalPages > 1 && (
+              <nav className="adm-pay__nav" aria-label="Phân trang">
+                <button
+                  type="button"
+                  className="adm-pay__nav-btn"
+                  onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                  disabled={currentPage === 0}
+                >
+                  Trước
+                </button>
+
+                <div className="adm-pay__nav-pages">
+                  {pageList.map((item, idx) =>
+                    item === 'gap' ? (
+                      <span key={`g-${idx}`} className="adm-pay__nav-gap" aria-hidden>
+                        …
+                      </span>
+                    ) : (
                       <button
                         type="button"
-                        className="adm-pay__confirm"
-                        onClick={() => handleConfirmPayment(booking.bookingId)}
-                        disabled={processingBookingId === booking.bookingId}
+                        key={item}
+                        className={`adm-pay__nav-page ${currentPage === item ? 'is-current' : ''}`}
+                        onClick={() => setCurrentPage(item)}
                       >
-                        {processingBookingId === booking.bookingId ? (
-                          <>
-                            <span className="adm-pay__confirm-spin" aria-hidden />
-                            Đang xử lý
-                          </>
-                        ) : (
-                          <>
-                            <svg
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              aria-hidden
-                            >
-                              <path d="M20 6L9 17l-5-5" strokeWidth="2" strokeLinecap="round" />
-                            </svg>
-                            Xác nhận
-                          </>
-                        )}
+                        {item + 1}
                       </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    )
+                  )}
+                </div>
 
-          {totalPages > 1 && (
-            <nav className="adm-pay__nav" aria-label="Phân trang">
-              <button
-                type="button"
-                className="adm-pay__nav-btn"
-                onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
-                disabled={currentPage === 0}
-              >
-                Trước
-              </button>
-
-              <div className="adm-pay__nav-pages">
-                {pageList.map((item, idx) =>
-                  item === 'gap' ? (
-                    <span key={`g-${idx}`} className="adm-pay__nav-gap" aria-hidden>
-                      …
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      key={item}
-                      className={`adm-pay__nav-page ${currentPage === item ? 'is-current' : ''}`}
-                      onClick={() => setCurrentPage(item)}
-                    >
-                      {item + 1}
-                    </button>
-                  )
-                )}
-              </div>
-
-              <button
-                type="button"
-                className="adm-pay__nav-btn"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
-                disabled={currentPage >= totalPages - 1}
-              >
-                Sau
-              </button>
-
-              <label className="adm-pay__nav-jump">
-                <span className="adm-pay__nav-jump-label">Đến trang</span>
-                <select
-                  className="adm-pay__nav-select"
-                  value={currentPage}
-                  onChange={(e) => setCurrentPage(Number(e.target.value))}
-                  aria-label="Chọn trang"
+                <button
+                  type="button"
+                  className="adm-pay__nav-btn"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
+                  disabled={currentPage >= totalPages - 1}
                 >
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <option key={i} value={i}>
-                      {i + 1}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </nav>
-          )}
-        </>
-      )}
-    </section>
+                  Sau
+                </button>
 
-    <ConfirmDialog {...confirmProps} />
+                <label className="adm-pay__nav-jump">
+                  <span className="adm-pay__nav-jump-label">Đến trang</span>
+                  <select
+                    className="adm-pay__nav-select"
+                    value={currentPage}
+                    onChange={(e) => setCurrentPage(Number(e.target.value))}
+                    aria-label="Chọn trang"
+                  >
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <option key={i} value={i}>
+                        {i + 1}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </nav>
+            )}
+          </>
+        )}
+      </section>
+
+      <ConfirmDialog {...confirmProps} />
     </>
   );
 };
