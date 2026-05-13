@@ -9,6 +9,7 @@ import aws.movie_ticket_sales_web_project.enums.SeatType;
 import aws.movie_ticket_sales_web_project.repository.CinemaHallRepository;
 import aws.movie_ticket_sales_web_project.repository.CinemaRepository;
 import aws.movie_ticket_sales_web_project.repository.SeatRepository;
+import aws.movie_ticket_sales_web_project.repository.TicketRepository;
 import aws.movie_ticket_sales_web_project.repository.UserRoleRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,7 @@ public class CinemaHallService {
     private final CinemaRepository cinemaRepository;
     private final UserRoleRepository userRoleRepository;
     private final SeatRepository seatRepository;
+    private final TicketRepository ticketRepository;
 
     /**
      * Check if user has SYSTEM_ADMIN or ADMIN role
@@ -500,6 +502,20 @@ public class CinemaHallService {
             
             // Regenerate seats if needed
             if (needRegenerateSeats) {
+                // Check if there are tickets referencing seats in this hall
+                boolean hasTickets = ticketRepository.existsBySeatHallId(updatedHall.getId());
+                if (hasTickets) {
+                    log.warn("Cannot regenerate seats for hall {} because existing tickets reference them. " +
+                             "Metadata updated but seats kept unchanged.", updatedHall.getId());
+                    // Still return success — metadata IS updated
+                    return ApiResponse.<CinemaHallDto>builder()
+                            .success(true)
+                            .message("Cập nhật thông tin phòng chiếu thành công. " +
+                                     "Lưu ý: Không thể tạo lại ghế vì đang có vé liên kết. " +
+                                     "Hãy xóa vé cũ trước nếu muốn thay đổi cấu hình ghế.")
+                            .data(convertToCinemaHallDto(updatedHall))
+                            .build();
+                }
                 try {
                     log.info("Regenerating seats for hall ID: {} due to configuration changes", updatedHall.getId());
                     // Delete existing seats
@@ -508,7 +524,6 @@ public class CinemaHallService {
                     generateSeatsForHall(updatedHall);
                 } catch (Exception seatException) {
                     log.error("Error regenerating seats for hall {}, but hall was updated", updatedHall.getId(), seatException);
-                    // Hall is still updated, just seats regeneration failed
                 }
             }
 

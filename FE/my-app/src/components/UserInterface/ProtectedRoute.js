@@ -3,7 +3,6 @@ import { Navigate } from 'react-router-dom';
 import { toast } from '../../utils/toast';
 import Cookies from 'js-cookie';
 import { hasAnyRole, getDashboardPath } from '../../utils/roleUtils';
-import { TOAST_IDS } from '../../utils/toastIds';
 
 /**
  * ProtectedRoute component - Bảo vệ route theo role
@@ -25,7 +24,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   if (!userStr) {
     if (!shownRef.current.login) {
       shownRef.current.login = true;
-      toast.error('Vui lòng đăng nhập để tiếp tục', { toastId: TOAST_IDS.AUTH_LOGIN_REQUIRED });
+      toast.error('Vui lòng đăng nhập để tiếp tục');
     }
     return <Navigate to="/login" replace />;
   }
@@ -35,9 +34,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     clearAuthSession();
     if (!shownRef.current.invalid) {
       shownRef.current.invalid = true;
-      toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', {
-        toastId: TOAST_IDS.AUTH_INVALID_SESSION,
-      });
+      toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
     }
     return <Navigate to="/login" replace />;
   }
@@ -53,7 +50,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     if (!hasAnyRole(userRoles, allowedRoles)) {
       if (!shownRef.current.forbidden) {
         shownRef.current.forbidden = true;
-        toast.error('Bạn không có quyền truy cập trang này', { toastId: TOAST_IDS.AUTH_FORBIDDEN });
+        toast.error('Bạn không có quyền truy cập trang này');
       }
       const dashboardPath = getDashboardPath(userRoles);
       return <Navigate to={dashboardPath} replace />;
@@ -65,7 +62,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     clearAuthSession();
     if (!shownRef.current.invalid) {
       shownRef.current.invalid = true;
-      toast.error('Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.', { toastId: TOAST_IDS.AUTH_INVALID_SESSION });
+      toast.error('Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.');
     }
     return <Navigate to="/login" replace />;
   }

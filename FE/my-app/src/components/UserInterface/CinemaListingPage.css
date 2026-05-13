@@ -499,7 +499,7 @@
 }
 
 /* ── Error ── */
-.error-message {
+.cinema-listing .error-message {
   max-width: 560px;
   margin: 40px auto;
   padding: 18px 24px;

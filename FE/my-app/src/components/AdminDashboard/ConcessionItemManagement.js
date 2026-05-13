@@ -14,6 +14,8 @@ import {
 } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import './ConcessionItemManagement.css';
 
 const ConcessionItemManagement = () => {
@@ -22,6 +24,7 @@ const ConcessionItemManagement = () => {
 
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
   const token = Cookies.get('accessToken');
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -167,19 +170,26 @@ const ConcessionItemManagement = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
-    try {
-      const response = await fetch(`${API_BASE_URL}/concessions/items/${id}`, {
-        method: 'DELETE',
-        headers: authHeaders,
-      });
-      if (!response.ok) throw new Error('Không thể xóa sản phẩm');
-      toast.success('Xóa sản phẩm thành công');
-      bumpList();
-    } catch {
-      toast.error('Không thể xóa sản phẩm');
-    }
+  const handleDelete = (id) => {
+    showConfirm({
+      title: 'Xác nhận xóa sản phẩm',
+      message: 'Bạn có chắc muốn xóa sản phẩm này?',
+      variant: 'danger',
+      confirmText: 'Xóa',
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/concessions/items/${id}`, {
+            method: 'DELETE',
+            headers: authHeaders,
+          });
+          if (!response.ok) throw new Error('Không thể xóa sản phẩm');
+          toast.success('Xóa sản phẩm thành công');
+          bumpList();
+        } catch {
+          toast.error('Không thể xóa sản phẩm');
+        }
+      },
+    });
   };
 
   const handleToggle = async (id) => {
@@ -697,6 +707,8 @@ const ConcessionItemManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

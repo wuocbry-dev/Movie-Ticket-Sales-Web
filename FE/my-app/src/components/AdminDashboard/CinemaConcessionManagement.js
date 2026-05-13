@@ -15,6 +15,8 @@ import {
 } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import './CinemaConcessionManagement.css';
 
 const CinemaConcessionManagement = () => {
@@ -43,6 +45,7 @@ const CinemaConcessionManagement = () => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [listTick, setListTick] = useState(0);
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const bumpList = useCallback(() => setListTick((t) => t + 1), []);
 
@@ -180,19 +183,26 @@ const CinemaConcessionManagement = () => {
     setShowEditModal(true);
   };
 
-  const handleRemoveItem = async (itemId) => {
-    if (!window.confirm('Bạn có chắc muốn xóa sản phẩm này khỏi rạp?')) return;
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/cinemas/${selectedCinema}/concessions/items/${itemId}`,
-        { method: 'DELETE', headers: authHeaders }
-      );
-      if (!response.ok) throw new Error('Không thể xóa sản phẩm');
-      toast.success('Xóa sản phẩm khỏi rạp thành công');
-      bumpList();
-    } catch {
-      toast.error('Không thể xóa sản phẩm');
-    }
+  const handleRemoveItem = (itemId) => {
+    showConfirm({
+      title: 'Xác nhận xóa sản phẩm',
+      message: 'Bạn có chắc muốn xóa sản phẩm này khỏi rạp?',
+      variant: 'danger',
+      confirmText: 'Xóa',
+      onConfirm: async () => {
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/cinemas/${selectedCinema}/concessions/items/${itemId}`,
+            { method: 'DELETE', headers: authHeaders }
+          );
+          if (!response.ok) throw new Error('Không thể xóa sản phẩm');
+          toast.success('Xóa sản phẩm khỏi rạp thành công');
+          bumpList();
+        } catch {
+          toast.error('Không thể xóa sản phẩm');
+        }
+      },
+    });
   };
 
   const handleToggleAvailability = async (itemId) => {
@@ -283,19 +293,26 @@ const CinemaConcessionManagement = () => {
     }
   };
 
-  const handleSyncItems = async () => {
-    if (!window.confirm('Đồng bộ tất cả sản phẩm vào rạp này?')) return;
-    try {
-      const response = await fetch(`${API_BASE_URL}/cinemas/${selectedCinema}/concessions/sync`, {
-        method: 'POST',
-        headers: authHeaders,
-      });
-      if (!response.ok) throw new Error('Không thể đồng bộ');
-      toast.success('Đồng bộ sản phẩm thành công');
-      bumpList();
-    } catch {
-      toast.error('Không thể đồng bộ sản phẩm');
-    }
+  const handleSyncItems = () => {
+    showConfirm({
+      title: 'Đồng bộ sản phẩm',
+      message: 'Đồng bộ tất cả sản phẩm vào rạp này?',
+      variant: 'info',
+      confirmText: 'Đồng bộ',
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/cinemas/${selectedCinema}/concessions/sync`, {
+            method: 'POST',
+            headers: authHeaders,
+          });
+          if (!response.ok) throw new Error('Không thể đồng bộ');
+          toast.success('Đồng bộ sản phẩm thành công');
+          bumpList();
+        } catch {
+          toast.error('Không thể đồng bộ sản phẩm');
+        }
+      },
+    });
   };
 
   const formatCurrency = (amount) =>
@@ -672,6 +689,8 @@ const CinemaConcessionManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { FaTags, FaPlus, FaSpinner, FaTimes } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import promotionService from '../../services/promotionService';
 import './PromotionManagement.css';
 
@@ -42,6 +44,7 @@ const emptyForm = () => ({
 const PromotionManagement = () => {
   const navigate = useNavigate();
   const token = Cookies.get('accessToken');
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -131,15 +134,22 @@ const PromotionManagement = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc muốn xóa khuyến mãi này?')) return;
-    try {
-      await promotionService.delete(id);
-      toast.success('Đã xóa khuyến mãi');
-      bumpList();
-    } catch (e) {
-      toast.error(e.response?.data?.message || 'Không thể xóa khuyến mãi');
-    }
+  const handleDelete = (id) => {
+    showConfirm({
+      title: 'Xác nhận xóa khuyến mãi',
+      message: 'Bạn có chắc muốn xóa khuyến mãi này?',
+      variant: 'danger',
+      confirmText: 'Xóa',
+      onConfirm: async () => {
+        try {
+          await promotionService.delete(id);
+          toast.success('Đã xóa khuyến mãi');
+          bumpList();
+        } catch (e) {
+          toast.error(e.response?.data?.message || 'Không thể xóa khuyến mãi');
+        }
+      },
+    });
   };
 
   const handleImageUpload = async (e) => {
@@ -610,6 +620,8 @@ const PromotionManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

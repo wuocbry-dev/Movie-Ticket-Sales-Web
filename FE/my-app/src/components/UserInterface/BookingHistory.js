@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '../../utils/toast';
 import bookingService from '../../services/bookingService';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import Cookies from 'js-cookie';
 import { FaTicketAlt, FaCalendar, FaClock, FaMapMarkerAlt, FaChair, FaQrcode, FaUtensils } from 'react-icons/fa';
 import './BookingHistory.css';
@@ -17,6 +19,7 @@ const BookingHistory = () => {
   const [expandedBooking, setExpandedBooking] = useState(null); // Track which booking's details are expanded
   const [showQRCode, setShowQRCode] = useState({}); // Track QR code visibility for each booking
   const [concessionOrders, setConcessionOrders] = useState({}); // Store concession orders by bookingId
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   useEffect(() => {
     fetchBookings();
@@ -205,20 +208,24 @@ const BookingHistory = () => {
     return null;
   };
 
-  const handleCancelBooking = async (bookingId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn hủy vé này?')) {
-      return;
-    }
-
-    try {
-      console.log('🚫 Canceling booking:', bookingId);
-      await bookingService.cancelBooking(bookingId);
-      toast.success('Hủy vé thành công!');
-      fetchBookings(); // Reload bookings
-    } catch (error) {
-      console.error('❌ Error cancelling booking:', error);
-      toast.error(error.response?.data?.message || 'Không thể hủy vé');
-    }
+  const handleCancelBooking = (bookingId) => {
+    showConfirm({
+      title: 'Xác nhận hủy vé',
+      message: 'Bạn có chắc chắn muốn hủy vé này? Thao tác không thể hoàn tác.',
+      variant: 'danger',
+      confirmText: 'Hủy vé',
+      onConfirm: async () => {
+        try {
+          console.log('🚭 Canceling booking:', bookingId);
+          await bookingService.cancelBooking(bookingId);
+          toast.success('Hủy vé thành công!');
+          fetchBookings();
+        } catch (error) {
+          console.error('❌ Error cancelling booking:', error);
+          toast.error(error.response?.data?.message || 'Không thể hủy vé');
+        }
+      },
+    });
   };
 
   const filteredBookings = bookings.filter(booking => {
@@ -434,6 +441,8 @@ const BookingHistory = () => {
           </div>
         )}
       </div>
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

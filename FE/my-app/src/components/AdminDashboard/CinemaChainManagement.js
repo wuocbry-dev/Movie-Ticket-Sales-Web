@@ -12,6 +12,8 @@ import {
   FaBuilding,
 } from 'react-icons/fa';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import Cookies from 'js-cookie';
 import './CinemaChainManagement.css';
 
@@ -28,6 +30,7 @@ const emptyForm = () => ({
 const CinemaChainManagement = () => {
   const navigate = useNavigate();
   const token = Cookies.get('accessToken');
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const [cinemaChains, setCinemaChains] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -220,23 +223,30 @@ const CinemaChainManagement = () => {
     }
   };
 
-  const handleDeleteCinemaChain = async (chainId) => {
-    if (!window.confirm('Bạn có chắc muốn xóa chuỗi rạp này?')) return;
-    try {
-      const response = await fetch(`${API_BASE_URL}/cinema-chains/admin/${chainId}`, {
-        method: 'DELETE',
-        headers: authHeaders,
-      });
-      const result = await response.json();
-      if (result.success) {
-        toast.success('Đã xóa');
-        setListTick((t) => t + 1);
-      } else {
-        toast.error(result.message || 'Không thể xóa');
-      }
-    } catch {
-      toast.error('Lỗi khi xóa');
-    }
+  const handleDeleteCinemaChain = (chainId) => {
+    showConfirm({
+      title: 'Xác nhận xóa chuỗi rạp',
+      message: 'Bạn có chắc muốn xóa chuỗi rạp này?',
+      variant: 'danger',
+      confirmText: 'Xóa',
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/cinema-chains/admin/${chainId}`, {
+            method: 'DELETE',
+            headers: authHeaders,
+          });
+          const result = await response.json();
+          if (result.success) {
+            toast.success('Đã xóa');
+            setListTick((t) => t + 1);
+          } else {
+            toast.error(result.message || 'Không thể xóa');
+          }
+        } catch {
+          toast.error('Lỗi khi xóa');
+        }
+      },
+    });
   };
 
   const handleSubmit = (e) => {
@@ -535,6 +545,8 @@ const CinemaChainManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

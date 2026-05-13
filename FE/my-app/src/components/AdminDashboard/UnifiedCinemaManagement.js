@@ -13,6 +13,8 @@ import {
   FaFilm,
 } from 'react-icons/fa';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import Cookies from 'js-cookie';
 import { hasRole, ROLES } from '../../utils/roleUtils';
 import './UnifiedCinemaManagement.css';
@@ -31,6 +33,7 @@ const UnifiedCinemaManagement = () => {
   const [submitting, setSubmitting] = useState(false);
   const [isActive, setIsActive] = useState(true);
   const [listTick, setListTick] = useState(0);
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const [cinemaChains, setCinemaChains] = useState([]);
   const [selectedChain, setSelectedChain] = useState(null);
@@ -317,23 +320,30 @@ const UnifiedCinemaManagement = () => {
     }
   };
 
-  const handleDeleteChain = async (chainId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa chuỗi rạp này?')) return;
-    try {
-      const response = await fetch(`${API_BASE_URL}/cinema-chains/admin/${chainId}`, {
-        method: 'DELETE',
-        headers: authHeaders,
-      });
-      const result = await response.json();
-      if (result.success) {
-        toast.success('Xóa chuỗi rạp thành công!');
-        bumpList();
-      } else {
-        toast.error(result.message || 'Lỗi khi xóa chuỗi rạp');
-      }
-    } catch {
-      toast.error('Không thể xóa chuỗi rạp. Vui lòng thử lại.');
-    }
+  const handleDeleteChain = (chainId) => {
+    showConfirm({
+      title: 'Xác nhận xóa chuỗi rạp',
+      message: 'Bạn có chắc chắn muốn xóa chuỗi rạp này?',
+      variant: 'danger',
+      confirmText: 'Xóa',
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/cinema-chains/admin/${chainId}`, {
+            method: 'DELETE',
+            headers: authHeaders,
+          });
+          const result = await response.json();
+          if (result.success) {
+            toast.success('Xóa chuỗi rạp thành công!');
+            bumpList();
+          } else {
+            toast.error(result.message || 'Lỗi khi xóa chuỗi rạp');
+          }
+        } catch {
+          toast.error('Không thể xóa chuỗi rạp. Vui lòng thử lại.');
+        }
+      },
+    });
   };
 
   const handleOpenCinemaCreateModal = () => {
@@ -457,24 +467,31 @@ const UnifiedCinemaManagement = () => {
     }
   };
 
-  const handleDeleteCinema = async (cinema) => {
-    if (!window.confirm(`Bạn có chắc muốn xóa rạp "${cinema.cinemaName}"?`)) return;
-    try {
-      const url = `${API_BASE_URL}/cinemas/admin/${cinema.cinemaId}?chainId=${cinema.chainId}`;
-      const response = await fetch(url, {
-        method: 'DELETE',
-        headers: authHeaders,
-      });
-      const result = await response.json();
-      if (result.success) {
-        toast.success('Xóa rạp thành công!');
-        bumpList();
-      } else {
-        toast.error(result.message || 'Lỗi khi xóa rạp');
-      }
-    } catch {
-      toast.error('Không thể xóa rạp. Vui lòng thử lại.');
-    }
+  const handleDeleteCinema = (cinema) => {
+    showConfirm({
+      title: 'Xác nhận xóa rạp',
+      message: `Bạn có chắc muốn xóa rạp "${cinema.cinemaName}"?`,
+      variant: 'danger',
+      confirmText: 'Xóa',
+      onConfirm: async () => {
+        try {
+          const url = `${API_BASE_URL}/cinemas/admin/${cinema.cinemaId}?chainId=${cinema.chainId}`;
+          const response = await fetch(url, {
+            method: 'DELETE',
+            headers: authHeaders,
+          });
+          const result = await response.json();
+          if (result.success) {
+            toast.success('Xóa rạp thành công!');
+            bumpList();
+          } else {
+            toast.error(result.message || 'Lỗi khi xóa rạp');
+          }
+        } catch {
+          toast.error('Không thể xóa rạp. Vui lòng thử lại.');
+        }
+      },
+    });
   };
 
   const handleViewCinemaHalls = (cinema) => {
@@ -1014,6 +1031,8 @@ const UnifiedCinemaManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

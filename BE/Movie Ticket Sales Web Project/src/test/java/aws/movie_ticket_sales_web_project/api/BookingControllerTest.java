@@ -4,8 +4,6 @@ import aws.movie_ticket_sales_web_project.dto.*;
 import aws.movie_ticket_sales_web_project.enums.PaymentStatus;
 import aws.movie_ticket_sales_web_project.enums.StatusBooking;
 import aws.movie_ticket_sales_web_project.service.BookingService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,23 +12,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BookingController Unit Tests")
@@ -41,15 +33,6 @@ class BookingControllerTest {
 
     @InjectMocks
     private BookingController bookingController;
-
-    private MockMvc mockMvc;
-    private ObjectMapper objectMapper;
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(bookingController).build();
-        objectMapper = new ObjectMapper();
-    }
 
     private BookingDto createTestBookingDto() {
         return BookingDto.builder()
@@ -94,7 +77,7 @@ class BookingControllerTest {
                 .pageSize(10)
                 .hasNext(false)
                 .hasPrevious(false)
-                .data(Arrays.asList(booking))
+                .data(List.of(booking))
                 .build();
     }
 
@@ -110,12 +93,14 @@ class BookingControllerTest {
             when(bookingService.getAllBookings(0, 10, null)).thenReturn(expectedResponse);
 
             // Act
-            ResponseEntity<PagedBookingResponse> response = bookingController.getAllBookings(0, 10, null, null);
+            ResponseEntity<ApiResponse<PagedBookingResponse>> response =
+                    bookingController.getAllBookings(0, 10, null, null);
 
             // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getBody()).isNotNull();
-            assertThat(response.getBody().getTotalElements()).isEqualTo(1L);
+            assertThat(response.getBody().getSuccess()).isTrue();
+            assertThat(response.getBody().getData().getTotalElements()).isEqualTo(1L);
             verify(bookingService).getAllBookings(0, 10, null);
             verify(bookingService, never()).getBookingsByStatus(any(), anyInt(), anyInt());
         }
@@ -128,12 +113,14 @@ class BookingControllerTest {
             when(bookingService.getBookingsByStatus(StatusBooking.PENDING, 0, 10)).thenReturn(expectedResponse);
 
             // Act
-            ResponseEntity<PagedBookingResponse> response = bookingController.getAllBookings(0, 10, StatusBooking.PENDING, null);
+            ResponseEntity<ApiResponse<PagedBookingResponse>> response =
+                    bookingController.getAllBookings(0, 10, StatusBooking.PENDING, null);
 
             // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getBody()).isNotNull();
-            assertThat(response.getBody().getTotalElements()).isEqualTo(1L);
+            assertThat(response.getBody().getSuccess()).isTrue();
+            assertThat(response.getBody().getData().getTotalElements()).isEqualTo(1L);
             verify(bookingService).getBookingsByStatus(StatusBooking.PENDING, 0, 10);
             verify(bookingService, never()).getAllBookings(anyInt(), anyInt(), anyString());
         }
@@ -145,11 +132,14 @@ class BookingControllerTest {
             when(bookingService.getAllBookings(0, 10, null)).thenThrow(new RuntimeException("Database error"));
 
             // Act
-            ResponseEntity<PagedBookingResponse> response = bookingController.getAllBookings(0, 10, null, null);
+            ResponseEntity<ApiResponse<PagedBookingResponse>> response =
+                    bookingController.getAllBookings(0, 10, null, null);
 
             // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-            assertThat(response.getBody()).isNull();
+            assertThat(response.getBody()).isNotNull();
+            assertThat(response.getBody().getSuccess()).isFalse();
+            assertThat(response.getBody().getMessage()).isEqualTo("Database error");
         }
     }
 
@@ -195,8 +185,7 @@ class BookingControllerTest {
         @Test
         @DisplayName("Should handle general exception")
         void shouldHandleGeneralException() {
-            // Arrange
-            // NullPointerException extends RuntimeException, so it's caught by the RuntimeException catch block
+            // Arrange — NullPointerException extends RuntimeException, caught by the RuntimeException catch block
             when(bookingService.getBookingById(1)).thenThrow(new NullPointerException("Unexpected error"));
 
             // Act
@@ -244,8 +233,7 @@ class BookingControllerTest {
         @Test
         @DisplayName("Should handle general exception")
         void shouldHandleGeneralException() {
-            // Arrange
-            // NullPointerException extends RuntimeException, so it's caught by the RuntimeException catch block
+            // Arrange — NullPointerException extends RuntimeException, caught by the RuntimeException catch block
             when(bookingService.getBookingByCode("BK123456")).thenThrow(new NullPointerException("Unexpected error"));
 
             // Act
@@ -370,7 +358,7 @@ class BookingControllerTest {
             CreateBookingRequest request = CreateBookingRequest.builder()
                     .userId(1)
                     .showtimeId(1)
-                    .seatIds(Arrays.asList(1, 2))
+                    .seatIds(List.of(1, 2))
                     .sessionId("session123")
                     .paymentMethod("CASH")
                     .build();
@@ -396,7 +384,7 @@ class BookingControllerTest {
             CreateBookingRequest request = CreateBookingRequest.builder()
                     .userId(1)
                     .showtimeId(1)
-                    .seatIds(Arrays.asList(1, 2))
+                    .seatIds(List.of(1, 2))
                     .sessionId("session123")
                     .paymentMethod("CASH")
                     .build();
@@ -423,12 +411,12 @@ class BookingControllerTest {
             CreateBookingRequest request = CreateBookingRequest.builder()
                     .userId(1)
                     .showtimeId(1)
-                    .seatIds(Arrays.asList(1, 2))
+                    .seatIds(List.of(1, 2))
                     .sessionId("session123")
                     .paymentMethod("CASH")
                     .build();
 
-            // NullPointerException extends RuntimeException, so it's caught by the RuntimeException catch block
+            // NullPointerException extends RuntimeException, caught by the RuntimeException catch block
             when(bookingService.createBooking(any(CreateBookingRequest.class)))
                     .thenThrow(new NullPointerException("Unexpected error"));
 
@@ -446,7 +434,7 @@ class BookingControllerTest {
         @DisplayName("Should create booking with concession items")
         void shouldCreateBookingWithConcessionItems() {
             // Arrange
-            List<CreateBookingRequest.ConcessionItemRequest> concessionItems = Arrays.asList(
+            List<CreateBookingRequest.ConcessionItemRequest> concessionItems = List.of(
                     CreateBookingRequest.ConcessionItemRequest.builder()
                             .itemId(1)
                             .quantity(2)
@@ -457,7 +445,7 @@ class BookingControllerTest {
             CreateBookingRequest request = CreateBookingRequest.builder()
                     .userId(1)
                     .showtimeId(1)
-                    .seatIds(Arrays.asList(1, 2))
+                    .seatIds(List.of(1, 2))
                     .sessionId("session123")
                     .paymentMethod("CASH")
                     .concessionItems(concessionItems)
@@ -481,7 +469,7 @@ class BookingControllerTest {
             CreateBookingRequest request = CreateBookingRequest.builder()
                     .userId(1)
                     .showtimeId(1)
-                    .seatIds(Arrays.asList(1, 2))
+                    .seatIds(List.of(1, 2))
                     .sessionId("session123")
                     .paymentMethod("CASH")
                     .pointsToUse(50)
@@ -559,7 +547,7 @@ class BookingControllerTest {
                     .status(StatusBooking.CONFIRMED)
                     .build();
 
-            // NullPointerException extends RuntimeException, so it's caught by the RuntimeException catch block
+            // NullPointerException extends RuntimeException, caught by the RuntimeException catch block
             when(bookingService.updateBooking(eq(1), any(UpdateBookingRequest.class)))
                     .thenThrow(new NullPointerException("Unexpected error"));
 
@@ -615,8 +603,7 @@ class BookingControllerTest {
         @Test
         @DisplayName("Should handle general exception when cancelling booking")
         void shouldHandleGeneralExceptionWhenCancellingBooking() {
-            // Arrange
-            // NullPointerException extends RuntimeException, so it's caught by the RuntimeException catch block
+            // Arrange — NullPointerException extends RuntimeException, caught by the RuntimeException catch block
             doThrow(new NullPointerException("Unexpected error")).when(bookingService).cancelBooking(1);
 
             // Act
@@ -670,8 +657,7 @@ class BookingControllerTest {
         @Test
         @DisplayName("Should handle general exception when deleting booking")
         void shouldHandleGeneralExceptionWhenDeletingBooking() {
-            // Arrange
-            // NullPointerException extends RuntimeException, so it's caught by the RuntimeException catch block
+            // Arrange — NullPointerException extends RuntimeException, caught by the RuntimeException catch block
             doThrow(new NullPointerException("Unexpected error")).when(bookingService).deleteBooking(1);
 
             // Act

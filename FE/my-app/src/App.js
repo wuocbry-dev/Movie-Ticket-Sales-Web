@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
+import { Toaster } from 'sonner';
+import './components/common/notification.css';
 import Header from './components/UserInterface/Header';
 import BookingStatusBar from './components/UserInterface/BookingStatusBar';
 import Footer from './components/UserInterface/Footer';
@@ -118,6 +120,16 @@ function App() {
   return (
     <Router>
       <QuickBookingProvider>
+      <Toaster
+        position="top-right"
+        richColors
+        duration={3000}
+        closeButton
+        theme="dark"
+        toastOptions={{
+          style: { maxWidth: '380px', fontSize: '0.88rem' },
+        }}
+      />
       <div className="App">
         <ConditionalHeader />
         <ConditionalBookingStatusBar />

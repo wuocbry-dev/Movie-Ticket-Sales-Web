@@ -19,6 +19,8 @@ import {
   FaMapMarkerAlt,
 } from 'react-icons/fa';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import Cookies from 'js-cookie';
 import './BookingManagement.css';
 
@@ -42,6 +44,7 @@ const BookingManagement = () => {
   const [sessionId, setSessionId] = useState('');
   const [holdExpiresAt, setHoldExpiresAt] = useState(null);
   const [listTick, setListTick] = useState(0);
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const [formData, setFormData] = useState({
     userId: null,
@@ -285,25 +288,31 @@ const BookingManagement = () => {
     setPage(0);
   };
 
-  const handleUpdateBookingStatus = async (bookingId, newStatus) => {
-    if (!window.confirm(`Bạn có chắc chắn muốn ${newStatus === 'CANCELLED' ? 'hủy' : 'kích hoạt lại'} vé này không?`)) {
-      return;
-    }
-    try {
-      const response = await fetch(`${API_BASE_URL}/bookings/${bookingId}`, {
-        method: 'PUT',
-        headers: authHeaders,
-        body: JSON.stringify({ status: newStatus })
-      });
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || 'Không thể cập nhật trạng thái vé');
-      }
-      toast.success('Cập nhật trạng thái vé thành công!');
-      bumpList();
-    } catch (error) {
-      toast.error(error.message || 'Có lỗi xảy ra khi cập nhật vé');
-    }
+  const handleUpdateBookingStatus = (bookingId, newStatus) => {
+    const actionLabel = newStatus === 'CANCELLED' ? 'hủy' : 'kích hoạt lại';
+    showConfirm({
+      title: `Xác nhận ${actionLabel} vé`,
+      message: `Bạn có chắc chắn muốn ${actionLabel} vé này không?`,
+      variant: newStatus === 'CANCELLED' ? 'danger' : 'info',
+      confirmText: newStatus === 'CANCELLED' ? 'Hủy vé' : 'Kích hoạt',
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/bookings/${bookingId}`, {
+            method: 'PUT',
+            headers: authHeaders,
+            body: JSON.stringify({ status: newStatus })
+          });
+          const result = await response.json();
+          if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Không thể cập nhật trạng thái vé');
+          }
+          toast.success('Cập nhật trạng thái vé thành công!');
+          bumpList();
+        } catch (error) {
+          toast.error(error.message || 'Có lỗi xảy ra khi cập nhật vé');
+        }
+      },
+    });
   };
 
   const handleOpenModal = () => {
@@ -768,6 +777,8 @@ const BookingManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

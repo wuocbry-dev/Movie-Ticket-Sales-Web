@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { FaTags, FaPlus, FaSpinner, FaTimes, FaEdit, FaTrash, FaLock, FaUnlock } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import './ConcessionCategoryManagement.css';
 
 const ConcessionCategoryManagement = () => {
   const navigate = useNavigate();
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
   const token = Cookies.get('accessToken');
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -99,19 +102,26 @@ const ConcessionCategoryManagement = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc muốn xóa danh mục này?')) return;
-    try {
-      const response = await fetch(`${API_BASE_URL}/concessions/categories/${id}`, {
-        method: 'DELETE',
-        headers: authHeaders,
-      });
-      if (!response.ok) throw new Error('Không thể xóa danh mục');
-      toast.success('Xóa danh mục thành công');
-      bumpList();
-    } catch {
-      toast.error('Không thể xóa danh mục');
-    }
+  const handleDelete = (id) => {
+    showConfirm({
+      title: 'Xác nhận xóa danh mục',
+      message: 'Bạn có chắc muốn xóa danh mục này?',
+      variant: 'danger',
+      confirmText: 'Xóa',
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/concessions/categories/${id}`, {
+            method: 'DELETE',
+            headers: authHeaders,
+          });
+          if (!response.ok) throw new Error('Không thể xóa danh mục');
+          toast.success('Xóa danh mục thành công');
+          bumpList();
+        } catch {
+          toast.error('Không thể xóa danh mục');
+        }
+      },
+    });
   };
 
   const handleToggle = async (id) => {
@@ -344,6 +354,8 @@ const ConcessionCategoryManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

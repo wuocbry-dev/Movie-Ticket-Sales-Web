@@ -10,6 +10,8 @@ import {
   FaTheaterMasks,
 } from 'react-icons/fa';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import Cookies from 'js-cookie';
 import './ManagerShowtimeManagement.css';
 
@@ -40,6 +42,7 @@ const ManagerShowtimeManagement = () => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [listTick, setListTick] = useState(0);
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
   const token = Cookies.get('accessToken');
@@ -318,28 +321,32 @@ const ManagerShowtimeManagement = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (showtimeId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa suất chiếu này?')) return;
-    try {
-      const validToken = await ensureToken();
-      if (!validToken) {
-        return;
-      }
-
-      const response = await fetch(`${API_BASE_URL}/showtimes/admin/${showtimeId}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders(validToken),
-      });
-      if (response.status === 401) {
-        handleUnauthorized();
-        return;
-      }
-      if (!response.ok) throw new Error('Không thể xóa suất chiếu');
-      toast.success('Xóa suất chiếu thành công');
-      bumpList();
-    } catch {
-      toast.error('Không thể xóa suất chiếu');
-    }
+  const handleDelete = (showtimeId) => {
+    showConfirm({
+      title: 'Xác nhận xóa suất chiếu',
+      message: 'Bạn có chắc chắn muốn xóa suất chiếu này?',
+      variant: 'danger',
+      confirmText: 'Xóa',
+      onConfirm: async () => {
+        try {
+          const validToken = await ensureToken();
+          if (!validToken) return;
+          const response = await fetch(`${API_BASE_URL}/showtimes/admin/${showtimeId}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders(validToken),
+          });
+          if (response.status === 401) {
+            handleUnauthorized();
+            return;
+          }
+          if (!response.ok) throw new Error('Không thể xóa suất chiếu');
+          toast.success('Xóa suất chiếu thành công');
+          bumpList();
+        } catch {
+          toast.error('Không thể xóa suất chiếu');
+        }
+      },
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -720,6 +727,8 @@ const ManagerShowtimeManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

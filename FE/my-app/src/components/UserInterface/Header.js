@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaSearch, FaUser, FaSignOutAlt, FaTachometerAlt, FaBars, FaHistory } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import { toast } from '../../utils/toast';
-import { TOAST_IDS } from '../../utils/toastIds';
+
 import { getDashboardPath, getRoleDisplayName, getHighestRole, isStaffMember } from '../../utils/roleUtils';
 import { useQuickBooking } from './QuickBookingContext';
 import QuickBookingMini from './QuickBookingMini';
@@ -180,7 +180,7 @@ const Header = () => {
     // Dispatch event để các component khác cập nhật
     window.dispatchEvent(new Event('userChanged'));
     
-    toast.success('Đăng xuất thành công!', { toastId: TOAST_IDS.LOGOUT_SUCCESS });
+    toast.success('Đăng xuất thành công!');
     navigate('/');
   };
 

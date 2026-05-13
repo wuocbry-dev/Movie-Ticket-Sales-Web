@@ -14,6 +14,8 @@ import {
   FaFilm,
 } from 'react-icons/fa';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import './MyCinemaManagement.css';
@@ -47,6 +49,7 @@ const MyCinemaManagement = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [listTick, setListTick] = useState(0);
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create');
@@ -235,29 +238,36 @@ const MyCinemaManagement = () => {
     }
   };
 
-  const handleDelete = async (cinema) => {
-    if (!window.confirm(`Xóa rạp "${cinema.cinemaName}"?`)) return;
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/cinemas/admin/${cinema.cinemaId}?chainId=${cinema.chainId}`,
-        {
-          method: 'DELETE',
-          headers: authHeaders,
+  const handleDelete = (cinema) => {
+    showConfirm({
+      title: 'Xác nhận xóa rạp',
+      message: `Xóa rạp "${cinema.cinemaName}"?`,
+      variant: 'danger',
+      confirmText: 'Xóa',
+      onConfirm: async () => {
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/cinemas/admin/${cinema.cinemaId}?chainId=${cinema.chainId}`,
+            {
+              method: 'DELETE',
+              headers: authHeaders,
+            }
+          );
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            throw new Error(result.message || `Lỗi ${response.status}`);
+          }
+          if (result.success) {
+            toast.success('Đã xóa');
+            setListTick((t) => t + 1);
+          } else {
+            toast.error(result.message || 'Không xóa được');
+          }
+        } catch (error) {
+          toast.error(error.message || 'Lỗi khi xóa');
         }
-      );
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(result.message || `Lỗi ${response.status}`);
-      }
-      if (result.success) {
-        toast.success('Đã xóa');
-        setListTick((t) => t + 1);
-      } else {
-        toast.error(result.message || 'Không xóa được');
-      }
-    } catch (error) {
-      toast.error(error.message || 'Lỗi khi xóa');
-    }
+      },
+    });
   };
 
   return (
@@ -530,6 +540,8 @@ const MyCinemaManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

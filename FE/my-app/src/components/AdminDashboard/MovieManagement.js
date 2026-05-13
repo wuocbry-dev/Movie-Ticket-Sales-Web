@@ -3,6 +3,8 @@ import { toast } from '../../utils/toast';
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaFilter, FaEye } from 'react-icons/fa';
 import movieService from '../../services/movieService';
 import MovieForm from './MovieForm';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import { hasRole, ROLES } from '../../utils/roleUtils';
 import './MovieManagement.css';
 
@@ -22,6 +24,7 @@ const MovieManagement = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const canEdit = hasRole(user.roles, ROLES.SYSTEM_ADMIN);
   const canView = hasRole(user.roles, ROLES.CINEMA_MANAGER) || canEdit;
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -98,22 +101,27 @@ const MovieManagement = () => {
     }
   };
 
-  const handleDelete = async (movieId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa phim này?')) {
-      return;
-    }
-    try {
-      const response = await movieService.deleteMovie(movieId);
-      if (response.success) {
-        toast.success('Xóa phim thành công!');
-        await fetchMovies();
-      } else {
-        toast.error(response.message || 'Không thể xóa phim!');
-      }
-    } catch (error) {
-      console.error('Error deleting movie:', error);
-      toast.error(error.response?.data?.message || 'Không thể xóa phim!');
-    }
+  const handleDelete = (movieId) => {
+    showConfirm({
+      title: 'Xác nhận xóa phim',
+      message: 'Bạn có chắc chắn muốn xóa phim này? Thao tác không thể hoàn tác.',
+      variant: 'danger',
+      confirmText: 'Xóa phim',
+      onConfirm: async () => {
+        try {
+          const response = await movieService.deleteMovie(movieId);
+          if (response.success) {
+            toast.success('Xóa phim thành công!');
+            await fetchMovies();
+          } else {
+            toast.error(response.message || 'Không thể xóa phim!');
+          }
+        } catch (error) {
+          console.error('Error deleting movie:', error);
+          toast.error(error.response?.data?.message || 'Không thể xóa phim!');
+        }
+      },
+    });
   };
 
   const handleFormSubmit = async (movieData) => {
@@ -408,6 +416,8 @@ const MovieManagement = () => {
           onClose={handleCloseModal}
         />
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

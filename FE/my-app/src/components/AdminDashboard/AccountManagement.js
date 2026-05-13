@@ -15,6 +15,8 @@ import {
 } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import api from '../../services/api';
 import './AccountManagement.css';
 
@@ -33,6 +35,7 @@ const AccountManagement = () => {
   const [newTier, setNewTier] = useState('');
   const [listTick, setListTick] = useState(0);
   const initialListFetchRef = useRef(true);
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const bumpList = useCallback(() => setListTick((t) => t + 1), []);
 
@@ -139,56 +142,66 @@ const AccountManagement = () => {
     }
   };
 
-  const handleDeleteUser = async (user) => {
-    if (
-      !window.confirm(`Vô hiệu hóa tài khoản "${user.fullName}" (${user.email})?`)
-    ) {
-      return;
-    }
-    try {
-      const response = await api.delete(`/admin/users/${user.userId}`);
-      if (response.data.success) {
-        toast.success('Đã vô hiệu hóa tài khoản');
-        bumpList();
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      if (error.response?.status === 401) {
-        toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
-        navigate('/login');
-      } else if (error.response?.status === 403) {
-        toast.error('Bạn không có quyền thao tác tài khoản này');
-      } else if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error('Không thể vô hiệu hóa tài khoản');
-      }
-    }
+  const handleDeleteUser = (user) => {
+    showConfirm({
+      title: 'Vô hiệu hóa tài khoản',
+      message: `Vô hiệu hóa tài khoản "${user.fullName}" (${user.email})?`,
+      variant: 'warning',
+      confirmText: 'Vô hiệu hóa',
+      onConfirm: async () => {
+        try {
+          const response = await api.delete(`/admin/users/${user.userId}`);
+          if (response.data.success) {
+            toast.success('Đã vô hiệu hóa tài khoản');
+            bumpList();
+          } else {
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+          if (error.response?.status === 401) {
+            toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+            navigate('/login');
+          } else if (error.response?.status === 403) {
+            toast.error('Bạn không có quyền thao tác tài khoản này');
+          } else if (error.response?.data?.message) {
+            toast.error(error.response.data.message);
+          } else {
+            toast.error('Không thể vô hiệu hóa tài khoản');
+          }
+        }
+      },
+    });
   };
 
-  const handleActivateUser = async (user) => {
-    if (!window.confirm(`Kích hoạt lại "${user.fullName}" (${user.email})?`)) return;
-    try {
-      const response = await api.put(`/admin/users/${user.userId}/activate`);
-      if (response.data.success) {
-        toast.success('Đã kích hoạt tài khoản');
-        bumpList();
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      if (error.response?.status === 401) {
-        toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
-        navigate('/login');
-      } else if (error.response?.status === 403) {
-        toast.error('Bạn không có quyền thao tác tài khoản này');
-      } else if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error('Không thể kích hoạt tài khoản');
-      }
-    }
+  const handleActivateUser = (user) => {
+    showConfirm({
+      title: 'Kích hoạt tài khoản',
+      message: `Kích hoạt lại "${user.fullName}" (${user.email})?`,
+      variant: 'info',
+      confirmText: 'Kích hoạt',
+      onConfirm: async () => {
+        try {
+          const response = await api.put(`/admin/users/${user.userId}/activate`);
+          if (response.data.success) {
+            toast.success('Đã kích hoạt tài khoản');
+            bumpList();
+          } else {
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+          if (error.response?.status === 401) {
+            toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+            navigate('/login');
+          } else if (error.response?.status === 403) {
+            toast.error('Bạn không có quyền thao tác tài khoản này');
+          } else if (error.response?.data?.message) {
+            toast.error(error.response.data.message);
+          } else {
+            toast.error('Không thể kích hoạt tài khoản');
+          }
+        }
+      },
+    });
   };
 
   const handleEditTier = (user) => {
@@ -629,6 +642,8 @@ const AccountManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import './AdminPaymentManager.css';
@@ -32,6 +34,7 @@ const AdminPaymentManager = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const api = useMemo(() => {
     const instance = axios.create({
@@ -84,33 +87,36 @@ const AdminPaymentManager = () => {
     fetchPendingBookings();
   }, [fetchPendingBookings]);
 
-  const handleConfirmPayment = async (bookingId) => {
-    if (!window.confirm('Xác nhận đã nhận được thanh toán cho booking này?')) {
-      return;
-    }
-
-    setProcessingBookingId(bookingId);
-    try {
-      const response = await api.post('/payments/process', { bookingId });
-
-      if (response.data.success) {
-        toast.success('Xác nhận thanh toán thành công');
-        fetchPendingBookings();
-      } else {
-        toast.error(response.data.message || 'Xác nhận thanh toán thất bại');
-      }
-    } catch (error) {
-      if (error.response?.status === 401) {
-        toast.error('Phiên đăng nhập hết hạn');
-        navigate('/login');
-      } else if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error('Xác nhận thanh toán thất bại');
-      }
-    } finally {
-      setProcessingBookingId(null);
-    }
+  const handleConfirmPayment = (bookingId) => {
+    showConfirm({
+      title: 'Xác nhận thanh toán',
+      message: 'Xác nhận đã nhận được thanh toán cho booking này?',
+      variant: 'info',
+      confirmText: 'Xác nhận',
+      onConfirm: async () => {
+        setProcessingBookingId(bookingId);
+        try {
+          const response = await api.post('/payments/process', { bookingId });
+          if (response.data.success) {
+            toast.success('Xác nhận thanh toán thành công');
+            fetchPendingBookings();
+          } else {
+            toast.error(response.data.message || 'Xác nhận thanh toán thất bại');
+          }
+        } catch (error) {
+          if (error.response?.status === 401) {
+            toast.error('Phiên đăng nhập hết hạn');
+            navigate('/login');
+          } else if (error.response?.data?.message) {
+            toast.error(error.response.data.message);
+          } else {
+            toast.error('Xác nhận thanh toán thất bại');
+          }
+        } finally {
+          setProcessingBookingId(null);
+        }
+      },
+    });
   };
 
   const formatCurrency = (amount) =>
@@ -144,6 +150,7 @@ const AdminPaymentManager = () => {
   }
 
   return (
+    <>
     <section className="adm-pay">
       <header className="adm-pay__head">
         <div>
@@ -334,6 +341,9 @@ const AdminPaymentManager = () => {
         </>
       )}
     </section>
+
+    <ConfirmDialog {...confirmProps} />
+    </>
   );
 };
 

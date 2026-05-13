@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { FaUserPlus, FaTrash, FaSearch, FaBuilding, FaUserTie, FaTimes, FaSpinner } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import './CinemaStaffManagement.css';
 import { API_BASE_URL } from '../../config/api';
 
@@ -27,6 +29,7 @@ const CinemaStaffManagement = () => {
   const [isCinemaManager, setIsCinemaManager] = useState(false);
   const [managerCinemaId, setManagerCinemaId] = useState(null);
   const [listTick, setListTick] = useState(0);
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const bumpList = useCallback(() => setListTick((t) => t + 1), []);
 
@@ -217,29 +220,36 @@ const CinemaStaffManagement = () => {
     }
   };
 
-  const handleRemoveStaff = async (userId, cinemaId) => {
-    if (!window.confirm('Bạn có chắc muốn cho nhân viên này nghỉ việc tại rạp?')) return;
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/cinema-staffs/remove?userId=${userId}&cinemaId=${cinemaId}`,
-        {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${Cookies.get('accessToken')}` },
+  const handleRemoveStaff = (userId, cinemaId) => {
+    showConfirm({
+      title: 'Xác nhận cho nghỉ việc',
+      message: 'Bạn có chắc muốn cho nhân viên này nghỉ việc tại rạp?',
+      variant: 'danger',
+      confirmText: 'Cho nghỉ việc',
+      onConfirm: async () => {
+        setIsLoading(true);
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/cinema-staffs/remove?userId=${userId}&cinemaId=${cinemaId}`,
+            {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${Cookies.get('accessToken')}` },
+            }
+          );
+          const data = await response.json();
+          if (response.ok && data.success) {
+            toast.success('Đã cho nhân viên nghỉ việc tại rạp');
+            bumpList();
+          } else {
+            toast.error(data.message || 'Không thể xóa nhân viên');
+          }
+        } catch {
+          toast.error('Có lỗi xảy ra');
+        } finally {
+          setIsLoading(false);
         }
-      );
-      const data = await response.json();
-      if (response.ok && data.success) {
-        toast.success('Đã cho nhân viên nghỉ việc tại rạp');
-        bumpList();
-      } else {
-        toast.error(data.message || 'Không thể xóa nhân viên');
-      }
-    } catch {
-      toast.error('Có lỗi xảy ra');
-    } finally {
-      setIsLoading(false);
-    }
+      },
+    });
   };
 
   const filteredStaff = useMemo(
@@ -484,6 +494,8 @@ const CinemaStaffManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import Cookies from 'js-cookie';
 import { FaSync, FaInbox, FaCreditCard } from 'react-icons/fa';
 import './StaffPaymentManager.css';
@@ -16,6 +18,7 @@ const StaffPaymentManager = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   useEffect(() => {
     const token = Cookies.get('accessToken');
@@ -77,51 +80,53 @@ const StaffPaymentManager = () => {
   }, [fetchPendingBookings]);
 
   const handleConfirmPayment = useCallback(
-    async (bookingId) => {
-      if (
-        !window.confirm('Xác nhận đã nhận được thanh toán cho booking này?')
-      ) {
-        return;
-      }
+    (bookingId) => {
+      showConfirm({
+        title: 'Xác nhận thanh toán',
+        message: 'Xác nhận đã nhận được thanh toán cho booking này?',
+        variant: 'info',
+        confirmText: 'Xác nhận',
+        onConfirm: async () => {
+          setProcessingBookingId(bookingId);
+          try {
+            const token = Cookies.get('accessToken');
+            const response = await fetch(`${API_BASE_URL}/payments/process`, {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ bookingId }),
+            });
 
-      setProcessingBookingId(bookingId);
-      try {
-        const token = Cookies.get('accessToken');
-        const response = await fetch(`${API_BASE_URL}/payments/process`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ bookingId }),
-        });
+            const json = await response.json().catch(() => ({}));
 
-        const json = await response.json().catch(() => ({}));
+            if (response.status === 401) {
+              toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại');
+              navigate('/login');
+              return;
+            }
 
-        if (response.status === 401) {
-          toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại');
-          navigate('/login');
-          return;
-        }
+            if (!response.ok || json.success === false) {
+              toast.error(
+                json.message ||
+                  json.error ||
+                  'Xác nhận thanh toán thất bại'
+              );
+              return;
+            }
 
-        if (!response.ok || json.success === false) {
-          toast.error(
-            json.message ||
-              json.error ||
-              'Xác nhận thanh toán thất bại'
-          );
-          return;
-        }
-
-        toast.success('Xác nhận thanh toán thành công');
-        fetchPendingBookings();
-      } catch {
-        toast.error('Xác nhận thanh toán thất bại');
-      } finally {
-        setProcessingBookingId(null);
-      }
+            toast.success('Xác nhận thanh toán thành công');
+            fetchPendingBookings();
+          } catch {
+            toast.error('Xác nhận thanh toán thất bại');
+          } finally {
+            setProcessingBookingId(null);
+          }
+        },
+      });
     },
-    [fetchPendingBookings, navigate]
+    [fetchPendingBookings, navigate, showConfirm]
   );
 
   const formatCurrency = useCallback(
@@ -171,6 +176,7 @@ const StaffPaymentManager = () => {
   );
 
   return (
+    <>
     <div className="stf-spm">
       <header className="stf-spm__head">
         <div className="stf-spm__head-main">
@@ -330,6 +336,9 @@ const StaffPaymentManager = () => {
         )}
       </div>
     </div>
+
+    <ConfirmDialog {...confirmProps} />
+    </>
   );
 };
 

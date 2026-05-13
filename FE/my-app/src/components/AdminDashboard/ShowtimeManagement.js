@@ -15,6 +15,8 @@ import {
   FaBuilding,
 } from 'react-icons/fa';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import Cookies from 'js-cookie';
 import './ShowtimeManagement.css';
 
@@ -49,6 +51,7 @@ const ShowtimeManagement = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [detailShowtime, setDetailShowtime] = useState(null);
   const [listTick, setListTick] = useState(0);
+  const { confirmProps, showConfirm } = useConfirmDialog();
   const initialListFetchRef = useRef(true);
 
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
@@ -500,38 +503,40 @@ const ShowtimeManagement = () => {
     }
   };
 
-  const handleDeleteShowtime = async (showtimeId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa suất chiếu này?')) {
-      return;
-    }
+  const handleDeleteShowtime = (showtimeId) => {
+    showConfirm({
+      title: 'Xác nhận xóa suất chiếu',
+      message: 'Bạn có chắc chắn muốn xóa suất chiếu này?',
+      variant: 'danger',
+      confirmText: 'Xóa',
+      onConfirm: async () => {
+        try {
+          const validToken = await ensureToken();
+          if (!validToken) return;
 
-    try {
-      const validToken = await ensureToken();
-      if (!validToken) {
-        return;
-      }
+          const response = await fetch(`${API_BASE_URL}/showtimes/admin/${showtimeId}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders(validToken),
+          });
 
-      const response = await fetch(`${API_BASE_URL}/showtimes/admin/${showtimeId}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders(validToken),
-      });
+          if (response.status === 401) {
+            handleUnauthorized();
+            return;
+          }
 
-      if (response.status === 401) {
-        handleUnauthorized();
-        return;
-      }
+          const result = await response.json().catch(() => ({}));
 
-      const result = await response.json().catch(() => ({}));
-
-      if (response.ok && result.success) {
-        toast.success('Xóa suất chiếu thành công!');
-        bumpList();
-      } else {
-        toast.error(result.message || 'Xóa suất chiếu thất bại!');
-      }
-    } catch {
-      toast.error('Có lỗi xảy ra khi xóa suất chiếu');
-    }
+          if (response.ok && result.success) {
+            toast.success('Xóa suất chiếu thành công!');
+            bumpList();
+          } else {
+            toast.error(result.message || 'Xóa suất chiếu thất bại!');
+          }
+        } catch {
+          toast.error('Có lỗi xảy ra khi xóa suất chiếu');
+        }
+      },
+    });
   };
 
   const formatCurrency = (value) => {
@@ -1043,6 +1048,8 @@ const ShowtimeManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

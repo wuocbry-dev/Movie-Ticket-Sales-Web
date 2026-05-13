@@ -5,6 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import axios from 'axios';
 import { toast } from '../../utils/toast';
+import InlineError from '../common/InlineError';
 import Cookies from 'js-cookie';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { FaGoogle, FaGithub, FaFacebookF } from 'react-icons/fa';
@@ -13,6 +14,19 @@ import { getDashboardPath, getRoleDisplayName, getHighestRole } from '../../util
 import './LoginForm.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+
+/** Map common backend register errors to Vietnamese */
+const translateRegisterError = (msg) => {
+  if (!msg) return 'Đăng ký thất bại. Vui lòng thử lại.';
+  const lower = msg.toLowerCase();
+  if (lower.includes('email already registered') || lower.includes('email đã'))
+    return 'Email này đã được đăng ký. Vui lòng sử dụng email khác hoặc đăng nhập.';
+  if (lower.includes('phone number already registered') || lower.includes('số điện thoại đã'))
+    return 'Số điện thoại này đã được đăng ký. Vui lòng sử dụng SĐT khác.';
+  if (lower.includes('registration failed'))
+    return 'Đăng ký thất bại: ' + msg.replace(/Registration failed:\s*/i, '');
+  return msg;
+};
 
 const loginSchema = yup.object().shape({
   email: yup
@@ -87,6 +101,8 @@ const LoginForm = () => {
   const [showRegConfirmPassword, setShowRegConfirmPassword] = useState(false);
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
   const [testimonialIndex, setTestimonialIndex] = useState(0);
+  const [serverError, setServerError] = useState('');
+  const [registerSuccess, setRegisterSuccess] = useState('');
 
   const {
     register,
@@ -110,6 +126,8 @@ const LoginForm = () => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
+    setServerError('');
+    setRegisterSuccess('');
     try {
       if (activeTab === 'login') {
         const response = await axios.post(`${API_BASE_URL}/auth/login`, {
@@ -140,9 +158,7 @@ const LoginForm = () => {
           const highestRole = getHighestRole(user.roles);
           const roleDisplay = getRoleDisplayName(highestRole);
 
-          toast.success(`Chào mừng ${user.fullName}!\nVai trò: ${roleDisplay}`, {
-            autoClose: 2000
-          });
+          toast.success(`Chào mừng ${user.fullName}! Vai trò: ${roleDisplay}`);
 
           setTimeout(() => {
             navigate(dashboardPath);
@@ -163,31 +179,35 @@ const LoginForm = () => {
         });
 
         if (response.data.success) {
-          const { fullName, membershipNumber, tierName } = response.data.data;
-
-          toast.success(
-            `${response.data.message}\n` +
-              `Chào mừng ${fullName}!\n` +
-              `Mã thành viên: ${membershipNumber}\n` +
-              `Hạng: ${tierName}`,
-            { autoClose: 5000 }
-          );
-
-          setActiveTab('login');
-          reset();
+          setRegisterSuccess('Đăng ký thành công! Đang chuyển sang đăng nhập...');
+          toast.success('Đăng ký thành công! Vui lòng đăng nhập.');
+          setTimeout(() => {
+            setActiveTab('login');
+            setRegisterSuccess('');
+            reset();
+          }, 1500);
+        } else {
+          // Backend returned success:false (shouldn't hit for 400 but handle anyway)
+          setServerError(translateRegisterError(response.data.message));
         }
       }
     } catch (error) {
-      const errorMessage =
+      const rawMessage =
         error.response?.data?.message ||
         error.response?.data?.error?.message ||
-        (activeTab === 'login'
-          ? 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.'
-          : 'Đăng ký thất bại. Vui lòng thử lại.');
-      toast.error(errorMessage);
+        '';
+      const errorMessage = activeTab === 'login'
+        ? (rawMessage || 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.')
+        : translateRegisterError(rawMessage);
+      setServerError(errorMessage);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Clear server error when user starts typing
+  const handleInputFocus = () => {
+    if (serverError) setServerError('');
   };
 
   return (
@@ -248,6 +268,7 @@ const LoginForm = () => {
               </header>
 
               <form onSubmit={handleSubmit(onSubmit)} className="login-form login-form--stack" noValidate>
+                {serverError && <InlineError message={serverError} />}
                 <div className="form-group">
                   <label htmlFor="email">Địa chỉ email</label>
                   <input
@@ -257,6 +278,7 @@ const LoginForm = () => {
                     {...register('email')}
                     className={`login-input ${errors.email ? 'is-error' : ''}`}
                     placeholder="email@vidu.com"
+                    onFocus={handleInputFocus}
                   />
                   {errors.email && <span className="error-message">{errors.email.message}</span>}
                 </div>
@@ -271,6 +293,7 @@ const LoginForm = () => {
                       {...register('password')}
                       className={`login-input ${errors.password ? 'is-error' : ''}`}
                       placeholder="••••••••"
+                      onFocus={handleInputFocus}
                     />
                     <button
                       type="button"
@@ -323,6 +346,13 @@ const LoginForm = () => {
               </header>
 
               <form onSubmit={handleSubmit(onSubmit)} className="login-form login-form--register" noValidate>
+                {serverError && <InlineError message={serverError} />}
+                {registerSuccess && (
+                  <div className="inline-success" role="status">
+                    <span className="inline-success__icon">✓</span>
+                    <span>{registerSuccess}</span>
+                  </div>
+                )}
                 <div className="form-group">
                   <label htmlFor="regEmail">Địa chỉ email</label>
                   <input
@@ -330,6 +360,8 @@ const LoginForm = () => {
                     type="email"
                     {...register('email')}
                     className={`login-input ${errors.email ? 'is-error' : ''}`}
+                    placeholder="email@vidu.com"
+                    onFocus={handleInputFocus}
                   />
                   {errors.email && <span className="error-message">{errors.email.message}</span>}
                 </div>
@@ -342,6 +374,8 @@ const LoginForm = () => {
                     inputMode="numeric"
                     {...register('phoneNumber')}
                     className={`login-input ${errors.phoneNumber ? 'is-error' : ''}`}
+                    placeholder="0912345678"
+                    onFocus={handleInputFocus}
                   />
                   {errors.phoneNumber && (
                     <span className="error-message">{errors.phoneNumber.message}</span>

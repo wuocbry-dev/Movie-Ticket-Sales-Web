@@ -28,4 +28,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     // Find active tickets only (exclude CANCELLED and REFUNDED)
     @Query("SELECT t FROM Ticket t WHERE t.seat.id = :seatId AND t.booking.showtime.id = :showtimeId AND t.status NOT IN ('CANCELLED', 'REFUNDED')")
     Optional<Ticket> findActiveBySeatIdAndShowtimeId(@Param("seatId") Integer seatId, @Param("showtimeId") Integer showtimeId);
+
+    @Query("SELECT COUNT(t) > 0 FROM Ticket t WHERE t.seat.hall.id = :hallId")
+    boolean existsBySeatHallId(@Param("hallId") Integer hallId);
 }

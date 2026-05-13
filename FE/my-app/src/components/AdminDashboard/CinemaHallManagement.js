@@ -16,6 +16,8 @@ import {
   FaTrashAlt
 } from 'react-icons/fa';
 import { toast } from '../../utils/toast';
+import ConfirmDialog from '../common/ConfirmDialog';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import Cookies from 'js-cookie';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './CinemaHallManagement.css';
@@ -62,16 +64,19 @@ const CinemaHallManagement = () => {
   const [seatMapData, setSeatMapData] = useState([]);
   const [listTick, setListTick] = useState(0);
   const initialListFetchRef = useRef(true);
+  const { confirmProps, showConfirm } = useConfirmDialog();
 
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
-  const token = Cookies.get('accessToken');
+  // Helper: always read fresh token at call time
+  const getToken = () => Cookies.get('accessToken');
 
   const authHeaders = useMemo(
     () => ({
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
       'Content-Type': 'application/json',
     }),
-    [token]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
   const bumpList = useCallback(() => setListTick((t) => t + 1), []);
@@ -81,7 +86,7 @@ const CinemaHallManagement = () => {
       setLoading(false);
       return;
     }
-    if (!token) {
+    if (!getToken()) {
       setLoading(false);
       navigate('/login');
       return;
@@ -94,7 +99,10 @@ const CinemaHallManagement = () => {
       }
       const response = await fetch(url, {
         method: 'GET',
-        headers: authHeaders,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          'Content-Type': 'application/json',
+        },
       });
       if (!response.ok) {
         let msg = 'Lỗi khi lấy danh sách phòng chiếu';
@@ -124,7 +132,7 @@ const CinemaHallManagement = () => {
       setLoading(false);
       initialListFetchRef.current = false;
     }
-  }, [cinemaId, page, searchTerm, token, API_BASE_URL, authHeaders, navigate]);
+  }, [cinemaId, page, searchTerm, API_BASE_URL, navigate]);
 
   useEffect(() => {
     if (cinemaInfo.cinemaName) {
@@ -269,10 +277,20 @@ const CinemaHallManagement = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => {
+      const next = { ...prev, [name]: value };
+      // Auto-calculate totalSeats when rowsCount or seatsPerRow changes
+      if (name === 'rowsCount' || name === 'seatsPerRow') {
+        const rows = parseInt(name === 'rowsCount' ? value : prev.rowsCount);
+        const cols = parseInt(name === 'seatsPerRow' ? value : prev.seatsPerRow);
+        if (!isNaN(rows) && rows > 0 && !isNaN(cols) && cols > 0) {
+          next.totalSeats = rows * cols;
+        } else {
+          next.totalSeats = '';
+        }
+      }
+      return next;
+    });
   };
 
   // Submit form (create or update)
@@ -369,7 +387,7 @@ const CinemaHallManagement = () => {
       const response = await fetch(url, {
         method: method,
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${getToken()}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
@@ -404,69 +422,73 @@ const CinemaHallManagement = () => {
   };
 
   // Delete hall
-  const handleDelete = async (hall) => {
-    if (window.confirm(`Bạn có chắc muốn xóa phòng chiếu "${hall.hallName}"?`)) {
-      try {
-        const url = `${API_BASE_URL}/cinema-halls/admin/${hall.hallId}?cinemaId=${cinemaId}`;
-
-        const response = await fetch(url, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+  const handleDelete = (hall) => {
+    showConfirm({
+      title: 'Xác nhận xóa phòng chiếu',
+      message: `Bạn có chắc muốn xóa phòng chiếu "${hall.hallName}"?`,
+      variant: 'danger',
+      confirmText: 'Xóa',
+      onConfirm: async () => {
+        try {
+          const url = `${API_BASE_URL}/cinema-halls/admin/${hall.hallId}?cinemaId=${cinemaId}`;
+          const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${getToken()}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Lỗi khi xóa phòng chiếu');
           }
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Lỗi khi xóa phòng chiếu');
+          const result = await response.json();
+          if (result.success) {
+            toast.success('Xóa phòng chiếu thành công');
+            bumpList();
+          } else {
+            toast.error(result.message || 'Lỗi khi xóa phòng chiếu');
+          }
+        } catch (error) {
+          toast.error('Lỗi: ' + error.message);
         }
-
-        const result = await response.json();
-
-        if (result.success) {
-          toast.success('Xóa phòng chiếu thành công');
-          bumpList();
-        } else {
-          toast.error(result.message || 'Lỗi khi xóa phòng chiếu');
-        }
-      } catch (error) {
-        toast.error('Lỗi: ' + error.message);
-      }
-    }
+      },
+    });
   };
 
   // Delete all seats in hall
-  const handleDeleteSeats = async (hall) => {
-    if (window.confirm(`Bạn có chắc muốn xóa TẤT CẢ ghế trong phòng "${hall.hallName}"?`)) {
-      try {
-        const url = `${API_BASE_URL}/cinema-halls/admin/${hall.hallId}/seats`;
-
-        const response = await fetch(url, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+  const handleDeleteSeats = (hall) => {
+    showConfirm({
+      title: 'Xác nhận xóa ghế',
+      message: `Bạn có chắc muốn xóa TẤT CẢ ghế trong phòng "${hall.hallName}"?`,
+      variant: 'danger',
+      confirmText: 'Xóa tất cả',
+      onConfirm: async () => {
+        try {
+          const url = `${API_BASE_URL}/cinema-halls/admin/${hall.hallId}/seats`;
+          const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${getToken()}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Lỗi khi xóa ghế');
           }
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Lỗi khi xóa ghế');
+          const result = await response.json();
+          if (result.success) {
+            toast.success(result.data || 'Xóa ghế thành công');
+            bumpList();
+          } else {
+            toast.error(result.message || 'Lỗi khi xóa ghế');
+          }
+        } catch (error) {
+          toast.error('Lỗi: ' + error.message);
         }
-
-        const result = await response.json();
-
-        if (result.success) {
-          toast.success(result.data || 'Xóa ghế thành công');
-          bumpList();
-        } else {
-          toast.error(result.message || 'Lỗi khi xóa ghế');
-        }
-      } catch (error) {
-        toast.error('Lỗi: ' + error.message);
-      }
-    }
+      },
+    });
   };
 
   // Generate seat map from seatLayout
@@ -556,36 +578,38 @@ const CinemaHallManagement = () => {
   };
 
   // Regenerate seats in hall
-  const handleRegenerateSeats = async (hall) => {
-    if (window.confirm(`Bạn có chắc muốn TẠO LẠI tất cả ghế cho phòng "${hall.hallName}"?\nGhế cũ sẽ bị xóa và tạo mới.`)) {
-      try {
-        const url = `${API_BASE_URL}/cinema-halls/admin/${hall.hallId}/regenerate-seats`;
-
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+  const handleRegenerateSeats = (hall) => {
+    showConfirm({
+      title: 'Tạo lại sơ đồ ghế',
+      message: `Bạn có chắc muốn TẠO LẠI tất cả ghế cho phòng "${hall.hallName}"?\nGhế cũ sẽ bị xóa và tạo mới.`,
+      variant: 'warning',
+      confirmText: 'Tạo lại',
+      onConfirm: async () => {
+        try {
+          const url = `${API_BASE_URL}/cinema-halls/admin/${hall.hallId}/regenerate-seats`;
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${getToken()}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Lỗi khi tạo lại ghế');
           }
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Lỗi khi tạo lại ghế');
+          const result = await response.json();
+          if (result.success) {
+            toast.success(result.data || 'Tạo lại ghế thành công');
+            bumpList();
+          } else {
+            toast.error(result.message || 'Lỗi khi tạo lại ghế');
+          }
+        } catch (error) {
+          toast.error('Lỗi: ' + error.message);
         }
-
-        const result = await response.json();
-
-        if (result.success) {
-          toast.success(result.data || 'Tạo lại ghế thành công');
-          bumpList();
-        } else {
-          toast.error(result.message || 'Lỗi khi tạo lại ghế');
-        }
-      } catch (error) {
-        toast.error('Lỗi: ' + error.message);
-      }
-    }
+      },
+    });
   };
 
   return (
@@ -846,9 +870,10 @@ const CinemaHallManagement = () => {
                     type="number"
                     name="totalSeats"
                     value={formData.totalSeats}
-                    onChange={handleInputChange}
-                    min="1"
-                    placeholder="VD: 100"
+                    readOnly
+                    tabIndex={-1}
+                    style={{ opacity: formData.totalSeats ? 1 : 0.45, cursor: 'default', pointerEvents: 'none', background: 'rgba(255,255,255,0.03)' }}
+                    placeholder="Tự tính khi nhập Số Hàng & Ghế/Hàng"
                     required
                   />
                 </div>
@@ -1244,6 +1269,8 @@ const CinemaHallManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog {...confirmProps} />
     </div>
   );
 };

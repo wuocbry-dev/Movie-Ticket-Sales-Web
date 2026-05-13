@@ -21,7 +21,7 @@ import {
 } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import { toast } from '../../utils/toast';
-import { TOAST_IDS } from '../../utils/toastIds';
+
 import './AdminLayout.css';
 
 const AdminLayout = () => {
@@ -196,7 +196,7 @@ const AdminLayout = () => {
     Cookies.remove('refreshToken');
     localStorage.removeItem('user');
     window.dispatchEvent(new Event('userChanged'));
-    toast.success('Đăng xuất thành công!', { toastId: TOAST_IDS.LOGOUT_SUCCESS });
+    toast.success('Đăng xuất thành công!');
     navigate('/');
   }, [navigate]);
 
